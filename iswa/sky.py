@@ -98,6 +98,7 @@ def csw2ksw(csw):
     #see csw.php#offset2cluster()
     #A S1c100 S1ce00 S26600 M15x43 S1c100 n9x15 S1ce00 n7xn43 S26600 n15xn10
     #  \_preamble of shps_/ \_base_coord        \shp   \coord \shp   \coord
+    #                              \_bottom     \_top         \_arrow
     #'pick' search for M15x43
     def replace(match):
         ksw = ''
