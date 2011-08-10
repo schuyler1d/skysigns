@@ -1,5 +1,10 @@
 #!/usr/bin/python
-#http://www.signbank.org/signpuddle1.6/glyphogram.php?text=AS14c50S14c58S20600S20600S36d00S36d00M41x34S36d00n21xn14S36d00n21x11S20600n22x23S206000x23S14c5017x1S14c58n42x2&pad=10
+"""
+http://www.signbank.org/signpuddle1.6/glyphogram.php?text=AS14c50S14c58S20600S20600S36d00S36d00M41x34S36d00n21xn14S36d00n21x11S20600n22x23S206000x23S14c5017x1S14c58n42x2&pad=10
+--download: gets sgn4.spml and svg1.zip, parses them and spits out files
+--spml=<sgn4.spml> spits out dict files
+--svg=<svg1_dir> spits out paths.txt and shapes.txt
+"""
 import re,sys,os
 
 #
@@ -90,7 +95,9 @@ def csw2ksw(csw):
     "convert from unicode format in spml file to text -- adapted from csw.php"
     #AS1c100S1ce00S26600M15x43S1c100n9x15S1ce00n7xn43S26600n15xn10
     #n='negative'  LMR = left, middle, right
+    #see csw.php#offset2cluster()
     #A S1c100 S1ce00 S26600 M15x43 S1c100 n9x15 S1ce00 n7xn43 S26600 n15xn10
+    #  \_preamble of shps_/ \_base_coord        \shp   \coord \shp   \coord
     #'pick' search for M15x43
     def replace(match):
         ksw = ''
@@ -125,6 +132,7 @@ class PhraseShapes:
     ('shapeid')
     ('x')
     ('y')
+    ('col')
 
 class Shape:
     #14c07$0,2,4$transform(1) scale(1,1)$scale(2)

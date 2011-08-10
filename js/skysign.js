@@ -197,7 +197,26 @@ if (window.openDatabase) {
             //dbs on filesystem are at:
             //~/.config/chromium/Default/databases/
             this.db.transaction(function (tx) {
+                //entryid-term entryid-shape+pos
+                tx.executeSql('CREATE TABLE IF NOT EXISTS terms ( '
+                              +'entry INTEGER'
+                              +')'
+                             );
+                tx.executeSql('CREATE TABLE IF NOT EXISTS entryshapes ( '
+                              +'entry INTEGER,'
+                              +'shape TEXT,'
+                              +'x INTEGER,'
+                              +'y INTEGER,'
+                              +'col INTEGER'
+                              +')'
+                             );
                 /*
+                tx.executeSql('CREATE TABLE IF NOT EXISTS shapes ( '
+                              +'key TEXT UNIQUE,'
+                              +'paths TEXT,'
+                              +'transforms TEXT'
+                              +')'
+                             );
                 tx.executeSql('CREATE TABLE IF NOT EXISTS paths ( '
                               +'id INTEGER UNIQUE,'
                               +'isrect BOOLEAN,'
@@ -206,12 +225,6 @@ if (window.openDatabase) {
                               +')'
                              );
                 */
-                tx.executeSql('CREATE TABLE IF NOT EXISTS shapes ( '
-                              +'key TEXT UNIQUE,'
-                              +'paths TEXT,'
-                              +'transforms TEXT'
-                              +')'
-                             );
                 localStorage['signdb_created'] = 'yes';
             });
         }
