@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sign Writing Dictionary</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style/style.css" media="all" type="text/css" />
+  </head>
+  <body>
+    <div id="top" class="region">
+      <input id="ksw" type="text" size="100" />
+    </div>
+    <div id="selection">
+      This will now create a simple table called “foo” in our database called “mydb”. Note that if the database already
+    <div>
+      <svg id="svg"
+         width="300" height="300"
+         viewBox="-100 -100 200 200"
+         >
+        <g id="term">
+        </g>
+      </svg>
+    </div>
+    </div>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script>
+      function addScriptSvg() {
+        var y = document.createElement('script');y.src = 'js/jquery.svg.js';
+        document.body.appendChild(y);
+      }
+
+      if (!window.jQuery) {
+        var z = document.createElement('script');z.src = 'js/jquery.min.js';
+        z.onload = addScriptSvg;
+        document.body.appendChild(z);
+      } else {
+        addScriptSvg();
+      }
+    </script>
+    <script src="js/skysign.js"></script>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+#top { 
+       top:0;
+       position:fixed;
+       height:40px;
+       background-color:white;
+       width:100%;
+ }
+#top input { 
+             width:90%;
+ }
+#selection { 
+             margin-top:40px;
+ }
