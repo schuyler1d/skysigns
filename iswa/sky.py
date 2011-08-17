@@ -6,8 +6,9 @@ http://www.signbank.org/signpuddle1.6/glyphogram.php?text=AS14c50S14c58S20600S20
 --svg=<svg1_dir> spits out paths.txt and shapes.txt
 """
 import re,sys,os
+from xml.dom.minidom import parse
 
-#
+#global incrementer
 x = {'n':-1}
 def inc():
     x['n'] = x['n']+1
@@ -79,7 +80,7 @@ def find_all_paths(dir):
                 ))+"\n")
     return (cnt,len(allpaths))
 
-print find_all_paths(sys.argv[1])
+#print find_all_paths(sys.argv[1])
 
 
 
@@ -90,6 +91,7 @@ def bsw2key(bsw):
         hex(int(bsw[1],16)-922)[2:], #fill
         hex(int(bsw[2],16)-928)[2:], #rot
         )
+
         
 def csw2ksw(csw):
     "convert from unicode format in spml file to text -- adapted from csw.php"
@@ -111,7 +113,40 @@ def csw2ksw(csw):
                   replace,
                   csw, 0, re.UNICODE)
 
+def ksw2cluster(ksw):
+    ksw_sym = r'S([123][a-f0-9]{2}[012345][a-f0-9])'
+    ksw_ncoord = r'(n?[0-9]+xn?[0-9]+)'
+    ksw_basepos = r'[LMR][0-9]+x[0-9]+'
+    pieces = re.findall(ksw_sym+ksw_ncoord,ksw)
+    return pieces
+    
+
+def parse_spml(spmlfile):
+    spml = parse(spmlfile)
+    rv = []
+    for e in spml.documentElement.getElementsByTagName('entry'):
+        entry = {"terms":[],
+                 "id":entry.getAttribute('id'),
+                 "modified":entry.getAttribute('mdt'),
+                 "created":entry.getAttribute('cdt'),
+                 "source":[s.wholeText for s in entry.getElementsByTagName('src')],
+                 "text":[t.wholeText for t in entry.getElementsByTagName('text')],
+                 }
+        for term in entry.getElementsByTagName('term'):
+            val = term.firstChild
+            if val.nodeType==3: #text node
+                entry['ksw'] = csw2ksw(val.wholeText)
+            elif val.nodeType==4:
+                entry['terms'].append(val.wholeText)
+        rv.append(entry)
+    return rv
         
+def spml2tables(spmlfile):
+    """parse spml file and create files for entry-shapes and term-entry
+    sgn.spml file doesn't seem to have any ^'s or $'s, so these are good chars
+    """
+    
+    spml = parse_spml(spmlfile)
     
 
 
