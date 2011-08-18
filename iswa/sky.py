@@ -130,13 +130,16 @@ def parse_spml(spmlfile):
                  "modified":entry.getAttribute('mdt'),
                  "created":entry.getAttribute('cdt'),
                  "source":[s.wholeText for s in entry.getElementsByTagName('src')],
-                 "text":[t.wholeText for t in entry.getElementsByTagName('text')],
+                 "text":[t.wholeText 
+                         for t in entry.getElementsByTagName('text')
+                         if t.nodeType==4 #cdata, not signdata
+                         ],
                  }
         for term in entry.getElementsByTagName('term'):
             val = term.firstChild
             if val.nodeType==3: #text node
                 entry['ksw'] = csw2ksw(val.wholeText)
-            elif val.nodeType==4:
+            elif val.nodeType==4: #cdata
                 entry['terms'].append(val.wholeText)
         rv.append(entry)
     return rv
