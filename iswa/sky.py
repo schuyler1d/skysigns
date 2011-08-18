@@ -195,11 +195,17 @@ class Path: #30,000 * 80[average path?] = 2.4M
 # Sign writing cheat sheet:
 #    1. mirror perspective 
 #    2. hand shapes: 
-#         palm, up/forward
-#         fist types: closed,open
+#         palm=white, back-of-hand=black, up/forward (broken finger=forward)
+#         fist types: closed (square) ,open
 #    3. movement: 
-#         arrows: single, double, crossbars
-#         modifiers: ~, dot, etc
+#         arrows: single (forward/back plane), double (up/down plane), crossbars, (white-head=left hand) (thick part of arrow (tail or just below head) is closer to body)
+#         modifiers: ~, @ (rub (in a circle, unless arrows)), dot (in arrow=toward body diagonally, over finger=joint closes, white over finger=joint opens), dot-circle (brush), etc
+#              * = contact
+#               'tie' (bottom half-circle) = simultaneous
+#              |*| = in between
+#              + = hold
+#              # = strike
+#              \/ = bend fingers (down=closed,up=open, double=drum fingers)
 #    4. face, body, shoulders
 #    5. ?asl alphabet
 
