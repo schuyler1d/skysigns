@@ -196,7 +196,7 @@ class Path: #30,000 * 80[average path?] = 2.4M
 #         fist types: closed,open
 #    3. movement: 
 #         arrows: single, double, crossbars
-#         modifiers: ~, dot, etc
+#         modifiers: ~, @, dot, dot-circle, etc
 #    4. face, body, shoulders
 #    5. ?asl alphabet
 
