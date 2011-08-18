@@ -2,11 +2,17 @@
 """
 http://www.signbank.org/signpuddle1.6/glyphogram.php?text=AS14c50S14c58S20600S20600S36d00S36d00M41x34S36d00n21xn14S36d00n21x11S20600n22x23S206000x23S14c5017x1S14c58n42x2&pad=10
 --download: gets sgn4.spml and svg1.zip, parses them and spits out files
---spml=<sgn4.spml> spits out dict files
+--spml=<sgn4.spml> spits out succinct entries.txt
 --svg=<svg1_dir> spits out paths.txt and shapes.txt
 """
 import re,sys,os
 from xml.dom.minidom import parse
+
+FILES = {
+    'paths':'paths.txt',
+    'shapes':'shapes.txt',
+    'entries':'entries.txt',
+}
 
 #global incrementer
 x = {'n':-1}
@@ -59,13 +65,13 @@ def find_paths(dir,allpaths={},shapefile=None):
 def find_all_paths(dir):
     allpaths={}
     cnt = 0
-    shapefile=open('shapes.txt','w')
+    shapefile=open(FILES['shapes'],'w')
     for dname in sorted(os.listdir(dir)):
         path = os.path.join(dir,dname)
         if os.path.isdir(path):
             d = find_paths(path,allpaths,shapefile)
             cnt += d[4]
-    pathfile=open('paths.txt','w')
+    pathfile=open(FILES['paths'],'w')
     def path_val(a,b):
         return allpaths[a][2]-allpaths[b][2]
 
@@ -126,16 +132,17 @@ def parse_spml(spmlfile):
     rv = []
     for e in spml.documentElement.getElementsByTagName('entry'):
         entry = {"terms":[],
-                 "id":entry.getAttribute('id'),
-                 "modified":entry.getAttribute('mdt'),
-                 "created":entry.getAttribute('cdt'),
-                 "source":[s.wholeText for s in entry.getElementsByTagName('src')],
-                 "text":[t.wholeText 
-                         for t in entry.getElementsByTagName('text')
+                 "id":e.getAttribute('id'),
+                 "modified":e.getAttribute('mdt'),
+                 "created":e.getAttribute('cdt'),
+                 "source":[s.firstChild.wholeText 
+                           for s in e.getElementsByTagName('src')],
+                 "text":[t.wholeText.replace("\n"," ") #guarantee one line
+                         for t in e.getElementsByTagName('text')
                          if t.nodeType==4 #cdata, not signdata
                          ],
                  }
-        for term in entry.getElementsByTagName('term'):
+        for term in e.getElementsByTagName('term'):
             val = term.firstChild
             if val.nodeType==3: #text node
                 entry['ksw'] = csw2ksw(val.wholeText)
@@ -148,10 +155,16 @@ def spml2tables(spmlfile):
     """parse spml file and create files for entry-shapes and term-entry
     sgn.spml file doesn't seem to have any ^'s or $'s, so these are good chars
     """
-    
     spml = parse_spml(spmlfile)
-    
-
+    es = open(FILES['entries'],'w')
+    for entry in spml:
+        es.write('^'.join((entry['id'],
+                           '$'.join(entry['terms']),
+                           '$'.join([''.join(c) 
+                                     for c in ksw2cluster(entry['ksw'])]),
+                           '$'.join(entry['text']),
+                           ))+"\n")
+    es.close()
 
 #maybe total is 7M?
 
