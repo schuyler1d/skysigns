@@ -137,9 +137,9 @@ def parse_spml(spmlfile):
                  "created":e.getAttribute('cdt'),
                  "source":[s.firstChild.wholeText 
                            for s in e.getElementsByTagName('src')],
-                 "text":[t.wholeText.replace("\n"," ") #guarantee one line
+                 "text":[t.firstChild.wholeText.replace("\n"," ") #guarantee one line
                          for t in e.getElementsByTagName('text')
-                         if t.nodeType==4 #cdata, not signdata
+                         if t.firstChild.nodeType==4 #cdata, not signdata
                          ],
                  }
         for term in e.getElementsByTagName('term'):
@@ -162,7 +162,7 @@ def spml2tables(spmlfile):
                            '$'.join(entry['terms']),
                            '$'.join([''.join(c) 
                                      for c in ksw2cluster(entry['ksw'])]),
-                           '$'.join(entry['text']),
+                           #'$'.join(entry['text']),
                            ))+"\n")
     es.close()
 
