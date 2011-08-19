@@ -92,12 +92,20 @@ SkySigns.prototype = {
             }
         });
     },
+    loadEntries:function(cb) {
+        var self = this;
+        jQuery.ajax({
+            url:'iswa/entries.txt', dataType:'text',
+            success:function(text){
+                self.addTable('entries',text,self.db,cb);
+            }
+        });
+    },
     addTable:function(name,text,db,cb){
         //doesn't seem to work :-(
         //db.addmany(name,text.split('$'),cb);
         //return;
         var text_arr = text.split("\n");
-        console.log(text_arr.length);
         for(var i=0,l=text_arr.length;i<l;i++) {
             if (i % 1000===0) console.log(i);
             if (text_arr[i].length) {
@@ -147,18 +155,37 @@ if (window.openDatabase) {
                 removeall:function(callback,tx){
                     tx.executeSql('DELETE FROM shapes',[],callback);
                 }
+            },
+            "entries":{
+                add:function(cols,tx,cb){
+                    //[id,terms,code,text]
+                    var terms = cols[1].split('^');
+                    for (var t=0;t<terms.length;t++) {
+                        tx.executeSql('INSERT INTO terms VALUES (?,?)',[cols[0],terms[t]],cb);
+                    }
+                    var shapes = cols[2].split('^');
+                    for (var s=0;s<shapes.length;s++) {
+                        var esh = this.ksw2cluster(shape[s]);
+                        esh.unshift(cols[0]);
+                        tx.executeSql('INSERT INTO entryshapes VALUES (?,?,?,?)',esh,cb);
+                    }
+                },
+                removeall:function(callback,tx){
+                    tx.executeSql('DELETE FROM terms',[],callback);
+                    tx.executeSql('DELETE FROM entryshapes',[],callback);
+                }
             }
         },
         tx:function(table,action,cb){
             var self = this;
             this.db.transaction(function(tx) {
-                self.tables[table][action](cb,tx,cb);
+                self.tables[table][action].call(self,cb,tx,cb);
             });
         },
         add:function(table,cols,callback) {
             var self = this;
             this.db.transaction(function(tx) {
-                self.tables[table].add(cols,tx,callback);
+                self.tables[table].add.call(self,cols,tx,callback);
             });
         },
         addmany:function(table,rows,callback) {
@@ -184,6 +211,7 @@ if (window.openDatabase) {
             this.db.transaction(function(tx) {
                 self.tables['shapes'].removeall(callback,tx);
                 self.tables['paths'].removeall(callback,tx);
+                self.tables['entries'].removeall(callback,tx);
             });
         },
         open:function() {
@@ -193,13 +221,19 @@ if (window.openDatabase) {
             }
             return this;
         },
+        ksw2cluster:function(ksw) {
+            var ksw_sym = 'S([123][a-f0-9]{2}[012345][a-f0-9])';
+            var ksw_ncoord = '(n?[0-9]+xn?[0-9]+)';
+            
+        },
         create:function() {
             //dbs on filesystem are at:
             //~/.config/chromium/Default/databases/
             this.db.transaction(function (tx) {
                 //entryid-term entryid-shape+pos
                 tx.executeSql('CREATE TABLE IF NOT EXISTS terms ( '
-                              +'entry INTEGER'
+                              +'entry INTEGER,'
+                              +'term TEXT'
                               +')'
                              );
                 tx.executeSql('CREATE TABLE IF NOT EXISTS entryshapes ( '

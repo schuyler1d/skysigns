@@ -158,9 +158,9 @@ def spml2tables(spmlfile):
     spml = parse_spml(spmlfile)
     es = open(FILES['entries'],'w')
     for entry in spml:
-        es.write('^'.join((entry['id'],
-                           '$'.join(entry['terms']),
-                           '$'.join([''.join(c) 
+        es.write('$'.join((entry['id'],
+                           '^'.join(entry['terms']),
+                           '^'.join([''.join(c) 
                                      for c in ksw2cluster(entry['ksw'])]),
                            #'$'.join(entry['text']),
                            ))+"\n")
