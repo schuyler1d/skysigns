@@ -78,12 +78,12 @@ def find_all_paths(dir):
     for p in sorted(allpaths, path_val):
         path = allpaths[p]
         pathfile.write(
-            '$'.join((
+            '$'.join([
                 str(path[2]),#number
                 path[0][0],#element first letter
                 ('%sxx' % path[3].get('fill',''))[1], #0 or f for fill
                 path[4] #goodattr
-                ))+"\n")
+                ])+"\n")
     return (cnt,len(allpaths))
 
 #print find_all_paths(sys.argv[1])
@@ -158,12 +158,12 @@ def spml2tables(spmlfile):
     spml = parse_spml(spmlfile)
     es = open(FILES['entries'],'w')
     for entry in spml:
-        es.write('$'.join((entry['id'],
+        es.write('$'.join([entry['id'],
                            '^'.join(entry['terms']),
-                           '^'.join([''.join(c) 
+                           'S'.join([''.join(c) 
                                      for c in ksw2cluster(entry['ksw'])]),
-                           #'$'.join(entry['text']),
-                           ))+"\n")
+                           '',#'$'.join(entry['text']), #unicode import issue
+                           ])+"\n")
     es.close()
 
 #maybe total is 7M?

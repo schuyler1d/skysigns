@@ -4,7 +4,64 @@ s.loadShapes(function(x,y){++window.ss.x;if (window.ss.x % 1000===0) console.log
 s.loadPaths();
 svg = jQuery('#svg').svg().svg('get')
 s.insertShape(svg,jQuery('#svg').svg(),'10000',0,0);
+
+things to do: parse/access db, load text files, interface
+dictionary, shapes/paths, interface
 */
+
+function SkyInterface(){}
+SkyInterface.prototype = {
+    init:function(signs) {
+        var self = this;
+        this.signs = signs;
+        this.svgwrap = jQuery('#svg').svg();
+        jQuery(document.forms.wordsearch).submit(function(evt) {
+            evt.preventDefault();
+            self.search(this.elements['q'].value);
+        });
+        return this;
+    },
+    search:function(q) {
+        this.signs.searchTerms(q,function(obj) {
+            
+        });
+    }
+}
+
+function SkyDictionary(){}
+SkyDictionary.prototype = {
+    open:function(){
+        this.db = new SkyDB().open();
+    },
+    searchTerms:function(q,cb) {
+        
+    },
+    searchShapes:function(shapes,cb) {
+
+    },
+    loaded:function(cb) {
+        this.db.create();
+
+    },
+    load:function(cb) {
+        var self = this;
+        jQuery.ajax({
+            url:'iswa/entries.txt', dataType:'text',
+            success:function(text){
+                self.addTable('entries',text,self.db,cb);
+            }
+        });
+    },
+    addTable:function(name,text,db,cb){
+        var text_arr = text.split("\n");
+        for(var i=0,l=text_arr.length;i<l;i++) {
+            if (i % 1000===0) console.log(i);
+            if (text_arr[i].length) {
+                db.add(name,text_arr[i].split('$'),cb)
+            }
+        }
+    }
+}
 
 function SkySigns(){}
 
@@ -52,15 +109,24 @@ SkySigns.prototype = {
             }
         }
     },
-    openDB:function(){
-        this.db = new SkyDB().open();
+    ksw2cluster:function(ksw) {
+        var ksw_sym = '([123][a-f0-9]{2}[012345][a-f0-9])',
+        ksw_ncoord = '(n?)([0-9]+)x(n?)([0-9]+)',
+        r = new RegExp(ksw_sym+ksw_ncoord);
+        m = ksw.match(r);
+        return [m[1],
+                parseInt(m[3],10) * ((m[2]=='n')?-1:1),
+                parseInt(m[5],10) * ((m[4]=='n')?-1:1)
+               ];
+        
     },
-    loadDB:function(cb){
-        var self = this;
-        //self.loadPaths(cb);
-        self.loadShapes(cb);
+    open:function(cb){ this.loadPaths(cb); },
+    load:function(cb){ this.loadShapes(cb); },
+    loaded:function(){
+        return Boolean(localStorage['10000'] && localStorage['38b07']);
     },
     loadPaths:function(cb) {
+        //needs to happen every page-load
         var self = this;
         jQuery.ajax({
             url:'iswa/paths.txt', dataType:'text',
@@ -70,6 +136,7 @@ SkySigns.prototype = {
                 for(var i=0,l=text_arr.length;i<l;i++) {
                     self.paths.push(text_arr[i].split('$').slice(1));
                 }
+                if (typeof cb==='function') cb(text_arr.length);
             }
         });
     },
@@ -78,7 +145,6 @@ SkySigns.prototype = {
         jQuery.ajax({
             url:'iswa/shapes.txt', dataType:'text',
             success:function(text){
-                //self.addTable('shapes',text,self.db,cb);
                 var text_arr = text.split("\n");
                 var next_ten, i=0, l=text_arr.length;
                 next_ten = function() {
@@ -91,27 +157,6 @@ SkySigns.prototype = {
                 next_ten();
             }
         });
-    },
-    loadEntries:function(cb) {
-        var self = this;
-        jQuery.ajax({
-            url:'iswa/entries.txt', dataType:'text',
-            success:function(text){
-                self.addTable('entries',text,self.db,cb);
-            }
-        });
-    },
-    addTable:function(name,text,db,cb){
-        //doesn't seem to work :-(
-        //db.addmany(name,text.split('$'),cb);
-        //return;
-        var text_arr = text.split("\n");
-        for(var i=0,l=text_arr.length;i<l;i++) {
-            if (i % 1000===0) console.log(i);
-            if (text_arr[i].length) {
-                db.add(name,text_arr[i].split('$'),cb)
-            }
-        }
     }
 }
 
@@ -134,53 +179,20 @@ if (window.openDatabase) {
     */
     SkyDB.prototype = {
         tables:{
-            "paths":{
-                add:function(cols,tx,cb){
-                    var color = {'0':0,'f':1,'x':-1};
-                    tx.executeSql('INSERT INTO paths VALUES (?,?,?,?)',
-                                  [parseInt(cols[0],10),cols[1]==='r',color[cols[2]],cols[3] ],
-                                 cb);
-                },
-                all:function(callback,tx){
-                    tx.executeSql('SELECT * FROM paths',[],callback);
-                },
-                removeall:function(callback,tx){
-                    tx.executeSql('DELETE FROM paths',[],callback);
-                }
-            },
-            "shapes":{
-                add:function(cols,tx,cb){
-                    tx.executeSql('INSERT INTO shapes VALUES (?,?,?)',cols,cb);
-                },
-                removeall:function(callback,tx){
-                    tx.executeSql('DELETE FROM shapes',[],callback);
-                }
-            },
             "entries":{
                 add:function(cols,tx,cb){
-                    //[id,terms,code,text]
+                    //cols=[id,terms,code,text]
                     var terms = cols[1].split('^');
                     for (var t=0;t<terms.length;t++) {
                         tx.executeSql('INSERT INTO terms VALUES (?,?)',[cols[0],terms[t]],cb);
                     }
-                    var shapes = cols[2].split('^');
-                    for (var s=0;s<shapes.length;s++) {
-                        var esh = this.ksw2cluster(shape[s]);
-                        esh.unshift(cols[0]);
-                        tx.executeSql('INSERT INTO entryshapes VALUES (?,?,?,?)',esh,cb);
-                    }
+                    tx.executeSql('INSERT INTO entries VALUES (?,?,?)',[cols[0],cols[2],cols[3]],cb);
                 },
                 removeall:function(callback,tx){
                     tx.executeSql('DELETE FROM terms',[],callback);
-                    tx.executeSql('DELETE FROM entryshapes',[],callback);
+                    tx.executeSql('DELETE FROM entries',[],callback);
                 }
             }
-        },
-        tx:function(table,action,cb){
-            var self = this;
-            this.db.transaction(function(tx) {
-                self.tables[table][action].call(self,cb,tx,cb);
-            });
         },
         add:function(table,cols,callback) {
             var self = this;
@@ -188,43 +200,29 @@ if (window.openDatabase) {
                 self.tables[table].add.call(self,cols,tx,callback);
             });
         },
-        addmany:function(table,rows,callback) {
-            var self = this;
-            this.db.transaction(function(tx) {
-                for(var i=0,l=rows.length;i<l;i++) {
-                    self.tables[table].add(rows[i].split('$'),tx,callback);
-                }
-            });
-        },
-        count:function(callback) {
-            this.db.readTransaction(function(tx) {
-                tx.executeSql('SELECT COUNT(*) FROM shapes',[],function(tx,r) {
-                    callback('shapes',r.rows.item(0)['COUNT(*)']);
-                });
-                tx.executeSql('SELECT COUNT(*) FROM paths',[],function(tx,r) {
-                    callback('paths',r.rows.item(0)['COUNT(*)']);
-                });
-            });
-        },
         clearall:function(callback) {
             var self = this;
             this.db.transaction(function(tx) {
-                self.tables['shapes'].removeall(callback,tx);
-                self.tables['paths'].removeall(callback,tx);
                 self.tables['entries'].removeall(callback,tx);
             });
         },
         open:function() {
-            this.db = openDatabase('skysign6','1.0','signbank',60*1024*1024);
-            if (localStorage['signdb_created']) {
-                this.create();
-            }
+            this.db = openDatabase('skysign7','1.0','signbank',60*1024*1024);
             return this;
         },
-        ksw2cluster:function(ksw) {
-            var ksw_sym = 'S([123][a-f0-9]{2}[012345][a-f0-9])';
-            var ksw_ncoord = '(n?[0-9]+xn?[0-9]+)';
-            
+        count:function(cb) {
+            //more complicated, because we want it to call cb, no matter what;
+            this.db.transaction(function (tx) {
+                tx.executeSql("SELECT tbl_name from sqlite_master WHERE type = 'table' and tbl_name='entries'",[],function(tx,results) {
+                    if (results.rows.length) {
+                        tx.executeSql("SELECT COUNT(*) FROM entries",[],function(tx,res) {
+                            cb(res.rows.item(0)['COUNT(*)']);
+                        });
+                    } else {
+                        cb(0);
+                    }
+                });
+            })            
         },
         create:function() {
             //dbs on filesystem are at:
@@ -236,34 +234,21 @@ if (window.openDatabase) {
                               +'term TEXT'
                               +')'
                              );
-                tx.executeSql('CREATE TABLE IF NOT EXISTS entryshapes ( '
-                              +'entry INTEGER,'
-                              +'shape TEXT,'
-                              +'x INTEGER,'
-                              +'y INTEGER,'
-                              +'col INTEGER'
+                tx.executeSql('CREATE TABLE IF NOT EXISTS entries ( '
+                              +'entry INTEGER UNIQUE,'
+                              +'shapes TEXT,'
+                              +'txt TEXT'
+                              //TODO: dictionary id, too?
                               +')'
                              );
-                /*
-                tx.executeSql('CREATE TABLE IF NOT EXISTS shapes ( '
-                              +'key TEXT UNIQUE,'
-                              +'paths TEXT,'
-                              +'transforms TEXT'
-                              +')'
-                             );
-                tx.executeSql('CREATE TABLE IF NOT EXISTS paths ( '
-                              +'id INTEGER UNIQUE,'
-                              +'isrect BOOLEAN,'
-                              +'color INTEGER,'
-                              +'path TEXT'
-                              +')'
-                             );
-                */
-                localStorage['signdb_created'] = 'yes';
             });
         }
     };
 }
 
-window.s = new SkySigns();
-s.openDB();
+window.ss = new SkySigns();
+window.sd = new SkyDictionary();
+window.si = new SkyInterface();
+
+ss.open();
+sd.open();
