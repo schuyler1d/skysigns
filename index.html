@@ -6,31 +6,32 @@
     <link rel="stylesheet" href="style/style.css" media="all" type="text/css" />
   </head>
   <body>
+    <ul id="error"></ul>
     <div id="top" class="region">
       <form name="wordsearch">
         <div>
           <label for="q">Word Search:</label>
-          <input name="q" type="text" size="50" />
+          <input name="q" type="text" size="15" />
+          <input type="submit" value="&rArr;" />
         </div>
       </form>
     </div>
-    <div id="selection">
-      This will now create a simple table called 'foo' in our database called 'mydb'. Note that if the database already
-    <div>
+    <ul id="results"></ul>
+    <div id="signdisplay">
       <svg id="svg"
-         width="300" height="300"
-         viewBox="-100 -100 200 200"
-         >
+           width="300" height="300"
+           viewBox="-100 -100 200 200"
+           >
         <g id="term">
         </g>
       </svg>
-    </div>
     </div>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
     <script>
       function addScriptSvg() {
         var y = document.createElement('script');y.src = 'js/jquery.svg.js';
         document.body.appendChild(y);
+        y.onload = function() {window.si.init(window.ss,window.sd);};//SkyInterface
       }
 
       if (!window.jQuery) {

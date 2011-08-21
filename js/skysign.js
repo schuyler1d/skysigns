@@ -11,20 +11,55 @@ dictionary, shapes/paths, interface
 
 function SkyInterface(){}
 SkyInterface.prototype = {
-    init:function(signs) {
+    init:function(signs,dict) {
         var self = this;
-        this.signs = signs;
+        this.signs = signs.open();
+        this.dict = dict.open();
         this.svgwrap = jQuery('#svg').svg();
         jQuery(document.forms.wordsearch).submit(function(evt) {
             evt.preventDefault();
             self.search(this.elements['q'].value);
         });
+        this.checkloaded();
         return this;
     },
+    showTerm:function(entry) {
+    },
     search:function(q) {
-        this.signs.searchTerms(q,function(obj) {
-            
+        this.dict.searchTerms(q,function(results) {
+            var dom = $('#results').empty().get(0);
+            var r = results.rows;
+            for (var i=0,l=r.length;i<l;i++) {
+                var t = r.item(i);
+                console.log(t);
+                $(dom).append('<li><a href="#" onclick="si.showTerm('+t.entry+');">'+t.term+'</a></li>');
+            }
         });
+    },
+    checkloaded:function() {
+        var self = this;
+        this.signs.loaded(function(yes) {
+            if (yes) { self.signs_loaded=yes; }
+            else self.notloaded('signs',yes);
+        });
+        this.dict.loaded(function(yes) {
+            if (yes) { self.dict_loaded=yes; }
+            else self.notloaded('dict',yes);
+        });
+    },
+    notloaded:function(what,val) {
+        var self = this;
+        var error = ($('#error')
+                     .append('<li>'+what+' not loaded, click to load</li>')
+                     .get(0).lastChild);
+        $(error).click(function(evt){
+            self[what].load(self.finishedloading);
+        });
+        
+    },
+    finishedloading:function(val,results,what) {
+        console.log(val);
+        console.log(what);
     }
 }
 
@@ -32,16 +67,14 @@ function SkyDictionary(){}
 SkyDictionary.prototype = {
     open:function(){
         this.db = new SkyDB().open();
+        return this;
     },
-    searchTerms:function(q,cb) {
-        
-    },
+    searchTerms:function(q,cb) { this.db.searchTerms(q,cb); },
     searchShapes:function(shapes,cb) {
 
     },
     loaded:function(cb) {
-        this.db.create();
-
+        this.db.count(cb);
     },
     load:function(cb) {
         var self = this;
@@ -64,7 +97,6 @@ SkyDictionary.prototype = {
 }
 
 function SkySigns(){}
-
 SkySigns.prototype = {
     getShape:function(key) {
         var rv = {'key':key};
@@ -120,10 +152,10 @@ SkySigns.prototype = {
                ];
         
     },
-    open:function(cb){ this.loadPaths(cb); },
+    open:function(cb){ this.loadPaths(cb); return this; },
     load:function(cb){ this.loadShapes(cb); },
-    loaded:function(){
-        return Boolean(localStorage['10000'] && localStorage['38b07']);
+    loaded:function(cb){
+        cb(Boolean(localStorage['10000'] && localStorage['38b07']));
     },
     loadPaths:function(cb) {
         //needs to happen every page-load
@@ -178,32 +210,29 @@ if (window.openDatabase) {
     })
     */
     SkyDB.prototype = {
-        tables:{
-            "entries":{
-                add:function(cols,tx,cb){
-                    //cols=[id,terms,code,text]
-                    var terms = cols[1].split('^');
-                    for (var t=0;t<terms.length;t++) {
-                        tx.executeSql('INSERT INTO terms VALUES (?,?)',[cols[0],terms[t]],cb);
-                    }
-                    tx.executeSql('INSERT INTO entries VALUES (?,?,?)',[cols[0],cols[2],cols[3]],cb);
-                },
-                removeall:function(callback,tx){
-                    tx.executeSql('DELETE FROM terms',[],callback);
-                    tx.executeSql('DELETE FROM entries',[],callback);
-                }
-            }
+        searchTerms:function(q,cb) {
+            this.db.transaction(function(tx) {
+                tx.executeSql("SELECT * FROM terms WHERE term LIKE '"+q.replace("'","''")+"%'",[],
+                              function(tx,res) { cb(res); }
+                             );
+            });
         },
         add:function(table,cols,callback) {
             var self = this;
             this.db.transaction(function(tx) {
-                self.tables[table].add.call(self,cols,tx,callback);
+                //cols=[id,terms,code,text]
+                var terms = cols[1].split('^');
+                for (var t=0;t<terms.length;t++) {
+                    tx.executeSql('INSERT INTO terms VALUES (?,?)',[cols[0],terms[t]],cb);
+                }
+                tx.executeSql('INSERT INTO entries VALUES (?,?,?)',[cols[0],cols[2],cols[3]],cb);
             });
         },
         clearall:function(callback) {
             var self = this;
             this.db.transaction(function(tx) {
-                self.tables['entries'].removeall(callback,tx);
+                tx.executeSql('DELETE FROM terms',[],callback);
+                tx.executeSql('DELETE FROM entries',[],callback);
             });
         },
         open:function() {
@@ -250,5 +279,3 @@ window.ss = new SkySigns();
 window.sd = new SkyDictionary();
 window.si = new SkyInterface();
 
-ss.open();
-sd.open();
