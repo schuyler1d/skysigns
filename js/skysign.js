@@ -23,12 +23,17 @@ SkyInterface.prototype = {
         this.svgwrap = jQuery('#svg').svg();
         jQuery(document.forms.wordsearch).submit(function(evt) {
             evt.preventDefault();
-            self.search(this.elements['q'].value);
+            self.search(this.elements['q'].value,true);
+            this.elements['q'].select();
+        });
+        jQuery('#q').bind('input',function(evt) {
+            if (this.value.length > 1)
+                self.search(this.value);
         });
         this.checkloaded();
         return this;
     },
-    search:function(q) {
+    search:function(q,autoshow) {
         var self = this;
         this.dict.searchTerms(q,function(results) {
             var dom = $('#results').empty().get(0);
@@ -37,8 +42,8 @@ SkyInterface.prototype = {
                 t = r.item(i);
                 $(dom).append('<li><a href="#signdisplay" onclick="si.showTerm('+t.entry+');">'+t.term+'</a></li>');
             }
-            if (r.length===1) {
-                self.showTerm(t.entry);
+            if (autoshow || r.length===1) {
+                self.showTerm(r.item(0).entry);
             }
         });
     },
