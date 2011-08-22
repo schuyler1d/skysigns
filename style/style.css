@@ -7,6 +7,15 @@
 #top input { 
 
  }
+#results 
+{ 
+  max-height:150px;
+  overflow-y:auto;
+ }
 #selection { 
              margin-top:40px;
+ }
+#signdisplay #svg
+{ 
+  border:1px solid black;
  }

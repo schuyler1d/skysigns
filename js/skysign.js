@@ -1,5 +1,9 @@
 /*
 http://keith-wood.name/svg.html
+
+TODO:
+  1. example: 'attractive' sign is too tall, 'alseep soundly' too tall cutoff on bottom
+
 window.ss = {x:0}
 s.loadShapes(function(x,y){++window.ss.x;if (window.ss.x % 1000===0) console.log('hi'+window.ss.x+','+y)})
 s.loadPaths();
@@ -31,7 +35,7 @@ SkyInterface.prototype = {
             var t,r = results.rows;
             for (var i=0,l=r.length;i<l;i++) {
                 t = r.item(i);
-                $(dom).append('<li><a href="#" onclick="si.showTerm('+t.entry+');">'+t.term+'</a></li>');
+                $(dom).append('<li><a href="#signdisplay" onclick="si.showTerm('+t.entry+');">'+t.term+'</a></li>');
             }
             if (r.length===1) {
                 self.showTerm(t.entry);
@@ -40,13 +44,19 @@ SkyInterface.prototype = {
     },
     showTerm:function(entry) {
         var self = this;
+        self.svgwrap.empty();//remove any previous sign
         this.dict.getEntry(entry,function(what,res) {
             switch(what) {
             case 'entry': 
-                self.svgwrap.empty();//remove any previous sign
-                self.signs.showSign(self.svgwrap,res.shapes)
+                self.signs.showSign(self.svgwrap,res.shapes);
+                $('#text').html(res.txt);
                 break;
             case 'terms':
+                var terms = [];
+                for (var i=0;i<res.rows.length;i++) {
+                    terms.push(res.rows.item(i).term);
+                }
+                $('#terms').html(terms.join(','))
                 break;
             }
         });
