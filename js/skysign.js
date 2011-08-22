@@ -1,4 +1,5 @@
 /*
+http://keith-wood.name/svg.html
 window.ss = {x:0}
 s.loadShapes(function(x,y){++window.ss.x;if (window.ss.x % 1000===0) console.log('hi'+window.ss.x+','+y)})
 s.loadPaths();
@@ -23,16 +24,26 @@ SkyInterface.prototype = {
         this.checkloaded();
         return this;
     },
-    showTerm:function(entry) {
-    },
     search:function(q) {
         this.dict.searchTerms(q,function(results) {
             var dom = $('#results').empty().get(0);
             var r = results.rows;
             for (var i=0,l=r.length;i<l;i++) {
                 var t = r.item(i);
-                console.log(t);
                 $(dom).append('<li><a href="#" onclick="si.showTerm('+t.entry+');">'+t.term+'</a></li>');
+            }
+        });
+    },
+    showTerm:function(entry) {
+        var self = this;
+        this.dict.getEntry(entry,function(what,res) {
+            switch(what) {
+            case 'entry': 
+                self.svgwrap.empty();//remove any previous sign
+                self.signs.showSign(self.svgwrap,res.shapes)
+                break;
+            case 'terms':
+                break;
             }
         });
     },
@@ -70,6 +81,7 @@ SkyDictionary.prototype = {
         return this;
     },
     searchTerms:function(q,cb) { this.db.searchTerms(q,cb); },
+    getEntry:function(entry,cb) { this.db.getEntry(entry,cb); },
     searchShapes:function(shapes,cb) {
 
     },
@@ -115,9 +127,16 @@ SkySigns.prototype = {
         return (tr.replace('s(','scale(')
                 .replace('t(','translate(').replace('r(','rotate('));
     },
+    showSign:function(svg,shapetext) {
+        var shapes = this.ksw2cluster(shapetext);
+        var svgcontext = svg.svg('get');
+        for (var i=0;i<shapes.length;i++) {
+            var s = shapes[i];
+            this.insertShape(svgcontext,svg,s.key,s.x,s.y);
+        }        
+    },
     insertShape:function(svg,parent,key,x,y) {
         var s = this.getShape(key);
-        console.log(s);
         parent = svg.other(parent,'g',{
             transform:'translate('+x+','+y+')'
         });
@@ -142,15 +161,19 @@ SkySigns.prototype = {
         }
     },
     ksw2cluster:function(ksw) {
+        var rv = [];
         var ksw_sym = '([123][a-f0-9]{2}[012345][a-f0-9])',
-        ksw_ncoord = '(n?)([0-9]+)x(n?)([0-9]+)',
-        r = new RegExp(ksw_sym+ksw_ncoord);
-        m = ksw.match(r);
-        return [m[1],
-                parseInt(m[3],10) * ((m[2]=='n')?-1:1),
-                parseInt(m[5],10) * ((m[4]=='n')?-1:1)
-               ];
-        
+            ksw_ncoord = '(n?)([0-9]+)x(n?)([0-9]+)',
+            rxp = new RegExp(ksw_sym+ksw_ncoord),
+            signs = ksw.split('S');
+        for (var i=0;i<signs.length;i++) {
+            var m = signs[i].match(rxp);
+            rv.push({'key':m[1],
+                     'x':parseInt(m[3],10) * ((m[2]=='n')?-1:1),
+                     'y':parseInt(m[5],10) * ((m[4]=='n')?-1:1)
+                    });
+        }
+        return rv;
     },
     open:function(cb){ this.loadPaths(cb); return this; },
     load:function(cb){ this.loadShapes(cb); },
@@ -216,6 +239,14 @@ if (window.openDatabase) {
                               function(tx,res) { cb(res); }
                              );
             });
+        },
+        getEntry:function(entry,cb) {
+            this.db.transaction(function(tx) {
+                tx.executeSql("SELECT * FROM entries WHERE entry=?",[entry],
+                              function(tx,res) { cb('entry',res.rows.item(0)); });
+                tx.executeSql("SELECT * FROM terms WHERE entry=?",[entry],
+                              function(tx,res) { cb('terms',res); });
+            });            
         },
         add:function(table,cols,callback) {
             var self = this;
