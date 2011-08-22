@@ -25,12 +25,16 @@ SkyInterface.prototype = {
         return this;
     },
     search:function(q) {
+        var self = this;
         this.dict.searchTerms(q,function(results) {
             var dom = $('#results').empty().get(0);
-            var r = results.rows;
+            var t,r = results.rows;
             for (var i=0,l=r.length;i<l;i++) {
-                var t = r.item(i);
+                t = r.item(i);
                 $(dom).append('<li><a href="#" onclick="si.showTerm('+t.entry+');">'+t.term+'</a></li>');
+            }
+            if (r.length===1) {
+                self.showTerm(t.entry);
             }
         });
     },
