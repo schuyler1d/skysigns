@@ -1,9 +1,6 @@
 /*
 http://keith-wood.name/svg.html
 
-TODO:
-  1. example: 'attractive' sign is too tall, 'alseep soundly' too tall cutoff on bottom
-
 window.ss = {x:0}
 s.loadShapes(function(x,y){++window.ss.x;if (window.ss.x % 1000===0) console.log('hi'+window.ss.x+','+y)})
 s.loadPaths();
