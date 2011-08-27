@@ -37,7 +37,7 @@ SkyInterface.prototype = {
             var t,r = results.rows;
             for (var i=0,l=r.length;i<l;i++) {
                 t = r.item(i);
-                $(dom).append('<li><a href="#signdisplay" onclick="si.showTerm('+t.entry+');">'+t.term+'</a></li>');
+                $(dom).append('<li><a href="#" onclick="si.showTerm('+t.entry+');">'+t.term+'</a></li>');
             }
             if (autoshow || r.length===1) {
                 self.showTerm(r.item(0).entry);
@@ -77,7 +77,7 @@ SkyInterface.prototype = {
     notloaded:function(what,val) {
         var self = this;
         var error = ($('#error')
-                     .append('<li>'+what+' not loaded, click to load</li>')
+                     .append('<li class="load">Click to load '+what+'</li>')
                      .get(0).lastChild);
         $(error).click(function(evt){
             self[what].load(self.finishedloading);
@@ -87,40 +87,6 @@ SkyInterface.prototype = {
     finishedloading:function(val,results,what) {
         console.log(val);
         console.log(what);
-    }
-}
-
-function SkyDictionary(){}
-SkyDictionary.prototype = {
-    open:function(){
-        this.db = new SkyDB().open();
-        return this;
-    },
-    searchTerms:function(q,cb) { this.db.searchTerms(q,cb); },
-    getEntry:function(entry,cb) { this.db.getEntry(entry,cb); },
-    searchShapes:function(shapes,cb) {
-
-    },
-    loaded:function(cb) {
-        this.db.count(cb);
-    },
-    load:function(cb) {
-        var self = this;
-        jQuery.ajax({
-            url:'iswa/entries.txt', dataType:'text',
-            success:function(text){
-                self.addTable('entries',text,self.db,cb);
-            }
-        });
-    },
-    addTable:function(name,text,db,cb){
-        var text_arr = text.split("\n");
-        for(var i=0,l=text_arr.length;i<l;i++) {
-            if (i % 1000===0) console.log(i);
-            if (text_arr[i].length) {
-                db.add(name,text_arr[i].split('$'),cb)
-            }
-        }
     }
 }
 
@@ -231,6 +197,44 @@ SkySigns.prototype = {
     }
 }
 
+function SkyDictionary(){}
+SkyDictionary.prototype = {
+    open:function(){
+        this.db = new SkyDB().open();
+        return this;
+    },
+    searchTerms:function(q,cb) { this.db.searchTerms(q,cb); },
+    getEntry:function(entry,cb) { this.db.getEntry(entry,cb); },
+    searchShapes:function(shapes,cb) {
+
+    },
+    loaded:function(cb) {
+        this.db.count(cb);
+    },
+    load:function(cb) {
+        var self = this;
+        this.db.create();
+        jQuery.ajax({
+            url:'iswa/entries.txt', dataType:'text',
+            success:function(text){
+                self.addTable('entries',text,self.db,cb);
+            }
+        });
+    },
+    addTable:function(name,text,db,cb){
+        var text_arr = text.split("\n");
+        for(var i=0,l=text_arr.length;i<l;i++) {
+            if (i % 1000===0) {
+                console.log(i);
+                console.log(text_arr[i]);
+            }
+            if (text_arr[i].length) {
+                db.add(name,text_arr[i].split('$'),cb,i)
+            }
+        }
+    }
+}
+
 function SkyDB(){}
 if (window.openDatabase) {
     ///paths should be in memory (in array)
@@ -264,15 +268,15 @@ if (window.openDatabase) {
                               function(tx,res) { cb('terms',res); });
             });            
         },
-        add:function(table,cols,callback) {
+        add:function(table,cols,callback,i) {
             var self = this;
             this.db.transaction(function(tx) {
                 //cols=[id,terms,code,text]
                 var terms = cols[1].split('^');
                 for (var t=0;t<terms.length;t++) {
-                    tx.executeSql('INSERT INTO terms VALUES (?,?)',[cols[0],terms[t]],cb);
+                    tx.executeSql('INSERT INTO terms VALUES (?,?)',[cols[0],terms[t]],callback);
                 }
-                tx.executeSql('INSERT INTO entries VALUES (?,?,?)',[cols[0],cols[2],cols[3]],cb);
+                tx.executeSql('INSERT INTO entries VALUES (?,?,?)',[cols[0],cols[2],cols[3]],callback);
             });
         },
         clearall:function(callback) {
@@ -295,7 +299,7 @@ if (window.openDatabase) {
                             cb(res.rows.item(0)['COUNT(*)']);
                         });
                     } else {
-                        cb(0);
+                        cb(false);
                     }
                 });
             })            
