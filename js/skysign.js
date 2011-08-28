@@ -87,6 +87,7 @@ SkyInterface.prototype = {
         
     },
     finishedloading:function(val,results,what) {
+        return;
         jQuery('#error').append('<li>finished something</li>');
         console.log(val);
         console.log(what);
@@ -303,8 +304,13 @@ if (window.openDatabase) {
             });
         },
         open:function() {
-            this.db = openDatabase('skysign7','1.0','signbank',60*1024*1024);
-            return this;
+            //iOS webview actually enforces the quota
+            try {
+            this.db = openDatabase('skysign46','1.0','signbank',2.75*1024*1024);
+            } catch(e) {
+                jQuery('#error').append('<li>'+e.message+'</li>');
+            }
+                return this;
         },
         count:function(cb) {
             //more complicated, because we want it to call cb, no matter what;
