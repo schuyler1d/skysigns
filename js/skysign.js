@@ -27,6 +27,7 @@ SkyInterface.prototype = {
             if (this.value.length > 1)
                 self.search(this.value);
         });
+        jQuery('#ajaxtest .button').click(this.ajax);
         this.checkloaded();
         return this;
     },
@@ -81,12 +82,26 @@ SkyInterface.prototype = {
                      .get(0).lastChild);
         $(error).click(function(evt){
             self[what].load(self.finishedloading);
+            jQuery(this).addClass('clicked');
         });
         
     },
     finishedloading:function(val,results,what) {
+        jQuery('#error').append('<li>finished something</li>');
         console.log(val);
         console.log(what);
+    },
+    ajax:function() {
+        jQuery('#ajaxtest').append('<span>start</span>');
+        jQuery.ajax({
+            url:'http://skyb.us/', dataType:'text',
+            success:function(text){
+                jQuery('#ajaxtest').append('<span>skybus</span>');
+            },
+            error:function(text) {
+                jQuery('#ajaxtest').append('<span>error</span>');
+            }
+        });
     }
 }
 
@@ -225,6 +240,7 @@ SkyDictionary.prototype = {
         var text_arr = text.split("\n");
         for(var i=0,l=text_arr.length;i<l;i++) {
             if (i % 1000===0) {
+                jQuery('#error').append('<li>'+i+'</li>')
                 console.log(i);
                 console.log(text_arr[i]);
             }

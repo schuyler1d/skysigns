@@ -369,14 +369,14 @@ for search categories: (+ is for composition)
                   [a-y1-8] minus j = 32+other
                   fist = a/s, point =1/g/L, f/9, 2/v, car=3, b=flat, ten=thumb, 
                    stupid=?g
-                   common confusions: a/s,b/open,g/L/bent,k/2,v/bent,1/x,6/w
+                   common confusions: a/s,b/open,g/L/bent,k/2,v/bent,1/x,6/w,f/open,m/3-closed
                  --other
                     [sick/feel, 
                      open hand (thumb side/out),
                      'america'/'[applause]' hand (spread fingers)
                        'fester' = curled (probably with movement)'
                      'hard' = bent V
-                     'run' = curled L
+                     'moon/run' = curled L
                      'new' = curved hand
                      'airplane' - L+pinky (also 'iloveyou')
                         'camp'? different or 
@@ -393,7 +393,17 @@ for search categories: (+ is for composition)
           bend (back and forth?)
           piano fingers
           *pick from other sign
-          
-  
+   +sequence symbol (arrows for what to do first/second)
+     see 'restaurant'
+     see 'tv'
+     see 'city'
+     see 'remember'
+   
+
+tests: 
+  1. remote ajax
+  2. coordinate click event in SVG
+  3. print db counts
+  4. 
 
 """
