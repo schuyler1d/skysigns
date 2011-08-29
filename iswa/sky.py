@@ -2,7 +2,7 @@
 """
 http://www.signbank.org/signpuddle1.6/glyphogram.php?text=AS14c50S14c58S20600S20600S36d00S36d00M41x34S36d00n21xn14S36d00n21x11S20600n22x23S206000x23S14c5017x1S14c58n42x2&pad=10
 --download: gets sgn4.spml and svg1.zip, parses them and spits out files
---spml=<sgn4.spml> spits out succinct entries.txt
+--spml=<sgn4.spml> spits out succinct entries.txt and entry_deps.txt
 --svg=<svg1_dir> spits out paths.txt and shapes.txt
 """
 import re,sys,os
@@ -12,6 +12,7 @@ FILES = {
     'paths':'paths.txt',
     'shapes':'shapes.txt',
     'entries':'entries.txt',
+    'entry_dependencies':'entry_deps.txt',
 }
 
 #global incrementer
@@ -58,19 +59,25 @@ def find_paths(dir,allpaths={},shapefile=None):
                     ';'.join( shapes[fkey]["transforms"] )
                     ))+"\n")
         f.close()
-    return (allpaths,shapes,attributes,elements,cnt,len(allpaths))
+    return {"paths":allpaths,
+            "shapes":shapes,
+            "attrs":attributes,
+            "elts":elements,
+            "cnt":cnt,
+            "pathlen":len(allpaths),
+            }
 
-#print find_paths(sys.argv[1],shapefile=open('hi.txt','w'))
-    
 def find_all_paths(dir):
     allpaths={}
+    allshapes={}
     cnt = 0
     shapefile=open(FILES['shapes'],'w')
     for dname in sorted(os.listdir(dir)):
         path = os.path.join(dir,dname)
         if os.path.isdir(path):
             d = find_paths(path,allpaths,shapefile)
-            cnt += d[4]
+            allshapes.update(d['shapes'])
+            cnt += d['cnt']
     pathfile=open(FILES['paths'],'w')
     def path_val(a,b):
         return allpaths[a][2]-allpaths[b][2]
@@ -84,11 +91,7 @@ def find_all_paths(dir):
                 ('%sxx' % path[3].get('fill',''))[1], #0 or f for fill
                 path[4] #goodattr
                 ])+"\n")
-    return (cnt,len(allpaths))
-
-#print find_all_paths(sys.argv[1])
-
-
+    return {"count":cnt,"paths":allpaths,"shapes":allshapes}
 
 def bsw2key(bsw):
     #http://www.signpuddle.net/mediawiki/index.php/Binary_SignWriting
@@ -120,6 +123,8 @@ def csw2ksw(csw):
                   csw, 0, re.UNICODE)
 
 def ksw2cluster(ksw):
+    if not ksw:
+        return []
     ksw_sym = r'S([123][a-f0-9]{2}[012345][a-f0-9])'
     ksw_ncoord = r'(n?[0-9]+xn?[0-9]+)'
     ksw_basepos = r'[LMR][0-9]+x[0-9]+'
@@ -151,20 +156,60 @@ def parse_spml(spmlfile):
         rv.append(entry)
     return rv
         
-def spml2tables(spmlfile):
+def spml2tables(spmlfile,shape_data=None):
     """parse spml file and create files for entry-shapes and term-entry
     sgn.spml file doesn't seem to have any ^'s or $'s, so these are good chars
     """
     spml = parse_spml(spmlfile)
+    edeps = open(FILES['entry_dependencies'],'w')
+    deps = {}
     es = open(FILES['entries'],'w')
     for entry in spml:
-        es.write('$'.join([entry['id'],
-                           '^'.join(entry['terms']),
-                           'S'.join([''.join(c) 
-                                     for c in ksw2cluster(entry['ksw'])]),
-                           '',#'$'.join(entry['text']), #unicode import issue
-                           ])+"\n")
+        cluster = ksw2cluster(entry.get('ksw',None))
+        try:
+            es.write('$'.join([entry['id'],
+                               '^'.join(entry['terms']),
+                               'S'.join([''.join(c) 
+                                         for c in cluster]),
+                               '',#'$'.join(entry['text']), #unicode import issue
+                               ])+"\n")
+        except UnicodeEncodeError:
+            print "Entry %s was laden with too much blessed Unicode" % entry['id']
+        for c in cluster:
+            if shape_data: #output path #'s instead of shapes
+                deps.update([(int(p),1) for p in shape_data['shapes'][c[0]]['paths'] ])
+            else:
+                deps[ c[0] ] = 1
+    for dep in sorted(deps.keys()):
+        edeps.write(str(dep)+"\n")
     es.close()
+    edeps.close()
+
+def main():
+    whattodo= dict([(a.split('=')[0],a.split('=').pop()) for a in  sys.argv])
+    didsomething = False
+    shape_data = None
+    if '--download' in whattodo:
+        print "Downloading not supported yet, sorry"
+    if '--svg' in whattodo:
+        shape_data = find_all_paths(whattodo['--svg'])
+        didsomething = True
+    if '--spml' in whattodo:
+        spml2tables(whattodo['--spml'],shape_data)
+        didsomething = True
+    if not didsomething:
+        print """
+--download: gets sgn4.spml and svg1.zip, parses them and spits out files
+--spml=<sgn4.spml> spits out succinct entries.txt and entry_deps.txt
+--svg=<svg1_dir> spits out paths.txt and shapes.txt
+"""
+        
+
+if __name__ == '__main__':
+    exit = main()
+    if exit:
+        sys.exit(exit)
+
 
 #maybe total is 7M?
 
