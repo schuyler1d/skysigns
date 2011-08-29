@@ -5,3 +5,10 @@
 2. styling/phone-touch UI
 3. composer
 
+PhoneGap/Mobile Issues
+----------------------
+* Android doesn't support SVG -- need to use canvas
+  http://appsynergy.net/2010/08/14/converting-svg-path-to-html5-canvas/
+* iOS observes the DB quota and seems to hover around 2.75M as the maximum
+   -- though I wonder if I'm splitting up my space, and it depends on how much storage is already used up, etc. -- either way, the division between localStorage and webSQL makes sense here, even if it's slower
+* need to import phonegap.js on the various platforms for PhoneGap.File API

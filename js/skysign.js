@@ -11,12 +11,17 @@ things to do: parse/access db, load text files, interface
 dictionary, shapes/paths, interface
 */
 
+//for android which does not have local xhr access
+var base_path = 'http://skyb.us/static/signlanguage/';
+base_path = '';
+
 function SkyInterface(){}
 SkyInterface.prototype = {
     init:function(signs,dict) {
         var self = this;
-        this.signs = signs.open();
+        jQuery('#error').append('<li>pre</li>');
         this.dict = dict.open();
+        this.signs = signs.open(/*this.dict.db*/);
         this.svgwrap = jQuery('#svg').svg();
         jQuery(document.forms.wordsearch).submit(function(evt) {
             evt.preventDefault();
@@ -40,7 +45,7 @@ SkyInterface.prototype = {
                 t = r.item(i);
                 $(dom).append('<li><a href="#" onclick="si.showTerm('+t.entry+');">'+t.term+'</a></li>');
             }
-            if (autoshow || r.length===1) {
+            if (r.length===1 || autoshow && r.length) {
                 self.showTerm(r.item(0).entry);
             }
         });
@@ -78,7 +83,7 @@ SkyInterface.prototype = {
     notloaded:function(what,val) {
         var self = this;
         var error = ($('#error')
-                     .append('<li class="load">Click to load '+what+'</li>')
+                     .append('<li class="load">Load '+what+'</li>')
                      .get(0).lastChild);
         $(error).click(function(evt){
             self[what].load(self.finishedloading);
@@ -108,15 +113,27 @@ SkyInterface.prototype = {
 
 function SkySigns(){}
 SkySigns.prototype = {
-    getShape:function(key) {
+    getShape:function(key, cb) {
+        var self = this;
         var rv = {'key':key};
         var shape = localStorage[key];
         if (shape) {
             var sparts = shape.split('$');
             rv.paths = sparts[0].split(',').map(this.getPath,this);
             rv.transforms = sparts[1].split(';')
+            return cb(rv);
+        } else if (this.db) {
+            this.db.getShape(key,function(table,s) {
+        	//var shape = localStorage.getItem(key);
+        	shape = s.data;
+        	if (shape) {
+            	    var sparts = shape.split('$');
+            	    rv.paths = sparts[0].split(',').map(self.getPath,self);
+            	    rv.transforms = sparts[1].split(';')
+        	}
+        	cb(rv);
+            });
         }
-        return rv;
     },
     getPath:function(i) {
         return this.paths[i];
@@ -134,29 +151,31 @@ SkySigns.prototype = {
         }        
     },
     insertShape:function(svg,parent,key,x,y) {
-        var s = this.getShape(key);
-        parent = svg.other(parent,'g',{
-            transform:'translate('+x+','+y+')'
-        });
-        for (var t=0;t<s.transforms.length;t++) {
+    	var self = this;
+        this.getShape(key, function(s) {
             parent = svg.other(parent,'g',{
-                transform:this.transform(s.transforms[t])
+                transform:'translate('+x+','+y+')'
             });
-        }
-        for (var i=0;i<s.paths.length;i++) {
-            var p = s.paths[i];
-            var color = p[1].replace('f','#ffffff').replace('0','#000000');
-            switch(p[0]) {
-            case 'r':
-                var xywh = p[2].split(',');
-                svg.rect(parent,xywh[0],xywh[1],xywh[2],xywh[3],
-                                {fill:color});
-                break;
-            case 'p':
-                svg.path(parent,p[2],{fill:color});
-                break;
+            for (var t=0;t<s.transforms.length;t++) {
+                parent = svg.other(parent,'g',{
+                    transform:this.transform(s.transforms[t])
+                });
             }
-        }
+            for (var i=0;i<s.paths.length;i++) {
+                var p = s.paths[i];
+                var color = p[1].replace('f','#ffffff').replace('0','#000000');
+                switch(p[0]) {
+                case 'r':
+                    var xywh = p[2].split(',');
+                    svg.rect(parent,xywh[0],xywh[1],xywh[2],xywh[3],
+                             {fill:color});
+                    break;
+                case 'p':
+                    svg.path(parent,p[2],{fill:color});
+                    break;
+                }
+            }
+        });
     },
     ksw2cluster:function(ksw) {
         var rv = [];
@@ -173,16 +192,20 @@ SkySigns.prototype = {
         }
         return rv;
     },
-    open:function(cb){ this.loadPaths(cb); return this; },
+    open:function(db){ this.loadPaths(); this.db = db; return this; },
     load:function(cb){ this.loadShapes(cb); },
     loaded:function(cb){
-        cb(Boolean(localStorage['10000'] && localStorage['38b07']));
+        if (this.db) {
+	    this.db.haveShapes(cb);
+        } else {
+            cb(Boolean(localStorage['10000'] && localStorage['38b07']));
+        }
     },
     loadPaths:function(cb) {
         //needs to happen every page-load
         var self = this;
         jQuery.ajax({
-            url:'iswa/paths.txt', dataType:'text',
+            url:base_path+'iswa/paths.txt', dataType:'text',
             success:function(text){
                 self.paths = [];
                 var text_arr = text.split("\n");
@@ -190,24 +213,43 @@ SkySigns.prototype = {
                     self.paths.push(text_arr[i].split('$').slice(1));
                 }
                 if (typeof cb==='function') cb(text_arr.length);
+            },
+            error:function(xhr,status,error) {
+		jQuery('#error').append('<li>nopaths:'+error+'</li>');
             }
         });
     },
     loadShapes:function(cb) {
         var self = this;
         jQuery.ajax({
-            url:'iswa/shapes.txt', dataType:'text',
+            url:base_path+'iswa/shapes.txt', dataType:'text',
             success:function(text){
                 var text_arr = text.split("\n");
                 var next_ten, i=0, l=text_arr.length;
+                cb(l, [], 'presh');
                 next_ten = function() {
                     for (var m=Math.min(i+10,l);i<m;i++) {
                         var line = text_arr[i].match(/^(\w+)\$(.+)$/)
-                        localStorage[line[1]] = line[2];
+                        if (line) {
+                            if (!self.db) {
+                                localStorage[line[1]] = line[2];
+                            } else {
+                                self.db.addShape(line.slice(1),undefined,i);
+                            }
+                        }
                     }
-                    setTimeout(next_ten,2000);
+                    if (i < l) {
+                        next_ten();
+                        //TODO: nec. for localStorage
+                        //setTimeout(next_ten,500); 
+                    } else {
+                    	cb(l, [], 'shapes');
+                    }
                 }
                 next_ten();
+            },
+            error:function(xhr,status,error) {
+		jQuery('#error').append('<li>noshapes:'+error+'</li>');
             }
         });
     }
@@ -231,22 +273,27 @@ SkyDictionary.prototype = {
         var self = this;
         this.db.create();
         jQuery.ajax({
-            url:'iswa/entries.txt', dataType:'text',
+            url:base_path+'iswa/entries.txt', dataType:'text',
             success:function(text){
                 self.addTable('entries',text,self.db,cb);
+            },
+            error:function(xhr,status,error) {
+		jQuery('#error').append('<li>noentries:'+error+'</li>');
             }
         });
     },
     addTable:function(name,text,db,cb){
-        var text_arr = text.split("\n");
-        for(var i=0,l=text_arr.length;i<l;i++) {
+        var text_arr = text.split("\n"), 
+            l=text_arr.length;
+        cb(l,[],'signs');
+        for(var i=0;i<l;i++) {
             if (i % 1000===0) {
                 jQuery('#error').append('<li>'+i+'</li>')
                 console.log(i);
                 console.log(text_arr[i]);
             }
             if (text_arr[i].length) {
-                db.add(name,text_arr[i].split('$'),cb,i)
+                db.add(name,text_arr[i].split('$'),function(){},i)
             }
         }
     }
@@ -285,17 +332,64 @@ if (window.openDatabase) {
                               function(tx,res) { cb('terms',res); });
             });            
         },
+        _add:function(tx,cols,callback) {
+            //cols=[id,terms,code,text]
+            var terms = cols[1].split('^');
+            for (var t=0;t<terms.length;t++) {
+                tx.executeSql('INSERT INTO terms VALUES (?,?)',[cols[0],terms[t]],callback);
+            }
+            tx.executeSql('INSERT INTO entries VALUES (?,?,?)',[cols[0],cols[2],cols[3]],callback);
+        },
         add:function(table,cols,callback,i) {
             var self = this;
             this.db.transaction(function(tx) {
-                //cols=[id,terms,code,text]
-                var terms = cols[1].split('^');
-                for (var t=0;t<terms.length;t++) {
-                    tx.executeSql('INSERT INTO terms VALUES (?,?)',[cols[0],terms[t]],callback);
-                }
-                tx.executeSql('INSERT INTO entries VALUES (?,?,?)',[cols[0],cols[2],cols[3]],callback);
+            	self._add(tx,cols,callback);
             });
         },
+        addShape:function(cols,callback,i) {
+	    var self = this;
+	    this.db.transaction(function(tx) {
+		tx.executeSql('INSERT INTO shapes VALUES (?,?)',cols,function() {
+		    if (!self.xxx || i%1000===0) {
+						self.xxx = true
+			console.log(cols);
+		    }
+		});
+            });
+        },
+	getShape:function(key,callback) {
+	    var self = this;
+	    console.log(key);
+	    this.db.transaction(function(tx) {
+		tx.executeSql('SELECT * FROM shapes WHERE key=?',[key],function(tx,res) {
+		    if (res.rows.length) {
+			callback('shape',res.rows.item(0));
+		    } else {
+			console.log('error');
+			console.log(res);
+		    }
+		},function() {console.log(arguments);});
+            });
+	},
+	haveShapes:function(callback) {
+	    var self = this;
+	    this.db.transaction(function(tx) {
+		tx.executeSql('SELECT COUNT(*) FROM shapes WHERE key=? OR key=?',
+			      ['10000','38b07'],function(tx,res) {
+				  if (res.rows.item(0)['COUNT(*)'] == 2) {
+				      callback(2);
+				  } else callback(false);
+			      });
+	    });
+	},
+	addmany:function(table,rows,callback,i) {
+	    var self = this;
+	    this.db.transaction(function(tx) {
+		for (var i=0;i<rows.length;i++) {
+		    self._add(tx,rows[i],callback);
+		}
+	    });
+	},
         clearall:function(callback) {
             var self = this;
             this.db.transaction(function(tx) {
@@ -306,11 +400,11 @@ if (window.openDatabase) {
         open:function() {
             //iOS webview actually enforces the quota
             try {
-            this.db = openDatabase('skysign46','1.0','signbank',2.75*1024*1024);
+                this.db = openDatabase('skysign9','1.0','signbank',2.75*1024*1024);
             } catch(e) {
                 jQuery('#error').append('<li>'+e.message+'</li>');
             }
-                return this;
+            return this;
         },
         count:function(cb) {
             //more complicated, because we want it to call cb, no matter what;
@@ -341,6 +435,11 @@ if (window.openDatabase) {
                               +'shapes TEXT,'
                               +'txt TEXT'
                               //TODO: dictionary id, too?
+                              +')'
+                             );
+                tx.executeSql('CREATE TABLE IF NOT EXISTS shapes ( '
+                              +'key TEXT,'
+                              +'data TEXT'
                               +')'
                              );
             });
