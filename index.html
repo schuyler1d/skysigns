@@ -29,21 +29,22 @@
         </g>
       </svg>
     </div>
+    <script>
+      var ready = 0;
+      function skyinit() {
+         if (++ready >= 1) {
+           window.si.init(window.ss,window.sd);
+         }
+      }
+    </script>
     <script src="js/jquery.min.js"></script>
     <script>
       function addScriptSvg() {
         var y = document.createElement('script');y.src = 'js/jquery.svg.js';
         document.body.appendChild(y);
-        y.onload = function() {window.si.init(window.ss,window.sd);};//SkyInterface
+        y.onload = skyinit
       }
-
-      if (!window.jQuery) {
-        var z = document.createElement('script');z.src = 'js/jquery.min.js';
-        z.onload = addScriptSvg;
-        document.body.appendChild(z);
-      } else {
-        addScriptSvg();
-      }
+      addScriptSvg();
     </script>
     <script src="js/skysign.js"></script>
   </body>
