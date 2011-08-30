@@ -70,10 +70,9 @@ Svg2Canvas.prototype = {
         return this;
     },
     clear:function() {
-        this.ctx.restore();
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.save();
+        this.canvas.width = this.canvas.width;
         this.ctx.translate(150,150);
+        this.ctx.save();
     },
     str2nums:function(str) {
         return str.split(/[\s,]+/).map(function(n){return parseFloat(n);});
@@ -90,8 +89,8 @@ Svg2Canvas.prototype = {
         path.replace(/([a-zA-Z])\s*([^a-zA-Z]*)/g,function(match,b,numbers,pos,wholestr) {
             //console.log(numbers);
             var num_ary = self.str2nums(numbers.replace(/\s+$/,''));
-            console.log(b);
-            console.log(num_ary);
+            //console.log(b);
+            //console.log(num_ary);
             switch(b.toUpperCase()) {
             case 'M': 
                 ctx.moveTo.apply(ctx,num_ary.slice(0,2)); 
@@ -109,7 +108,7 @@ Svg2Canvas.prototype = {
             ctx.fill();
     },
     rect:function(ctx,x,y,w,h,fill) {
-        console.log('rect');
+        //console.log('rect');
         console.log(arguments);
         ctx.fillStyle = fill;
         ctx.fillRect(x,y,w,h);
@@ -118,6 +117,7 @@ Svg2Canvas.prototype = {
         var self = this;
         str.replace(/(\w)\(([^\)]+)\)/,function(match,tfm,nums) {
             var num_ary = self.str2nums(nums);
+            console.log('transform');
             console.log(num_ary);
             switch(tfm) {
             case 't': ctx.translate.apply(ctx,num_ary); break;
