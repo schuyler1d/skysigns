@@ -84,25 +84,33 @@ Svg2Canvas.prototype = {
         var self = this;
         ctx.fillStyle = fill;
         //ctx.strokeStyle = 0;
-        //ctx.strokeStyle = fill; //todo: FILL first (in another function)
+        ctx.strokeStyle = fill; //todo: FILL first (in another function)
         ctx.lineWidth = 0;
         ctx.beginPath();
-        path.replace(/([a-zA-Z])\s*([^a-zA-Z]*[^a-zA-Z\s])/g,function(match,b,numbers,pos,wholestr) {
-            console.log(numbers);
-            var num_ary = self.str2nums(numbers);
+        path.replace(/([a-zA-Z])\s*([^a-zA-Z]*)/g,function(match,b,numbers,pos,wholestr) {
+            //console.log(numbers);
+            var num_ary = self.str2nums(numbers.replace(/\s+$/,''));
+            console.log(b);
             console.log(num_ary);
             switch(b.toUpperCase()) {
-            case 'M': ctx.moveTo.apply(ctx,num_ary); break;
+            case 'M': 
+                ctx.moveTo.apply(ctx,num_ary.slice(0,2)); 
+                if (num_ary.length > 2) {
+                    ctx.lineTo.apply(ctx,num_ary.slice(2));
+                }
+                break;
             case 'C': ctx.bezierCurveTo.apply(ctx,num_ary); break;
             case 'L': ctx.lineTo.apply(ctx,num_ary); break;
+            case 'Z': ctx.closePath();
             }
         });
-        ctx.lineTo(0,0)
         ctx.stroke();
         if (fill) //TODO: am i sure?
             ctx.fill();
     },
     rect:function(ctx,x,y,w,h,fill) {
+        console.log('rect');
+        console.log(arguments);
         ctx.fillStyle = fill;
         ctx.fillRect(x,y,w,h);
     },
@@ -110,6 +118,7 @@ Svg2Canvas.prototype = {
         var self = this;
         str.replace(/(\w)\(([^\)]+)\)/,function(match,tfm,nums) {
             var num_ary = self.str2nums(nums);
+            console.log(num_ary);
             switch(tfm) {
             case 't': ctx.translate.apply(ctx,num_ary); break;
             case 's': ctx.scale.apply(ctx,num_ary); break;
@@ -128,15 +137,16 @@ Svg2Canvas.prototype = {
           for (var t=0;t<shape.transforms.length;t++) {
               this.transform(ctx,shape.transforms[t]);
           }
-          for (var i=0;i<shape.paths.length;i++) {
+          for (var i=0,l=shape.paths.length;i<l;i++) {
               var p = shape.paths[i];
-              var color = p[1].replace('f','#ffffff').replace('0',fgcolor||'#000000');
+              var color = p[1].replace('f','#1111ff').replace('0',fgcolor||'#ff0000');
               switch(p[0]) {
                 case 'r':
                     var xywh = p[2].split(',');
                     this.rect(ctx,xywh[0],xywh[1],xywh[2],xywh[3],color);
                     break;
                 case 'p':
+                  color = color.replace('1111ff','11ff11');
                     this.path(ctx,p[2],color);
                     break;
                 }
