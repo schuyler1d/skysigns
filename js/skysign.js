@@ -158,7 +158,7 @@ SkySigns.prototype = {
             });
             for (var t=0;t<s.transforms.length;t++) {
                 parent = svg.other(parent,'g',{
-                    transform:this.transform(s.transforms[t])
+                    transform:self.transform(s.transforms[t])
                 });
             }
             for (var i=0;i<s.paths.length;i++) {
