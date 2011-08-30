@@ -76,24 +76,31 @@ Svg2Canvas.prototype = {
         this.ctx.translate(150,150);
     },
     str2nums:function(str) {
-        return str.split(/\s+/).map(function(n){return parseFloat(n);});
+        return str.split(/[\s,]+/).map(function(n){return parseFloat(n);});
     },
     path:function(ctx,path,fill) {
+        console.log(path);
         //stolen from http://appsynergy.net/2010/08/14/converting-svg-path-to-html5-canvas/
         var self = this;
-        ctx.fillStyle = fill //todo: FILL first (in another function)
+        ctx.fillStyle = fill;
+        //ctx.strokeStyle = 0;
+        //ctx.strokeStyle = fill; //todo: FILL first (in another function)
+        ctx.lineWidth = 0;
         ctx.beginPath();
         path.replace(/([a-zA-Z])\s*([^a-zA-Z]*[^a-zA-Z\s])/g,function(match,b,numbers,pos,wholestr) {
+            console.log(numbers);
             var num_ary = self.str2nums(numbers);
+            console.log(num_ary);
             switch(b.toUpperCase()) {
             case 'M': ctx.moveTo.apply(ctx,num_ary); break;
             case 'C': ctx.bezierCurveTo.apply(ctx,num_ary); break;
             case 'L': ctx.lineTo.apply(ctx,num_ary); break;
             }
         });
-        
+        ctx.lineTo(0,0)
         ctx.stroke();
-        ctx.fill(); //am i sure?
+        if (fill) //TODO: am i sure?
+            ctx.fill();
     },
     rect:function(ctx,x,y,w,h,fill) {
         ctx.fillStyle = fill;
