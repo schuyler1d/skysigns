@@ -21,6 +21,7 @@
     <div id="signdisplay">
       <div id="terms"></div>
       <div id="text"></div>
+      <canvas id="canvas" width="300" height="300"></canvas>
       <svg id="svg"
            width="300" height="300"
            viewBox="-100 -100 200 200"
@@ -29,23 +30,11 @@
         </g>
       </svg>
     </div>
-    <script>
-      var ready = 0;
-      function skyinit() {
-         if (++ready >= 1) {
-           window.si.init(window.ss,window.sd);
-         }
-      }
-    </script>
     <script src="js/jquery.min.js"></script>
-    <script>
-      function addScriptSvg() {
-        var y = document.createElement('script');y.src = 'js/jquery.svg.js';
-        document.body.appendChild(y);
-        y.onload = skyinit
-      }
-      addScriptSvg();
-    </script>
+    <script src="js/svg2canvas.js"></script>
     <script src="js/skysign.js"></script>
+    <script>
+      window.si.init(window.ss,window.sd);
+    </script>
   </body>
 </html>

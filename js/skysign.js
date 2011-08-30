@@ -22,7 +22,7 @@ SkyInterface.prototype = {
         jQuery('#error').append('<li>pre</li>');
         this.dict = dict.open();
         this.signs = signs.open(/*this.dict.db*/);
-        this.svgwrap = jQuery('#svg').svg();
+        this.viewer = new ViewerBoth().init();
         jQuery(document.forms.wordsearch).submit(function(evt) {
             evt.preventDefault();
             self.search(this.elements['q'].value,true);
@@ -52,11 +52,11 @@ SkyInterface.prototype = {
     },
     showTerm:function(entry) {
         var self = this;
-        self.svgwrap.empty();//remove any previous sign
+        self.viewer.clear();//remove any previous sign
         this.dict.getEntry(entry,function(what,res) {
             switch(what) {
             case 'entry': 
-                self.signs.showSign(self.svgwrap,res.shapes);
+                self.signs.showSign(self.viewer,res.shapes);
                 $('#text').html(res.txt);
                 break;
             case 'terms':
@@ -138,43 +138,17 @@ SkySigns.prototype = {
     getPath:function(i) {
         return this.paths[i];
     },
-    transform:function(tr) {
-        return (tr.replace('s(','scale(')
-                .replace('t(','translate(').replace('r(','rotate('));
-    },
-    showSign:function(svg,shapetext) {
+    showSign:function(viewer,shapetext) {
         var shapes = this.ksw2cluster(shapetext);
-        var svgcontext = svg.svg('get');
         for (var i=0;i<shapes.length;i++) {
             var s = shapes[i];
-            this.insertShape(svgcontext,svg,s.key,s.x,s.y);
+            this.insertShape(viewer,s.key,s.x,s.y);
         }        
     },
-    insertShape:function(svg,parent,key,x,y) {
+    insertShape:function(viewer,key,x,y) {
     	var self = this;
         this.getShape(key, function(s) {
-            parent = svg.other(parent,'g',{
-                transform:'translate('+x+','+y+')'
-            });
-            for (var t=0;t<s.transforms.length;t++) {
-                parent = svg.other(parent,'g',{
-                    transform:self.transform(s.transforms[t])
-                });
-            }
-            for (var i=0;i<s.paths.length;i++) {
-                var p = s.paths[i];
-                var color = p[1].replace('f','#ffffff').replace('0','#000000');
-                switch(p[0]) {
-                case 'r':
-                    var xywh = p[2].split(',');
-                    svg.rect(parent,xywh[0],xywh[1],xywh[2],xywh[3],
-                             {fill:color});
-                    break;
-                case 'p':
-                    svg.path(parent,p[2],{fill:color});
-                    break;
-                }
-            }
+            viewer.insertShape(s,x,y);
         });
     },
     ksw2cluster:function(ksw) {
