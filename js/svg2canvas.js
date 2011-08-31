@@ -78,6 +78,7 @@ Svg2Canvas.prototype = {
         return str.split(/[\s,]+/).map(function(n){return parseFloat(n);});
     },
     path:function(ctx,path,fill) {
+        console.log(fill);
         console.log(path);
         //stolen from http://appsynergy.net/2010/08/14/converting-svg-path-to-html5-canvas/
         var self = this;
@@ -118,9 +119,9 @@ Svg2Canvas.prototype = {
     },
     _series:function(ctx,cmd,ary,arglen,rel) {
         var l = ary.length/arglen;
-        console.log(this.current.x+":"+this.current.y);
         console.log(ary);
-        for (var i=0;i<l;i++) {
+        for (var i=0;i<l;i++) { 
+            console.log(this.current.x+":"+this.current.y);
             var coords = ary.slice(i*arglen,i*arglen+arglen);
             if (rel) {
                 for (var a=0;a<coords.length;a+=2) {
@@ -129,6 +130,7 @@ Svg2Canvas.prototype = {
                     coords[a+1] += this.current.y;
                 }
             }
+            console.log(coords);
             ctx[cmd].apply(ctx,coords);
             this.current.x = coords[coords.length-2];
             this.current.y = coords[coords.length-1];
