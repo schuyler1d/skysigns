@@ -78,22 +78,15 @@ Svg2Canvas.prototype = {
         return str.split(/[\s,]+/).map(function(n){return parseFloat(n);});
     },
     path:function(ctx,path,fill) {
-        console.log(fill);
-        console.log(path);
-        //stolen from http://appsynergy.net/2010/08/14/converting-svg-path-to-html5-canvas/
         var self = this;
+        this.current = {x:0,y:0};
         ctx.fillStyle = fill;
-        //ctx.strokeStyle = 0;
         ctx.strokeStyle = fill; //todo: FILL first (in another function)
         ctx.lineWidth = 0;
         ctx.beginPath();
         path = path.replace(/-?[\d.]+e-\d+/g,'0');
         path.replace(/([a-zA-Z])\s*([^a-zA-Z]*)/g,function(match,b,numbers,pos,wholestr) {
-            console.log(numbers);
             var num_ary = self.str2nums(numbers.replace(/\s+$/,''));
-            console.log(b);
-            console.log('len:'+num_ary.length);
-            console.log(num_ary);
             var rel = (b == b.toLowerCase());
             switch(b.toUpperCase()) {
             case 'M': 
@@ -111,34 +104,31 @@ Svg2Canvas.prototype = {
             }
         });
         ctx.stroke();
-        //TODO: am i sure?
         if (fill) ctx.fill();
+        
     },
     arc2canvas:function(ctx,cmd,ary,arglen,rel) {
         console.log('ARC NOT IMPLEMENTED YET');
+        //see sign for ?150
+        //all cases are circle-arcs and 0 1 1 or 0 0 1  
+        //no rotation (meaningless)
     },
     _series:function(ctx,cmd,ary,arglen,rel) {
         var l = ary.length/arglen;
-        console.log(ary);
         for (var i=0;i<l;i++) { 
-            console.log(this.current.x+":"+this.current.y);
             var coords = ary.slice(i*arglen,i*arglen+arglen);
             if (rel) {
                 for (var a=0;a<coords.length;a+=2) {
-                    console.log(a);
                     coords[a] += this.current.x;
                     coords[a+1] += this.current.y;
                 }
             }
-            console.log(coords);
             ctx[cmd].apply(ctx,coords);
             this.current.x = coords[coords.length-2];
             this.current.y = coords[coords.length-1];
         }
     },
     rect:function(ctx,x,y,w,h,fill) {
-        //console.log('rect');
-        console.log(arguments);
         ctx.fillStyle = fill;
         ctx.fillRect(x,y,w,h);
     },
@@ -146,8 +136,6 @@ Svg2Canvas.prototype = {
         var self = this;
         str.replace(/(\w)\(([^\)]+)\)/g,function(match,tfm,nums) {
             var num_ary = self.str2nums(nums);
-            console.log('transform');
-            console.log(match);
             switch(tfm) {
             case 't': ctx.translate.apply(ctx,num_ary); break;
             case 's': ctx.scale.apply(ctx,num_ary); break;
@@ -161,26 +149,21 @@ Svg2Canvas.prototype = {
         return this._insertShape(this.ctx,shape,x,y,fgcolor);
     },
     _insertShape:function(ctx,shape,x,y,fgcolor) {
-        console.log(shape);
-        console.log([x,y]);
-        this.current = {x:0,y:0};
         ctx.save();
           ctx.translate(x,y);
           for (var t=0;t<shape.transforms.length;t++) {
               this.transform(ctx,shape.transforms[t]);
           }
-        console.log('TRANSFORM FINISH');
           for (var i=0,l=shape.paths.length;i<l;i++) {
               var p = shape.paths[i];
-              var color = p[1].replace('f','#1111ff').replace('0',fgcolor||'#ff0000');
-              console.log('SHAPE');
+              var color = p[1].replace('f','#ffffff').replace('0',fgcolor||'#000000');
               switch(p[0]) {
                 case 'r':
                     var xywh = p[2].split(',');
                     this.rect(ctx,xywh[0],xywh[1],xywh[2],xywh[3],color);
                     break;
                 case 'p':
-                  color = color.replace('1111ff','11ff11');
+                  //color = color.replace('1111ff','11ff11');
                     this.path(ctx,p[2],color);
                     break;
                 }
