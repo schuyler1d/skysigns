@@ -101,15 +101,20 @@ Svg2Canvas.prototype = {
                     self._series(ctx,'lineTo',num_ary.slice(2),2,rel);
                 }
                 break;
-            case 'C': ctx.fillStyle='#00ff00';
-                self._series(ctx,'bezierCurveTo',num_ary,6,rel);break;
             case 'L': self._series(ctx,'lineTo',num_ary,2,rel);break;
+            case 'C': self._series(ctx,'bezierCurveTo',num_ary,6,rel);break;
             case 'Z': ctx.closePath();break;
+            case 'A': //steal from:
+                //http://code.google.com/p/canvg/source/browse/trunk/canvg.js#1308
+                self.arc2canvas(ctx,'arcTo',num_ary,2,rel);break;
             }
         });
         ctx.stroke();
         //TODO: am i sure?
         if (fill) ctx.fill();
+    },
+    arc2canvas:function(ctx,cmd,ary,arglen,rel) {
+        console.log('ARC NOT IMPLEMENTED YET');
     },
     _series:function(ctx,cmd,ary,arglen,rel) {
         var l = ary.length/arglen;
