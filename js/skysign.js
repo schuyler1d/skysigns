@@ -34,6 +34,12 @@ SkyInterface.prototype = {
         });
         jQuery('#ajaxtest .button').click(this.ajax);
         this.checkloaded();
+        if (document.location.search) {
+            console.log(document.location.search.substr(1));
+            setTimeout(function() {
+                self.search(document.location.search.substr(1),true);
+            },1000)
+        }
         return this;
     },
     search:function(q,autoshow) {
