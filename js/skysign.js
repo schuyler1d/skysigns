@@ -299,7 +299,7 @@ if (window.openDatabase) {
     SkyDB.prototype = {
         searchTerms:function(q,cb) {
             this.db.transaction(function(tx) {
-                tx.executeSql("SELECT * FROM terms WHERE term LIKE '"+q.replace("'","''")+"%'",[],
+                tx.executeSql("SELECT * FROM terms WHERE term LIKE '"+q.replace("'","''")+"%' ORDER BY term",[],
                               function(tx,res) { cb(res); }
                              );
             });
