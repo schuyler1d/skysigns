@@ -72,6 +72,7 @@ Svg2Canvas.prototype = {
     clear:function() {
         this.canvas.width = this.canvas.width;
         this.ctx.translate(150,150);
+        this.current = {x:0,y:0};
         this.ctx.save();
     },
     str2nums:function(str) {
@@ -92,28 +93,37 @@ Svg2Canvas.prototype = {
             console.log(b);
             console.log(num_ary.length);
             console.log(num_ary);
+            var rel = (b == b.toLowerCase());
             switch(b.toUpperCase()) {
             case 'M': 
-                ctx.moveTo.apply(ctx,num_ary.slice(0,2)); 
+                self._series(ctx,'moveTo',num_ary.slice(0,2),2,rel);
                 if (num_ary.length > 2) {
-                    self._series(ctx,'lineTo',num_ary.slice(2),2);
+                    self._series(ctx,'lineTo',num_ary.slice(2),2,rel);
                 }
                 break;
             case 'C': ctx.fillStyle='#00ff00';
-                self._series(ctx,'bezierCurveTo',num_ary,6);break;
-            case 'L': self._series(ctx,'lineTo',num_ary,2);break;
+                self._series(ctx,'bezierCurveTo',num_ary,6,rel);break;
+            case 'L': self._series(ctx,'lineTo',num_ary,2,rel);break;
             case 'Z': ctx.closePath();
             }
         });
         ctx.stroke();
-        if (fill) //TODO: am i sure?
-            ctx.fill();
+        //TODO: am i sure?
+        //if (fill) ctx.fill();
     },
-    _series:function(ctx,cmd,ary,arglen) {
+    _series:function(ctx,cmd,ary,arglen,rel) {
         var l = ary.length/arglen;
+        if (rel) {
+            for (var a=0;a<ary.length;a+=2) {
+                ary[a] += this.current.x;
+                ary[a+1] += this.current.y;
+            }
+        }
         for (var i=0;i<l;i++) {
             ctx[cmd].apply(ctx,ary.slice(i*arglen,i*arglen+arglen));
         }
+        this.current.x = ary[ary.length-2];
+        this.current.y = ary[ary.length-1];
     },
     rect:function(ctx,x,y,w,h,fill) {
         //console.log('rect');
