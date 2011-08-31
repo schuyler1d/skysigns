@@ -153,6 +153,7 @@ SkySigns.prototype = {
     },
     insertShape:function(viewer,key,x,y) {
     	var self = this;
+        //console.log(key+' x:'+x+',y:'+y);
         this.getShape(key, function(s) {
             viewer.insertShape(s,x,y);
         });

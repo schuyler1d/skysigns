@@ -434,8 +434,6 @@ for search categories: (+ is for composition)
                         'camp'? different or 
                      'money'/'number'/'dinosaur'
                      'hope'= bent hands
-                     [cutting through solid hand:
-                        'start/escape', [vulcan]
                     ], 
                up-down/forward-back
                (palm: side-back-front/side-up-down)

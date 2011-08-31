@@ -60,6 +60,7 @@ CanvgViewer.prototype = {
     clear:function() {
         this.canvas.width = this.canvas.width;
         this.ctx.translate(150,150);
+        this.ctx.scale(1.5,1.5);
         this.ctx.save();
     },
     _transform:SvgNormal.prototype._transform,
@@ -92,6 +93,7 @@ CanvgViewer.prototype = {
         this.ctx.drawSvg(svgstr,150,150,300,300);
     }
 }
+
 ViewerBoth = function(){}
 ViewerBoth.prototype = {
     init:function() {
