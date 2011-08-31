@@ -86,6 +86,7 @@ Svg2Canvas.prototype = {
         ctx.strokeStyle = fill; //todo: FILL first (in another function)
         ctx.lineWidth = 0;
         ctx.beginPath();
+        path = path.replace(/-?[\d.]+e-\d+/g,'0');
         path.replace(/([a-zA-Z])\s*([^a-zA-Z]*)/g,function(match,b,numbers,pos,wholestr) {
             console.log(numbers);
             var num_ary = self.str2nums(numbers.replace(/\s+$/,''));
@@ -103,7 +104,7 @@ Svg2Canvas.prototype = {
             case 'C': ctx.fillStyle='#00ff00';
                 self._series(ctx,'bezierCurveTo',num_ary,6,rel);break;
             case 'L': self._series(ctx,'lineTo',num_ary,2,rel);break;
-            case 'Z': ctx.closePath();
+            case 'Z': ctx.closePath();break;
             }
         });
         ctx.stroke();
