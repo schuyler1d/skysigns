@@ -72,7 +72,6 @@ Svg2Canvas.prototype = {
     clear:function() {
         this.canvas.width = this.canvas.width;
         this.ctx.translate(150,150);
-        this.current = {x:0,y:0};
         this.ctx.save();
     },
     str2nums:function(str) {
@@ -91,7 +90,7 @@ Svg2Canvas.prototype = {
             console.log(numbers);
             var num_ary = self.str2nums(numbers.replace(/\s+$/,''));
             console.log(b);
-            console.log(num_ary.length);
+            console.log('len:'+num_ary.length);
             console.log(num_ary);
             var rel = (b == b.toLowerCase());
             switch(b.toUpperCase()) {
@@ -109,21 +108,25 @@ Svg2Canvas.prototype = {
         });
         ctx.stroke();
         //TODO: am i sure?
-        //if (fill) ctx.fill();
+        if (fill) ctx.fill();
     },
     _series:function(ctx,cmd,ary,arglen,rel) {
         var l = ary.length/arglen;
-        if (rel) {
-            for (var a=0;a<ary.length;a+=2) {
-                ary[a] += this.current.x;
-                ary[a+1] += this.current.y;
-            }
-        }
+        console.log(this.current.x+":"+this.current.y);
+        console.log(ary);
         for (var i=0;i<l;i++) {
-            ctx[cmd].apply(ctx,ary.slice(i*arglen,i*arglen+arglen));
+            var coords = ary.slice(i*arglen,i*arglen+arglen);
+            if (rel) {
+                for (var a=0;a<coords.length;a+=2) {
+                    console.log(a);
+                    coords[a] += this.current.x;
+                    coords[a+1] += this.current.y;
+                }
+            }
+            ctx[cmd].apply(ctx,coords);
+            this.current.x = coords[coords.length-2];
+            this.current.y = coords[coords.length-1];
         }
-        this.current.x = ary[ary.length-2];
-        this.current.y = ary[ary.length-1];
     },
     rect:function(ctx,x,y,w,h,fill) {
         //console.log('rect');
@@ -135,12 +138,12 @@ Svg2Canvas.prototype = {
         var self = this;
         str.replace(/(\w)\(([^\)]+)\)/g,function(match,tfm,nums) {
             var num_ary = self.str2nums(nums);
-            //console.log('transform');
-            //console.log(match);
+            console.log('transform');
+            console.log(match);
             switch(tfm) {
             case 't': ctx.translate.apply(ctx,num_ary); break;
             case 's': ctx.scale.apply(ctx,num_ary); break;
-            case 'r': ctx.rotate(num_ary[0]); break;
+            case 'r': ctx.rotate(num_ary[0]* (Math.PI / 180.0)); break;
             }
         });
         
@@ -152,6 +155,7 @@ Svg2Canvas.prototype = {
     _insertShape:function(ctx,shape,x,y,fgcolor) {
         console.log(shape);
         console.log([x,y]);
+        this.current = {x:0,y:0};
         ctx.save();
           ctx.translate(x,y);
           for (var t=0;t<shape.transforms.length;t++) {
