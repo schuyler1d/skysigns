@@ -63,6 +63,8 @@ ViewerBoth.prototype = {
 
 Svg2Canvas = function(){}
 Svg2Canvas.prototype = {
+    /* signs still at issue: 150, ?barrier,
+    */
     init:function() {
         this.canvas = document.getElementById('canvas');
         this.ctx = this.canvas.getContext('2d');

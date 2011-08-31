@@ -21,6 +21,14 @@ def inc():
     x['n'] = x['n']+1
     return x['n']
 
+def clean_path(d):
+    d = d.replace("\n"," ") #no lines
+    #exponentially small nums (e.g. 3.2e-15) == 0
+    d = re.sub(r'-?[\d.]+e-\d+',r'0',d)    
+    #too many decimals
+    d = re.sub(r'(.\d{3})\d+',r'\1',d)
+    return d
+
 def find_paths(dir,allpaths={},shapefile=None):
     cnt = 0
     attributes = {}
@@ -44,8 +52,7 @@ def find_paths(dir,allpaths={},shapefile=None):
                                          attrs['width'],attrs['height'],
                                         ))
                 elif p[1]=='path':
-                    goodattr = re.sub(r'(.\d{3})\d+',r'\1',
-                                      attrs.get('d','SKY').replace("\n"," "))
+                    goodattr = clean_path(attrs.get('d','ERROR'))
                 allpaths[p[0]] = [p[1],p[2],inc(),attrs,goodattr]
             shapes[fkey]["paths"].append(str(allpaths[p[0]][2]))
         shapes[fkey]["transforms"] = [
