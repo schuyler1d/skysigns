@@ -173,7 +173,11 @@ SkySigns.prototype = {
         }
         return rv;
     },
-    open:function(db){ this.loadPaths(); this.db = db; return this; },
+    open:function(db){ 
+        //this.loadPaths(); 
+        this.db = db; 
+        return this; 
+    },
     load:function(cb){ this.loadShapes(cb); },
     loaded:function(cb){
         if (this.db) {
@@ -181,6 +185,9 @@ SkySigns.prototype = {
         } else {
             cb(Boolean(localStorage['10000'] && localStorage['38b07']));
         }
+    },
+    connectPaths:function() {
+        if (window.SignPaths) this.paths = window.SignPaths;
     },
     loadPaths:function(cb) {
         //needs to happen every page-load

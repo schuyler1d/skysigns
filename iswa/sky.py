@@ -10,6 +10,7 @@ from xml.dom.minidom import parse
 
 FILES = {
     'paths':'paths.txt',
+    'pathsjs':'paths.js',
     'shapes':'shapes.txt',
     'entries':'entries.txt',
     'entry_dependencies':'entry_deps.txt',
@@ -86,18 +87,22 @@ def find_all_paths(dir):
             allshapes.update(d['shapes'])
             cnt += d['cnt']
     pathfile=open(FILES['paths'],'w')
+    pathjs=open(FILES['pathsjs'],'w')
+    pathjs.write("window.SignPaths = [\n")
     def path_val(a,b):
         return allpaths[a][2]-allpaths[b][2]
 
     for p in sorted(allpaths, path_val):
         path = allpaths[p]
-        pathfile.write(
-            '$'.join([
-                str(path[2]),#number
-                path[0][0],#element first letter
-                ('%sxx' % path[3].get('fill',''))[1], #0 or f for fill
-                path[4] #goodattr
-                ])+"\n")
+        pathdata = [
+            str(path[2]),#number
+            path[0][0],#element first letter
+            ('%sxx' % path[3].get('fill',''))[1], #0 or f for fill
+            path[4] #goodattr
+            ]
+        pathfile.write('$'.join(pathdata)+"\n")
+        pathjs.write("['%s'],\n" % "','".join(pathdata[1:]))
+    pathjs.write("'LAST'];\n")
     return {"count":cnt,"paths":allpaths,"shapes":allshapes}
 
 def bsw2key(bsw):
