@@ -9,7 +9,7 @@
  }
 #results 
 { 
-  max-height:100px;
+  max-height:50px;
   overflow-y:auto;
  }
 #selection { 
@@ -21,5 +21,21 @@
  }
 
 #error {
-    float:right;
+   /* float:right;*/
+}
+
+#progress {
+   width:100px;
+   height:1em;
+   border:1px solid black;
+   background-color:#ddddff;
+   position:relative;
+}
+#bar {
+   width:0px;
+   height:1em;
+   position:absolute;
+   top:0px;
+   left:0px;
+   background-color:#9999ff;
 }

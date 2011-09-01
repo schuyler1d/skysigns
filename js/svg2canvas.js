@@ -46,7 +46,7 @@ SvgNormal.prototype = {
 
 CanvgViewer = function(){}
 CanvgViewer.prototype = {
-    init:function() {
+    init:function(cb) {
         this.canvas = document.getElementById('canvas');
 
         var self = this;
@@ -54,12 +54,13 @@ CanvgViewer.prototype = {
         document.body.appendChild(y);
         y.onload = function() {
             self.ctx=self.canvas.getContext('2d');
+	    if (cb) cb();
         }
         return this;
     },
     clear:function() {
-        this.canvas.width = this.canvas.width;
-        this.ctx.translate(150,150);
+        this.w = this.canvas.width = this.canvas.width;
+        this.ctx.translate(this.w/2,this.w/2);
         this.ctx.scale(1.5,1.5);
         this.ctx.save();
     },
@@ -90,7 +91,7 @@ CanvgViewer.prototype = {
             svgstr += '</g>';
         }
         svgstr += '</g>'; //original translated
-        this.ctx.drawSvg(svgstr,150,150,300,300);
+        this.ctx.drawSvg(svgstr,this.w/2,this.w/2,this.w,this.w);
     }
 }
 
