@@ -13,7 +13,7 @@ dictionary, shapes/paths, interface
 
 //for android which does not have local xhr access
 var base_path = 'http://skyb.us/static/signlanguage/';
-base_path = '';
+//base_path = '';
 
 function SkyInterface(){}
 SkyInterface.prototype = {
@@ -24,10 +24,13 @@ SkyInterface.prototype = {
         this.signs = signs.open(this.dict.db);
 	this.signs.onpaths = function() {
 	    jQuery('#error').append('<li>paths</li>');
-	    //self.signs.insertShape(self.viewer,'10000',-75,-75);
+	    self.signs.insertShape(self.viewer,'10000',0,0);
 	}
         this.viewer = new CanvgViewer().init(function() {
-	    jQuery('#error').append('<li>viewer</li>');		
+	    jQuery('#error')
+	    .append('<li>viewer</li>')
+	    .children(':last')
+	    .click(self.signs.onpaths);
 	    });
         jQuery(document.forms.wordsearch).submit(function(evt) {
             evt.preventDefault();
@@ -108,11 +111,15 @@ SkyInterface.prototype = {
 	if (typeof val==='number') {
 	    console.log('max number:'+val);
 	    this._prog_max = val;
-	    jQuery('#bar').css('width',3);
+	    jQuery('#bar').css('width',3).empty();
 	    jQuery('#progress').show();
-	} else {
+	} else if (results != 0 && results%1000===0) {
 	    jQuery('#bar').css('width',parseInt(100*results/this._prog_max,10));
-	}
+	    console.log('bar:'+results);
+	} else if (results === this._prog_max-2) {
+	    //-2: who knows why, but from l=7412, we seem to get to 7410
+	    jQuery('#bar').css('width','100px').append('complete');
+	} 
     },
     ajax:function() {
         jQuery('#ajaxtest').append('<span>start</span>');
@@ -185,11 +192,11 @@ SkySigns.prototype = {
         return rv;
     },
     open:function(db){ 
-        //this.loadPaths(); 
+        this.loadPaths(); 
         this.db = db; 
         return this; 
     },
-    load:function(cb){ this.loadShapes(cb); },
+    load:function(cb){ this.db.create(); this.loadShapes(cb); },
     loaded:function(cb){
         if (this.db) {
 	    this.db.haveShapes(cb);
@@ -213,6 +220,7 @@ SkySigns.prototype = {
                     self.paths.push(text_arr[i].split('$').slice(1));
                 }
                 if (typeof cb==='function') cb(text_arr.length);
+		jQuery('#error').append('<li>gotpaths.txt</li>');
             },
             error:function(xhr,status,error) {
 		jQuery('#error').append('<li>nopaths:'+error+'</li>');
@@ -226,7 +234,7 @@ SkySigns.prototype = {
             success:function(text){
                 var text_arr = text.split("\n");
                 var next_ten, i=0, l=text_arr.length;
-                cb(l, [], 'shapes');
+                cb(l-1, [], 'shapes');
                 next_ten = function() {
                     for (var m=Math.min(i+10,l);i<m;i++) {
                         var line = text_arr[i].match(/^(\w+)\$(.+)$/)
@@ -240,8 +248,6 @@ SkySigns.prototype = {
                     }
                     if (i < l) {
                         next_ten();
-                        //TODO: nec. for localStorage
-                        //setTimeout(next_ten,500); 
                     }
                 }
                 next_ten();
@@ -283,7 +289,7 @@ SkyDictionary.prototype = {
     addTable:function(name,text,db,cb){
         var text_arr = text.split("\n"), 
             l=text_arr.length;
-        cb(l,[],'signs');
+        cb(l-1,[],'signs');
         for(var i=0;i<l;i++) {
             if (text_arr[i].length) {
                 db.add(name,text_arr[i].split('$'),cb,i)
@@ -332,7 +338,7 @@ if (window.openDatabase) {
                 tx.executeSql('INSERT INTO terms VALUES (?,?)',[cols[0],terms[t]],callback);
             }
             tx.executeSql('INSERT INTO entries VALUES (?,?,?)',[cols[0],cols[2],cols[3]],
-			  function() { if (callback && i%1000===0) callback(null,i); });
+			  function() { callback(null,i); });
         },
         add:function(table,cols,callback,i) {
             var self = this;
@@ -343,12 +349,8 @@ if (window.openDatabase) {
         addShape:function(cols,callback,i) {
 	    var self = this;
 	    this.db.transaction(function(tx) {
-		tx.executeSql('INSERT INTO shapes VALUES (?,?)',cols,function() {
-		    if (callback && i%1000===0) {
-			console.log(cols);
-			callback(null,i,cols);
-		    }
-		});
+		tx.executeSql('INSERT INTO shapes VALUES (?,?)',cols,
+			      function() { callback(null,i,cols); });
             });
         },
 	getShape:function(key,callback) {
@@ -373,7 +375,7 @@ if (window.openDatabase) {
 				  if (res.rows.item(0)['COUNT(*)'] == 2) {
 				      callback(2);
 				  } else callback(false);
-			      });
+			      },function(tx,e){callback(false,e);});
 	    });
 	},
 	addmany:function(table,rows,callback,i) {
@@ -392,11 +394,11 @@ if (window.openDatabase) {
             });
         },
         open:function() {
-            //iOS webview actually enforces the quota
+            //iOS webview actually enforces the quota: seems to max out at 2.75M
             try {
-                this.db = openDatabase('skysign9','1.0','signbank',2.75*1024*1024);
+                this.db = openDatabase('skysign11','1.0','signbank',60*1024*1024);
             } catch(e) {
-                jQuery('#error').append('<li>'+e.message+'</li>');
+                jQuery('#error').append('<li>db:'+e.message+'</li>');
             }
             return this;
         },
