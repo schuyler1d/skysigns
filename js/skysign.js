@@ -28,10 +28,16 @@ SkyInterface.prototype = {
 	}
         this.viewer = new CanvgViewer().init(function() {
 	    jQuery('#error')
+	    .append('<li>canvas</li>')
+	    .children(':last')
+	    .click(function() {
+	       self.viewer.ctx.drawSvg('<circle r="20" cx="20" cy="20" fill="red" />',0,0,100,100);
+	    });
+	    jQuery('#error')
 	    .append('<li>viewer</li>')
 	    .children(':last')
 	    .click(self.signs.onpaths);
-	    });
+	});
         jQuery('#error').append('<li>load paths</li>')
 	.children(':last')
 	.click(function(){self.signs.loadPaths();});
