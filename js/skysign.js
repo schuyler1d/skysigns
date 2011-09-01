@@ -32,6 +32,10 @@ SkyInterface.prototype = {
 	    .children(':last')
 	    .click(self.signs.onpaths);
 	    });
+        jQuery('#error').append('<li>load paths</li>')
+	.children(':last')
+	.click(function(){self.signs.loadPaths();});
+
         jQuery(document.forms.wordsearch).submit(function(evt) {
             evt.preventDefault();
             self.search(this.elements['q'].value,true);
@@ -192,7 +196,7 @@ SkySigns.prototype = {
         return rv;
     },
     open:function(db){ 
-        this.loadPaths(); 
+        //this.loadPaths(); 
         this.db = db; 
         return this; 
     },
