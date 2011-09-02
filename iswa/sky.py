@@ -75,6 +75,14 @@ def find_paths(dir,allpaths={},shapefile=None):
             "pathlen":len(allpaths),
             }
 
+def pathdata_struct(path_ary):
+    return [
+        str(path_ary[2]),#number
+        path_ary[0][0],#element first letter
+        ('%sxx' % path_ary[3].get('fill',''))[1], #0 or f for fill
+        path_ary[4] #goodattr
+        ]
+
 def find_all_paths(dir):
     allpaths={}
     allshapes={}
@@ -93,13 +101,7 @@ def find_all_paths(dir):
         return allpaths[a][2]-allpaths[b][2]
 
     for p in sorted(allpaths, path_val):
-        path = allpaths[p]
-        pathdata = [
-            str(path[2]),#number
-            path[0][0],#element first letter
-            ('%sxx' % path[3].get('fill',''))[1], #0 or f for fill
-            path[4] #goodattr
-            ]
+        pathdata = pathdata_struct(allpaths[p])
         pathfile.write('$'.join(pathdata)+"\n")
         pathjs.write("['%s'],\n" % "','".join(pathdata[1:]))
     pathjs.write("'LAST'];\n")
@@ -174,7 +176,7 @@ def spml2tables(spmlfile,shape_data=None):
     """
     spml = parse_spml(spmlfile)
     edeps = open(FILES['entry_dependencies'],'w')
-    deps = {}
+    deps = {'shapes':{},'paths':{}}
     es = open(FILES['entries'],'w')
     for entry in spml:
         cluster = ksw2cluster(entry.get('ksw',None))
@@ -188,11 +190,13 @@ def spml2tables(spmlfile,shape_data=None):
         except UnicodeEncodeError:
             print "Entry %s was laden with too much blessed Unicode" % entry['id']
         for c in cluster:
+            deps['shapes'][ c[0] ] = 1
             if shape_data: #output path #'s instead of shapes
-                deps.update([(int(p),1) for p in shape_data['shapes'][c[0]]['paths'] ])
-            else:
-                deps[ c[0] ] = 1
-    for dep in sorted(deps.keys()):
+                deps['paths'].update([(int(p),1) 
+                                      for p in 
+                                      shape_data['shapes'][c[0]]['paths'] ])
+            
+    for dep in sorted(deps['shapes'].keys()):
         edeps.write(str(dep)+"\n")
     es.close()
     edeps.close()
