@@ -24,13 +24,11 @@
       <div id="terms"></div>
       <div id="text"></div>
       <canvas id="canvas" width="200" height="200"></canvas>
-      <!--svg id="svg"
-           width="200" height="200"
+      <svg id="svg" width="200" height="200"
            viewBox="-100 -100 200 200"
            >
-        <g id="term">
-        </g>
-      </svg-->
+        <g id="term"></g>
+      </svg>
     </div>
     <script src="js/jquery.min.js"></script>
     <script src="js/svg2canvas.js"></script>
@@ -38,12 +36,12 @@
     <script src="js/skystore.js"></script>
     <script>
       window.si.init(window.ss,window.sd,{
-        base_path:'http://skyb.us/static/signlanguage/',
+        base_path:'',
         storage:{
-          paths:'sql',
-          shapes:'sql'
+          paths:'memory',
+          shapes:'localStorage'
         },
-        viewer:CanvgViewer
+        viewer:ViewerBoth
       });
     </script>
   </body>
