@@ -1,11 +1,15 @@
+* skylog()
+* phonegap-deviceready
+* show download progress
+
+* break up paths/shapes/dict into separate files
 * need to import phonegap.js on the various platforms for PhoneGap.File API
-* include phonegap storage.js for openDatabase
+* iPhone? include phonegap storage.js for openDatabase
 * implement flexible storage for paths,shapes so they can be in sql/localStorage/memory
 * display sign within boundary
    example: 'attractive' sign is too tall, 
             'alseep soundly' too tall cutoff on bottom
 
-* styling/phone-touch UI
 * composer
   * hand list
 

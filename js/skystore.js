@@ -16,44 +16,65 @@ if (window.openDatabase) {
        results.rows.item(i).text
     })
     */
+    //addcallback(), 
+    //countcallback(), 
+    //getcallback()
     SkyDB.prototype = {
         searchTerms:function(q,cb) {
             this.db.transaction(function(tx) {
                 tx.executeSql("SELECT * FROM terms WHERE term LIKE '"+q.replace("'","''")+"%' ORDER BY term",[],
-                              function(tx,res) { cb(res); }
+                              function(tx,res) { cb({'results':res,'type':"terms"}); }
                              );
             });
         },
         getEntry:function(entry,cb) {
             this.db.transaction(function(tx) {
                 tx.executeSql("SELECT * FROM entries WHERE entry=?",[entry],
-                              function(tx,res) { cb('entry',res.rows.item(0)); });
+                              function(tx,res) { cb({'type':"entry",'item':res.rows.item(0)}); });
                 tx.executeSql("SELECT * FROM terms WHERE entry=?",[entry],
-                              function(tx,res) { cb('terms',res); });
+                              function(tx,res) { cb({'type':"terms",'results':res}); });
             });            
         },
         _add:function(tx,cols,callback,i) {
             //cols=[id,terms,code,text]
             var terms = cols[1].split('^');
             for (var t=0;t<terms.length;t++) {
-                tx.executeSql('INSERT INTO terms VALUES (?,?)',[cols[0],terms[t]],callback);
+                tx.executeSql('INSERT INTO terms VALUES (?,?)',[cols[0],terms[t]]);
             }
             tx.executeSql('INSERT INTO entries VALUES (?,?,?)',[cols[0],cols[2],cols[3]],
-			  function() { callback(null,i); });
+			  function() { 
+			      callback({'index':i,'type':"dict",'item':cols}); 
+			  },this.errback(callback));
         },
-        add:function(table,cols,callback,i) {
+        addEntries:function(table,rows,callback,i) {
             var self = this;
-            this.db.transaction(function(tx) {
-		self._add(tx,cols,callback,i);
-            });
-        },
-        addShape:function(cols,callback,i) {
-	    var self = this;
 	    this.db.transaction(function(tx) {
-		tx.executeSql('INSERT INTO shapes VALUES (?,?)',cols,
-			      function() { callback(null,i,cols); });
-            });
+		    for (var j=0;j<rows.length;j++) {
+			var cols = rows[j];
+			self._add(tx,cols,callback,i+j);
+		    }
+		});
         },
+	errback:function(cb) {
+	    return function(tx, err) {
+		cb({log:'db error',error:err});
+	    }
+	},
+        addShapes:function(shapes,callback,i) {
+	    var self = this;
+	    var getcb = function(i,j,cols,typ) {
+		return function() { 
+		    callback({'index':i+j,'item':cols,'type':typ}); 
+		}
+	    }
+	    this.db.transaction(function(tx) {
+		for (var j=0;j<shapes.length;j++) {
+		    var cols = shapes[j];
+		    tx.executeSql('INSERT INTO shapes VALUES (?,?)',
+				  cols,getcb(i,j,cols,'signs'),self.errback(callback));
+		}
+            });
+	},
 	getShape:function(key,callback) {
 	    var self = this;
 	    console.log(key);
@@ -70,15 +91,15 @@ if (window.openDatabase) {
 	},
 	haveShapes:function(callback) {
 	    var self = this;
-	    jQuery('#error').append('<li>haveShapes:'+this.db+'</li>');
-	    jQuery('#error').append('<li>haveShapes f:'+(typeof this.haveShapes)+'</li>');
+	    callback({'log':'haveShapes:'+this.db});
+	    callback({'log':'haveShapes f:'+(typeof this.haveShapes)});
 	    this.db.transaction(function(tx) {
 		tx.executeSql('SELECT COUNT(*) FROM shapes WHERE key=? OR key=?',
 			      ['10000','38b07'],function(tx,res) {
 				  if (res.rows.item(0)['COUNT(*)'] == 2) {
-				      callback(2);
-				  } else callback(false);
-			      },function(tx,e){callback(false,e);});
+				      callback({'loaded':2,'type':"signs"});
+				  } else callback({'loaded':false,'type':"signs"});
+			      },function(tx,e){callback({'loaded':false,'error':e});});
 	    });
 	},
 	addmany:function(table,rows,callback,i) {
@@ -96,14 +117,15 @@ if (window.openDatabase) {
                 tx.executeSql('DELETE FROM entries',[],callback);
             });
         },
-        open:function() {
+        open:function(logback) {
             //iOS webview actually enforces the quota: seems to max out at 2.75M
-	    jQuery('#error').append('<li>db orig?:'+window.openDatabase_orig+'</li>');
+	    logback = logback || function(){};
+	    logback({'log':'db orig?:'+window.openDatabase_orig});
             try {
                 this.db = openDatabase('skysign11','1.0','signbank',60*1024*1024);
-                jQuery('#error').append('<li>db opening:'+this.db+'</li>');
+		logback({'log':'db opening:'+this.db});
             } catch(e) {
-                jQuery('#error').append('<li>db:'+e.message+'</li>');
+		logback({'log':'db error:'+e.message,'error':e});
             }
             return this;
         },
@@ -114,19 +136,18 @@ if (window.openDatabase) {
                 tx.executeSql("SELECT tbl_name from sqlite_master WHERE type = 'table' and tbl_name='entries'",[],function(tx,results) {
                     if (results.rows.length) {
                         tx.executeSql("SELECT COUNT(*) FROM entries",[],function(tx,res) {
-                            cb(res.rows.item(0)['COUNT(*)']);
+				var count = res.rows.item(0)['COUNT(*)'];
+				cb({'loaded':count,'total':count,'type':"dict"});
                         });
                     } else {
-                        cb(false);
+                        cb({'loaded':false,'type':"dict"});
                     }
                 });
             })            
         },
         create:function() {
-            //dbs on filesystem are at:
-            //~/.config/chromium/Default/databases/
+            //dbs on filesystem are at: ~/.config/chromium/Default/databases/
             this.db.transaction(function (tx) {
-                //entryid-term entryid-shape+pos
                 tx.executeSql('CREATE TABLE IF NOT EXISTS terms ( '
                               +'entry INTEGER,'
                               +'term TEXT'
@@ -139,8 +160,14 @@ if (window.openDatabase) {
                               //TODO: dictionary id, too?
                               +')'
                              );
+		//these may or may not be used;
                 tx.executeSql('CREATE TABLE IF NOT EXISTS shapes ( '
-                              +'key TEXT,'
+                              +'key TEXT UNIQUE,'
+                              +'data TEXT'
+                              +')'
+                             );
+                tx.executeSql('CREATE TABLE IF NOT EXISTS paths ( '
+                              +'id INTEGER UNIQUE,'
                               +'data TEXT'
                               +')'
                              );

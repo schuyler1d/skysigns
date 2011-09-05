@@ -1,54 +1,13 @@
-body
-{ margin:0;
-  padding:0;
-  width:300px;
-  background-color:black;
-  color:white;
-  font-family:Helvetica, Verdana, sans-serif;
-  font-size:14px;
-}
-table 
-{ font-family:Helvetica, Verdana, sans-serif;
-  font-size:14px;
- }
-
-#top { 
-       top:0;
-       height:40px;
-       background-color:white;
-       width:100%;
- }
-#top input { 
-
- }
-#results 
-{ 
-  max-height:50px;
-  overflow-y:auto;
- }
-#selection { 
-             margin-top:40px;
- }
-#signdisplay #svg,
-#signdisplay #canvas
-{ 
-  border:1px solid black;
- }
-
-#error 
-{
-   /* float:right;*/
-  clear:both;
-}
-
-#progress {
+#progress,
+.progress {
    width:100px;
    height:1em;
    border:1px solid black;
    background-color:#ddddff;
    position:relative;
 }
-#bar {
+#bar,
+.bar {
    width:0px;
    height:1em;
    position:absolute;
@@ -58,52 +17,3 @@ table
    text-align:center;
 }
 
-/*
-nicer stuff
-*/
-
-table.tabs 
-{ 
-  margin:0;
-  padding:0;
-  width:300px;
-  height:50px;
- }
-
-table.tabs td 
-{ 
-  margin:0;
-  padding:5px;
-  text-align:center;
-  border-top:1px solid blue;
-  border-left:1px solid blue;
-  border-right:1px solid blue;
-  border-top-left-radius:5px;
-  border-top-right-radius:5px;
- }
-#wordsearch 
-{ width:300px;
- }
-#wordsearch form 
-{ width:100%;
-  
- }
-
-#q 
-{ width:100%;  }
-
-#wordsearch div.wordsearch-q 
-{ margin-right:60px;
-
- }
-
-#wordsearch input#submit-word
-{ width:45px;
-  float:right; 
-}
-
-#wordsearch #signdisplay
-{ background-color:white;
-  color:black;
-  width:100%;
-  }
