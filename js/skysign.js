@@ -47,14 +47,20 @@ SkyInterface.prototype = {
             if (this.value.length > 1)
                 self.search(this.value);
         });
+	jQuery('#error').append('<li>middle</li>');
         jQuery('#ajaxtest .button').click(this.ajax);
+	try {
         this.checkloaded();
+        self.notloaded('dict',true);
         if (document.location.search) {
             console.log(document.location.search.substr(1));
             setTimeout(function() {
                 self.search(document.location.search.substr(1),true);
             },1000)
         }
+	} catch(e) {
+	    jQuery('#error').append('<li>e:'+e.message+'</li>');
+	}
 	jQuery('#error').append('<li>end</li>');
         return this;
     },
@@ -209,7 +215,10 @@ SkySigns.prototype = {
     },
     load:function(cb){ this.db.create(); this.loadShapes(cb); },
     loaded:function(cb){
+	jQuery('#error').append('<li>loaded.db:'+this.db+'</li>');
+
         if (this.db) {
+	    jQuery('#error').append('<li>loaded.db:'+(typeof this.db.haveShapes)+'</li>');
 	    this.db.haveShapes(cb);
         } else {
             cb(Boolean(localStorage['10000'] && localStorage['38b07']));
@@ -283,6 +292,7 @@ SkyDictionary.prototype = {
 
     },
     loaded:function(cb) {
+	jQuery('#error').append('<li>loadedx.db:'+(typeof this.db.count)+'</li>');
         this.db.count(cb);
     },
     load:function(cb) {

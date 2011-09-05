@@ -70,6 +70,8 @@ if (window.openDatabase) {
 	},
 	haveShapes:function(callback) {
 	    var self = this;
+	    jQuery('#error').append('<li>haveShapes:'+this.db+'</li>');
+	    jQuery('#error').append('<li>haveShapes f:'+(typeof this.haveShapes)+'</li>');
 	    this.db.transaction(function(tx) {
 		tx.executeSql('SELECT COUNT(*) FROM shapes WHERE key=? OR key=?',
 			      ['10000','38b07'],function(tx,res) {
@@ -96,8 +98,10 @@ if (window.openDatabase) {
         },
         open:function() {
             //iOS webview actually enforces the quota: seems to max out at 2.75M
+	    jQuery('#error').append('<li>db orig?:'+window.openDatabase_orig+'</li>');
             try {
                 this.db = openDatabase('skysign11','1.0','signbank',60*1024*1024);
+                jQuery('#error').append('<li>db opening:'+this.db+'</li>');
             } catch(e) {
                 jQuery('#error').append('<li>db:'+e.message+'</li>');
             }
@@ -105,6 +109,7 @@ if (window.openDatabase) {
         },
         count:function(cb) {
             //more complicated, because we want it to call cb, no matter what;
+                jQuery('#error').append('<li>count: '+this.db+'</li>');
             this.db.transaction(function (tx) {
                 tx.executeSql("SELECT tbl_name from sqlite_master WHERE type = 'table' and tbl_name='entries'",[],function(tx,results) {
                     if (results.rows.length) {
