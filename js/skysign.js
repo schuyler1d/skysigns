@@ -43,7 +43,7 @@ SkyInterface.prototype = {
             self.search(this.elements['q'].value,true);
             this.elements['q'].select();
         });
-        jQuery('#q').bind('input',function(evt) {
+        jQuery('#q').live('input',function(evt) {
             if (this.value.length > 1)
                 self.search(this.value);
         });
@@ -70,6 +70,7 @@ SkyInterface.prototype = {
             if (r.length===1 || autoshow && r.length) {
                 self.showTerm(r.item(0).entry);
             }
+            $(dom).listview('refresh');
         });
     },
     showTerm:function(entry) {
@@ -86,10 +87,11 @@ SkyInterface.prototype = {
                 for (var i=0;i<res.rows.length;i++) {
                     terms.push(res.rows.item(i).term);
                 }
-                $('#terms').html(terms.join(','))
+                $('#terms').html(terms.join(', '))
                 break;
             }
         });
+        $.mobile.changePage('#signdisplay');
     },
     checkloaded:function() {
         var self = this;
@@ -198,9 +200,11 @@ SkySigns.prototype = {
         return rv;
     },
     open:function(db,opts){ 
-        //this.loadPaths(); 
         this.db = db; 
         this.opts = opts;
+        if (opts.loadpaths) {
+            this.loadPaths(); 
+        }
         return this; 
     },
     load:function(cb){ this.db.create(); this.loadShapes(cb); },

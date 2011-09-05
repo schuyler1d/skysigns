@@ -47,15 +47,21 @@ SvgNormal.prototype = {
 CanvgViewer = function(){}
 CanvgViewer.prototype = {
     init:function(cb) {
-        this.canvas = document.getElementById('canvas');
-
         var self = this;
-        var y = document.createElement('script');y.src = 'js/canvg.js';
-        document.body.appendChild(y);
-        y.onload = function() {
+        var onload = function() {
             self.ctx=self.canvas.getContext('2d');
 	    if (cb) cb();
         }
+        jQuery(function() {
+            self.canvas = document.getElementById('canvas');
+            if (!window.canvg) {
+                var y = document.createElement('script');y.src = 'js/canvg.js';
+                document.body.appendChild(y);
+                y.onload = onload;
+            } else {
+                onload();
+            }
+        });
         return this;
     },
     clear:function() {
