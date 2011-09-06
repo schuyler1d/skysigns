@@ -1,14 +1,5 @@
 /*
-http://keith-wood.name/svg.html
 
-window.ss = {x:0}
-s.loadShapes(function(x,y){++window.ss.x;if (window.ss.x % 1000===0) console.log('hi'+window.ss.x+','+y)})
-s.loadPaths();
-svg = jQuery('#svg').svg().svg('get')
-s.insertShape(svg,jQuery('#svg').svg(),'10000',0,0);
-
-things to do: parse/access db, load text files, interface
-dictionary, shapes/paths, interface
 */
 
 function SkyInterface(){}
@@ -273,7 +264,7 @@ SkySigns.prototype = {
         var self = this;
 	cb = cb || function(){};
         jQuery.ajax({
-            url:this.opts.base_path+'iswa/paths.txt', dataType:'text',
+	    url:this.opts.base_path+'iswa/paths.txt', dataType:'text',
             success:function(text){
                 self.paths = [];
                 var text_arr = text.split("\n");
@@ -293,7 +284,7 @@ SkySigns.prototype = {
     loadShapes:function(cb) {
         var self = this;
         jQuery.ajax({
-            url:this.opts.base_path+'iswa/shapes.txt', dataType:'text',
+	    url:(this.opts.remote_path||this.opts.base_path)+'iswa/shapes.txt', dataType:'text',
             success:function(text){
                 var text_arr = text.split("\n");
                 var i=0, l=text_arr.length;
@@ -344,7 +335,7 @@ SkyDictionary.prototype = {
         var self = this;
         this.db.create();
         jQuery.ajax({
-            url:this.opts.base_path+'iswa/entries.txt', dataType:'text',
+	    url:(this.opts.remote_path||this.opts.base_path)+'iswa/entries.txt', dataType:'text',
             success:function(text){
                 self.addTable('entries',text,self.db,cb);
             },

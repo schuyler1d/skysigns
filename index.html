@@ -104,7 +104,8 @@
       window.initSkyS = function() {
 	    jQuery('#error').append('<li>deviceready orig?:'+window.openDatabase_orig+'</li>');
       window.si.init(window.ss,window.sd,{
-          base_path:'',//'http://skyb.us/static/signlanguage/',
+          base_path:'',
+          remote_path:'http://skyb.us/static/signlanguage/',
           storage:{
               paths:'sql',
               shapes:'sql'
@@ -121,9 +122,6 @@
       }
       jQuery(window).bind('load',function() {
          $('#q').focus();
-      });
-      jQuery('.type-interior').bind('pageshow',function() {
-         $('#q').select();
       });
     </script>              
     <!--script async src="http://debug.phonegap.com/target/target-script-min.js#sksky"></script-->
