@@ -296,9 +296,9 @@ SkySigns.prototype = {
             url:this.opts.base_path+'iswa/shapes.txt', dataType:'text',
             success:function(text){
                 var text_arr = text.split("\n");
-                var next_ten, i=0, l=text_arr.length;
+                var i=0, l=text_arr.length;
                 cb({'total':l-1, 'type':"signs"});
-                next_ten = function() {
+                var next_ten = function() {
 		    var lines = [];
                     for (var m=Math.min(i+100,l);i<m;i++) {
                         var line = text_arr[i].match(/^(\w+)\$(.+)$/)
@@ -355,14 +355,21 @@ SkyDictionary.prototype = {
 	cb({'event':"request",'type':"dict"});
     },
     addTable:function(name,text,db,cb){
-        var text_arr = text.split("\n"), 
-            l=text_arr.length;
-        cb({'total':l-1,'type':"dict"});
-        for(var i=0;i<l;i++) {
-            if (text_arr[i].length) {
-                db.addEntries(name,[text_arr[i].split('$')],cb,i)
-            }
-        }
+	var text_arr = text.split("\n");
+	var i=0, l=text_arr.length;
+	cb({'total':l-1, 'type':"dict"});
+	var next_ten = function() {
+	    var lines = [];
+	    for (var m=Math.min(i+100,l);i<m;i++) {
+		if (text_arr[i])
+		    lines.push(text_arr[i].split('$'));
+	    }
+	    db.addEntries(lines,cb,i);
+	    if (i < l) {
+		next_ten();
+	    }
+	}
+	next_ten();
     }
 }
 

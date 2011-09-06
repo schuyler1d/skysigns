@@ -46,7 +46,7 @@ if (window.openDatabase) {
 			      callback({'index':i,'type':"dict",'item':cols}); 
 			  },this.errback(callback));
         },
-        addEntries:function(table,rows,callback,i) {
+        addEntries:function(rows,callback,i) {
             var self = this;
 	    this.db.transaction(function(tx) {
 		    for (var j=0;j<rows.length;j++) {
@@ -99,7 +99,7 @@ if (window.openDatabase) {
 				  if (res.rows.item(0)['COUNT(*)'] == 2) {
 				      callback({'loaded':2,'type':"signs"});
 				  } else callback({'loaded':false,'type':"signs"});
-			      },function(tx,e){callback({'loaded':false,'error':e});});
+			      },function(tx,e){callback({'loaded':false,'error':e,'type':"signs"});});
 	    });
 	},
 	addmany:function(table,rows,callback,i) {

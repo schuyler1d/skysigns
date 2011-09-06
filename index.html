@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8"> 
       <meta name="viewport" content="width=device-width, initial-scale=1"> 
-	<title>jQuery Mobile Framework - Persistent footer B</title> 
+	<title>SkySigns</title> 
 	<link rel="stylesheet"  href="jquery-mobile/jquery.mobile.css" />  
 	<link rel="stylesheet"  href="style/style.css" />  
 	<script src="js/jquery.min.js"></script> 
@@ -30,10 +30,11 @@
       <div data-role="header" data-position="fixed" style="background-color:white;"> 
         <div data-role="navbar"> 
           <ul> 
-            <li><a href="#errorpage" data-rel="dialog">error</a></li> 
+            <li><a href="#errorpage" data-rel="dialog">Load Data</a></li> 
             <li><a href="jmobile.html" class="ui-btn-active ui-state-persist">Word Search</a></li> 
-            <li><a href="footer-persist-b.html">Sign Search</a></li> 
-            <li><a href="footer-persist-c.html">Add Sign</a></li> 
+            <li><a href="about.html">About</a></li> 
+            <!--li><a href="signsearch.html">Sign Search</a></li> 
+            <li><a href="addsign.html">Add Sign</a></li--> 
           </ul> 
         </div><!-- /navbar --> 
 
@@ -77,7 +78,7 @@
 
     <div id="errorpage" data-role="dialog"> 
       <div data-role="header" data-theme="d"> 
-        <h1>Alert</h1> 
+        <h1>Data</h1> 
       </div> 
       <ul id="error" data-role="listview" data-inset="true">
         <li id="dicttest" class="loadaction"><button>Load Dictionary</button>
@@ -92,6 +93,7 @@
           <div class="progress"><div class="bar"></div></div>
 	  <div class="msg">not loaded</div>
 	</li>
+	<li>Debugging:</li>
         <li id="ajaxtest"><button>text remote ajax</button></li>
         <li id="canvastest"><button>test canvas</button>
 	  <div class="msg"></div>
@@ -102,13 +104,13 @@
       window.initSkyS = function() {
 	    jQuery('#error').append('<li>deviceready orig?:'+window.openDatabase_orig+'</li>');
       window.si.init(window.ss,window.sd,{
-          base_path:'http://skyb.us/static/signlanguage/',
+          base_path:'',//'http://skyb.us/static/signlanguage/',
           storage:{
               paths:'sql',
               shapes:'sql'
           },
           viewer:CanvgViewer,
-          loadpaths:false
+          loadpaths:true//false
       });
       }
       if (window.PhoneGap) {
