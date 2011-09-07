@@ -73,7 +73,7 @@ CanvgViewer.prototype = {
     },
     _transform:SvgNormal.prototype._transform,
     createContext:function(domparent,w,h) {
-        return (jQuery('<canvas></canvas>',{width:w,height:h})
+        return (jQuery('<canvas width="'+w+'" height="'+h+'"></canvas>')
                 .appendTo(domparent)
                 .get(0).getContext('2d'));
     },
@@ -104,7 +104,8 @@ CanvgViewer.prototype = {
             svgstr += '</g>';
         }
         svgstr += '</g>'; //original translated
-        ctx.drawSvg(svgstr,this.w/2,this.w/2,this.w,this.w);
+        var w = ctx.canvas.width;
+        ctx.drawSvg(svgstr,w/2,w/2,w,w);
     }
 }
 

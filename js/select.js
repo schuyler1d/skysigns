@@ -4,7 +4,7 @@ Composer.prototype = {
         ['a','1f720'],
         ['b','14720'],
         ['c','16d20'],
-        ['d','10120'],
+        ['d','10128'],
         ['e','14a20'],
         ['f','1ce20'],
         ['g','1f000'],
@@ -35,16 +35,14 @@ Composer.prototype = {
         ['8','1bb20']
     ],
     "other":[
-        ['sick/feel','1c500'],
-        ['open hand','15a00'],
-        ['america/applause','14c00'],
-        ['wait (curled fingers)',''],
-        ['hard','11041'],
-        ['moon/run','1ed10'],
+        ['sick','1c500'],
+        ['know','15a00'],
+        ['applause','14c00'],
+        ['rain','15050'],
+        ['hard','11040'],
+        ['moon','1ed10'],
         ['airplane','1cb21'],
-        ['number/money','18510'],
-        ['hope/level/new','18220'],
-        ['',''],
-        ['',''],
+        ['number','18510'],
+        ['new','18220'],
     ]
 }
