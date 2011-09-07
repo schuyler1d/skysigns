@@ -102,19 +102,34 @@ if (window.openDatabase) {
 			      },function(tx,e){callback({'loaded':false,'error':e,'type':"signs"});});
 	    });
 	},
-	addmany:function(table,rows,callback,i) {
-	    var self = this;
-	    this.db.transaction(function(tx) {
-		for (var i=0;i<rows.length;i++) {
-		    self._add(tx,rows[i],callback);
+	addmany:function(text,add_func,cb,typ,process_func) {
+            var self = this;
+            var text_arr = text.split("\n");
+            var i=0, l=text_arr.length;
+            cb({'total':l-1, 'type':typ});
+            var next_ten = function() {
+		var lines = [];
+                for (var m=Math.min(i+100,l);i<m;i++) {
+                    process_func(text_arr[i],lines);
 		}
-	    });
+                self[add_func](lines,cb,i);
+                if (i < l) {
+                    next_ten();
+                }
+            }
+            next_ten();
 	},
-        clearall:function(callback) {
+        clearEntries:function(callback) {
             var self = this;
             this.db.transaction(function(tx) {
                 tx.executeSql('DELETE FROM terms',[],callback);
                 tx.executeSql('DELETE FROM entries',[],callback);
+            });
+        },
+        clearShapes:function(callback) {
+            var self = this;
+            this.db.transaction(function(tx) {
+                tx.executeSql('DELETE FROM shapes',[],callback);
             });
         },
         open:function(logback) {

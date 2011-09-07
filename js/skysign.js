@@ -35,7 +35,6 @@ SkyInterface.prototype = {
 	}
 
 	if (document.location.search) {
-	    console.log(document.location.search.substr(1));
 	    setTimeout(function() {
 		    self.search(document.location.search.substr(1),true);
 		},1000)
@@ -70,7 +69,6 @@ SkyInterface.prototype = {
 	var decorate = function(what) {
 	    var display = jQuery('#'+what+'test').get(0);
 	    jQuery('button',display).click(function(evt){
-		    console.log(what);
 		    self[what].load(progress);
 		    jQuery(this).addClass('clicked');
 		});
@@ -121,17 +119,13 @@ SkyInterface.prototype = {
     showloaded:function(x) {
 	this[x.type+'_loaded'] = x.loaded;
 	var display = jQuery('#'+x.type+'test').get(0);
-	console.log(x.type);
-	console.log(display);
 	jQuery('.progress',display).show();
 	jQuery('.bar',display).css('width','100%');
 	jQuery('.msg',display).text('loaded:'+(x.count || x.loaded));
     },
     notloaded:function(x) {
         var self = this;
-	console.log(x.type);
 	var display = jQuery('#'+x.type+'test').get(0);
-	console.log(display);
 	jQuery('.msg',display).text('not loaded');
 	var what = x.type;
         
@@ -139,7 +133,6 @@ SkyInterface.prototype = {
     _prog_max:{},
     progress:function(x) {
 	if (x.total) {//max
-	    console.log('max number:'+x.type+':'+x.total);
 	    this._prog_max[x.type] = x.total;
 	    var display = jQuery('#'+x.type+'test').get(0);
 	    jQuery('.bar',display).css('width',3).empty();
@@ -150,7 +143,6 @@ SkyInterface.prototype = {
 	if (x.index && x.index%500===0) {//count
 	    var display = jQuery('#'+x.type+'test').get(0);
 	    jQuery('.bar',display).css('width',parseInt(100*x.index/max,10));
-	    console.log('bar:'+x.type+':'+x.index);
 	    jQuery('.msg',display).text('request loading: '+x.index+'/'+max);
 	}
 	if (max && x.index==max-1) {
@@ -167,18 +159,13 @@ SkyInterface.prototype = {
 	if (x.error) {
 	    jQuery('#error').append('<li>ERROR: '+(x.error.message || x.error)+'</li>');
 	}
-	
-	/* TODO: else if (results === this._prog_max-2) {
-	    //-2: who knows why, but from l=7412, we seem to get to 7410
-	    jQuery('#bar').css('width','100px').append('complete');
-	    } */
     },
     ajax:function() {
-        jQuery('#ajaxtest').append('<span>start</span>');
+        jQuery('#ajaxtest').append('<span>start...</span>');
         jQuery.ajax({
             url:'http://skyb.us/', dataType:'text',
             success:function(text){
-                jQuery('#ajaxtest').append('<span>skybus</span>');
+                jQuery('#ajaxtest').append('<span>skyb.us success</span>');
             },
             error:function(text) {
                 jQuery('#ajaxtest').append('<span>error</span>');
@@ -192,24 +179,15 @@ SkySigns.prototype = {
     getShape:function(key, cb) {
         var self = this;
         var rv = {'key':key};
-        var shape = localStorage[key];
-        if (shape) {
-            var sparts = shape.split('$');
-            rv.paths = sparts[0].split(',').map(this.getPath,this);
-            rv.transforms = sparts[1].split(';')
-            return cb(rv);
-        } else if (this.db) {
-            this.db.getShape(key,function(table,s) {
-        	//var shape = localStorage.getItem(key);
-        	shape = s.data;
-        	if (shape) {
-            	    var sparts = shape.split('$');
-            	    rv.paths = sparts[0].split(',').map(self.getPath,self);
-            	    rv.transforms = sparts[1].split(';')
-        	}
-        	cb(rv);
-            });
-        }
+        this.db.getShape(key,function(table,s) {
+            var shape = s.data;
+            if (shape) {
+            	var sparts = shape.split('$');
+            	rv.paths = sparts[0].split(',').map(self.getPath,self);
+            	rv.transforms = sparts[1].split(';')
+            }
+            cb(rv);
+        });
     },
     getPath:function(i) {
         return this.paths[i];
@@ -223,7 +201,6 @@ SkySigns.prototype = {
     },
     insertShape:function(viewer,key,x,y) {
     	var self = this;
-        //console.log(key+' x:'+x+',y:'+y);
         this.getShape(key, function(s) {
             viewer.insertShape(s,x,y);
         });
@@ -250,14 +227,8 @@ SkySigns.prototype = {
     },
     load:function(cb){ this.db.create(); this.loadShapes(cb); },
     loaded:function(cb){
-	jQuery('#error').append('<li>loaded.db:'+this.db+'</li>');
-
-        if (this.db) {
-	    jQuery('#error').append('<li>loaded.db:'+(typeof this.db.haveShapes)+'</li>');
-	    this.db.haveShapes(cb);
-        } else {
-            cb({'loaded':(Boolean(localStorage['10000'] && localStorage['38b07'])),'type':"signs"});
-        }
+        cb({'log':'loaded.db:'+this.db});
+	this.db.haveShapes(cb);
     },
     loadPaths:function(cb) {
         //needs to happen every page-load
@@ -275,8 +246,7 @@ SkySigns.prototype = {
                 cb({'loaded':self.paths.length,'type':"paths"});
             },
             error:function(xhr,status,error) {
-		jQuery('#error').append('<li>nopaths:'+error+'</li>');
-		cb({'error':error,'type':"paths"});
+		cb({'error':error,'type':"paths",'log':"nopaths"});
             }
         });
 	cb({'event':"request",'type':"paths"});
@@ -284,32 +254,18 @@ SkySigns.prototype = {
     loadShapes:function(cb) {
         var self = this;
         jQuery.ajax({
-	    url:(this.opts.remote_path||this.opts.base_path)+'iswa/shapes.txt', dataType:'text',
+	    url:(this.opts.remote_path||this.opts.base_path)+'iswa/shapes.txt',
+            dataType:'text',
             success:function(text){
-                var text_arr = text.split("\n");
-                var i=0, l=text_arr.length;
-                cb({'total':l-1, 'type':"signs"});
-                var next_ten = function() {
-		    var lines = [];
-                    for (var m=Math.min(i+100,l);i<m;i++) {
-                        var line = text_arr[i].match(/^(\w+)\$(.+)$/)
-			if (line) lines.push(line.slice(1))
-		    }
-		    if (!self.db) {
-			while (ln = lines.shift()) {
-			    localStorage[ln[0]] = ln[1];
-			}
-		    } else {
-			self.db.addShapes(lines,cb,i);
-		    }
-                    if (i < l) {
-                        next_ten();
-                    }
-                }
-                next_ten();
+                self.db.clearShapes();
+                self.db.addmany(text,'addShapes',cb,'signs',
+                                function (x,lines) {
+                                    var line = x.match(/^(\w+)\$(.+)$/);
+                                    if (line) lines.push(line.slice(1));
+                                });
             },
             error:function(xhr,status,error) {
-		cb({'log':'noshapex:'+status,'error':error});
+		cb({'log':'noshapes:'+status,'error':error});
             }
         });
     }
@@ -324,9 +280,6 @@ SkyDictionary.prototype = {
     },
     searchTerms:function(q,cb) { this.db.searchTerms(q,cb); },
     getEntry:function(entry,cb) { this.db.getEntry(entry,cb); },
-    searchShapes:function(shapes,cb) {
-
-    },
     loaded:function(cb) {
 	cb({'log':'loadedx.db:'+(typeof this.db.count)});
         this.db.count(cb);
@@ -335,32 +288,20 @@ SkyDictionary.prototype = {
         var self = this;
         this.db.create();
         jQuery.ajax({
-	    url:(this.opts.remote_path||this.opts.base_path)+'iswa/entries.txt', dataType:'text',
+	    url:(this.opts.remote_path||this.opts.base_path)+'iswa/entries.txt',
+            dataType:'text',
             success:function(text){
-                self.addTable('entries',text,self.db,cb);
+                self.db.clearEntries();
+                self.db.addmany(text,'addEntries',cb,'dict',
+                                function (x,lines) {
+                                    lines.push(x.split('$'));
+                                });
             },
             error:function(xhr,status,error) {
-		jQuery('#error').append('<li>noentries:'+error+'</li>');
+                cb({'log':'noentries:'+error});
             }
         });
 	cb({'event':"request",'type':"dict"});
-    },
-    addTable:function(name,text,db,cb){
-	var text_arr = text.split("\n");
-	var i=0, l=text_arr.length;
-	cb({'total':l-1, 'type':"dict"});
-	var next_ten = function() {
-	    var lines = [];
-	    for (var m=Math.min(i+100,l);i<m;i++) {
-		if (text_arr[i])
-		    lines.push(text_arr[i].split('$'));
-	    }
-	    db.addEntries(lines,cb,i);
-	    if (i < l) {
-		next_ten();
-	    }
-	}
-	next_ten();
     }
 }
 
