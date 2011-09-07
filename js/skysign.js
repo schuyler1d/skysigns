@@ -8,8 +8,9 @@ SkyInterface.prototype = {
         var self = this;
 	var progress = self.progress.bind(self);
         jQuery('#error').append('<li>pre</li>');
-        this.dict = dict.open(opts,progress);
-        this.signs = signs.open(this.dict.db,opts);
+        this.db = new SkyDB().open(progress);
+        this.dict = dict.open(this.db,opts);
+        this.signs = signs.open(this.db,opts);
         if (opts.loadpaths) {
             this.signs.loadPaths(progress); 
         }
@@ -189,9 +190,7 @@ SkySigns.prototype = {
             cb(rv);
         });
     },
-    getPath:function(i) {
-        return this.paths[i];
-    },
+    getPath:function(i) { return this.paths[i]; },
     showSign:function(viewer,shapetext) {
         var shapes = this.ksw2cluster(shapetext);
         for (var i=0;i<shapes.length;i++) {
@@ -220,16 +219,9 @@ SkySigns.prototype = {
         }
         return rv;
     },
-    open:function(db,opts,logback){ 
-        this.db = db; 
-        this.opts = opts;
-        return this; 
-    },
+    open:function(db,opts){ this.db=db; this.opts=opts; return this; },
     load:function(cb){ this.db.create(); this.loadShapes(cb); },
-    loaded:function(cb){
-        cb({'log':'loaded.db:'+this.db});
-	this.db.haveShapes(cb);
-    },
+    loaded:function(cb){ this.db.haveShapes(cb); },
     loadPaths:function(cb) {
         //needs to happen every page-load
         var self = this;
@@ -264,26 +256,17 @@ SkySigns.prototype = {
                                     if (line) lines.push(line.slice(1));
                                 });
             },
-            error:function(xhr,status,error) {
-		cb({'log':'noshapes:'+status,'error':error});
-            }
+            error:function(xhr,stat,e) {cb({'log':'noshapes:'+stat,'error':e});}
         });
     }
 }
 
 function SkyDictionary(){}
 SkyDictionary.prototype = {
-    open:function(opts,logback){
-        this.db = new SkyDB().open(logback);
-        this.opts = opts;
-        return this;
-    },
+    open:function(db,opts){ this.db=db; this.opts=opts; return this; },
     searchTerms:function(q,cb) { this.db.searchTerms(q,cb); },
     getEntry:function(entry,cb) { this.db.getEntry(entry,cb); },
-    loaded:function(cb) {
-	cb({'log':'loadedx.db:'+(typeof this.db.count)});
-        this.db.count(cb);
-    },
+    loaded:function(cb) { this.db.count(cb); },
     load:function(cb) {
         var self = this;
         this.db.create();
@@ -293,13 +276,9 @@ SkyDictionary.prototype = {
             success:function(text){
                 self.db.clearEntries();
                 self.db.addmany(text,'addEntries',cb,'dict',
-                                function (x,lines) {
-                                    lines.push(x.split('$'));
-                                });
+                     function (x,lines) { lines.push(x.split('$')); });
             },
-            error:function(xhr,status,error) {
-                cb({'log':'noentries:'+error});
-            }
+            error:function(xhr,st,e) { cb({'log':'noentries:'+e}); }
         });
 	cb({'event':"request",'type':"dict"});
     }

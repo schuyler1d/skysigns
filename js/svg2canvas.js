@@ -12,9 +12,10 @@ SvgNormal.prototype = {
     clear:function() {
         this.svgwrap.empty();
     },
-    insertShape:function(shape,x,y,fgcolor) {
-        var svg = this.svgwrap.svg('get');
-        var parent = this.svgwrap;
+    insertShape:function(shape,x,y,fgcolor,svgwrap) {
+        svgwrap = svgwrap || this.svgwrap;
+        var svg = svgwrap.svg('get');
+        var parent = svgwrap;
         parent = svg.other(parent,'g',{
             transform:'translate('+x+','+y+')'
         });
@@ -71,7 +72,13 @@ CanvgViewer.prototype = {
         this.ctx.save();
     },
     _transform:SvgNormal.prototype._transform,
-    insertShape:function(shape,x,y,fgcolor) {
+    createContext:function(domparent,w,h) {
+        return (jQuery('<canvas></canvas>',{width:w,height:h})
+                .appendTo(domparent)
+                .get(0).getContext('2d'));
+    },
+    insertShape:function(shape,x,y,fgcolor,ctx) {
+        ctx = ctx || this.ctx;
         var svgstr = '';
         svgstr += '<g transform="translate('+x+','+y+')" >';
 
@@ -97,7 +104,7 @@ CanvgViewer.prototype = {
             svgstr += '</g>';
         }
         svgstr += '</g>'; //original translated
-        this.ctx.drawSvg(svgstr,this.w/2,this.w/2,this.w,this.w);
+        ctx.drawSvg(svgstr,this.w/2,this.w/2,this.w,this.w);
     }
 }
 
