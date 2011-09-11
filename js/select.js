@@ -44,5 +44,22 @@ Composer.prototype = {
         ['airplane','1cb21'],
         ['number','18510'],
         ['new','18220'],
+    ],
+    'modifiers':[
+        ['contact','20500','twice','20600','thrice','20610'],
+        ['hold','20800'],
+        ['strike','20b00'],
+        ['brush','20e00'],
+        ['simultaneous','2fb00']
+    ],
+    'context or facial expressions': [
+        ['head','2ff00'],
+        ['trunk','36d00']
+    ],
+    'hand motion': [
+        ['curl',''],
+        ['uncurl',''],
+        ['bend (back and forth)',''],
+        ['piano fingers','']
     ]
 }
