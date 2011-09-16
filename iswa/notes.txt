@@ -218,6 +218,7 @@ for search categories: (+ is for composition)
                up-down/forward-back
                (palm: side-back-front/side-up-down)
                direction (compass)
+               hand:left/right
        +motion: 
           curl/uncurl
           bend (back and forth?)

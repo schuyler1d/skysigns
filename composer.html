@@ -3,7 +3,15 @@
   <head>
     <title>Sign Writing Dictionary</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet"  href="jquery-mobile/jquery.mobile.css" />  
     <style>
+      #editor {
+        float:right;
+      }
+      #composer-page {
+        background-color:white;
+      }
+      .canvas {border:1px solid black;}
       li {display:inline-block;
           list-style-type:none;
           border:1px solid black;
@@ -16,11 +24,58 @@
     <script src="js/svg2canvas.js"></script> 
     <script src="js/skysign.js"></script>
     <script src="js/select.js"></script> 
+    <script src="jquery-mobile/jquery.mobile.js"></script> 
   </head>
   <body>
-    <canvas id="canvas" width="100" height="100"></canvas>
-    <ul id="letterlist">
-    </ul>
+    <div data-role="page" class="type-interior"> 
+      <div data-role="header" data-position="fixed" style="background-color:white;"> 
+        <div data-role="navbar"> 
+          <ul> 
+            <li><a href="#errorpage" data-rel="dialog">Load Data</a></li> 
+            <li><a href="jmobile.html">Word Search</a></li> 
+            <li><a href="composer.html" class="ui-btn-active ui-state-persist">Compose</a></li> 
+            <li><a href="about.html">About</a></li> 
+            <!--li><a href="signsearch.html">Sign Search</a></li> 
+            <li><a href="addsign.html">Add Sign</a></li--> 
+          </ul> 
+        </div><!-- /navbar --> 
+        <div id="composer-page" data-role="content" data-theme="d"> 
+          <div id="editor">
+            <canvas id="current" class="canvas" width="60" height="60"></canvas>
+            <form id="handshape">
+              hand
+              <fieldset>
+                left
+                <input type="radio" name="hand" value="left" />
+                right
+                <input type="radio" name="hand" value="right" />
+              </fieldset>
+              palm faces
+              <fieldset>
+                forward
+                <input type="radio" name="hand" value="forward" />
+                back
+                <input type="radio" name="hand" value="back" />
+                side
+                <input type="radio" name="hand" value="side" />
+              </fieldset>
+              fingers point
+              <fieldset>
+                <input type="radio" name="orientation" value="up" />
+                <input type="radio" name="orientation" value="forward" />
+                <input type="radio" name="orientation" value="side" />
+              </fieldset>
+              <button>rotate</button>
+            </form>
+            <ul id="canvasqueue">
+            </ul>
+          </div>
+          <canvas id="canvas" class="canvas" width="200" height="200"></canvas>
+          <ul id="letterlist">
+          </ul>
+        </div>
+      </div>
+    </div>
     <script src="js/composer.js"></script> 
   </body>
 </html>

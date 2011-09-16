@@ -46,20 +46,20 @@ Composer.prototype = {
         ['new','18220'],
     ],
     'modifiers':[
-        ['contact','20500','twice','20600','thrice','20610'],
+        ['contact','20500','twice','20600','thrice','20610'],//rotate
         ['hold','20800'],
-        ['strike','20b00'],
+        ['strike','20b00','twice','20c00','thrice','20c10'],//rotate
         ['brush','20e00'],
-        ['simultaneous','2fb00']
+        ['simultaneous','2fb00'] //rotate
     ],
     'context or facial expressions': [
         ['head','2ff00'],
         ['trunk','36d00']
     ],
     'hand motion': [
-        ['curl',''],
-        ['uncurl',''],
-        ['bend (back and forth)',''],
+        ['curl','21600'],
+        ['uncurl finger','21b00'],
+        ['bend (back and forth)','22104'], //multiple,rotate
         ['piano fingers','']
     ]
 }
