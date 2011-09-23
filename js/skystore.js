@@ -51,7 +51,8 @@ if (window.openDatabase) {
 	    this.db.transaction(function(tx) {
 		    for (var j=0;j<rows.length;j++) {
 			var cols = rows[j];
-			self._add(tx,cols,callback,i+j);
+                        if (cols.length > 1)
+			    self._add(tx,cols,callback,i+j);
 		    }
 		});
         },

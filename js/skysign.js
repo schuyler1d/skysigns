@@ -12,7 +12,9 @@ SkyInterface.prototype = {
         this.dict = dict.open(this.db,opts);
         this.signs = signs.open(this.db,opts);
         if (opts.loadpaths) {
-            this.signs.loadPaths(progress); 
+            setTimeout(function() {
+                self.signs.loadPaths(progress); 
+            },2000);
         }
 	this.loadinterface();
 	var debug = this.debug();
@@ -227,13 +229,14 @@ SkySigns.prototype = {
         var self = this;
 	cb = cb || function(){};
         jQuery.ajax({
-	    url:this.opts.base_path+'iswa/paths.txt', dataType:'text',
+	    url:this.opts.base_path+'iswa/pathsmin.txt', dataType:'text',
             success:function(text){
-                self.paths = [];
+                self.paths = new Array(30602);
                 var text_arr = text.split("\n");
                 cb({'total':text_arr.length,'type':"paths"});
                 for(var i=0,l=text_arr.length;i<l;i++) {
-                    self.paths.push(text_arr[i].split('$').slice(1));
+                    var cols = text_arr[i].split('$');
+                    self.paths[parseInt(cols[0],10)] = cols.slice(1);
                 }
                 cb({'loaded':self.paths.length,'type':"paths"});
             },

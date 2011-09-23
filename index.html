@@ -14,7 +14,9 @@
 	<script src="js/skysign.js"></script> 
         <script>
           jQuery(document).bind('mobileinit',function() {
-              $('#signdisplay').live('pagebeforecreate',function(event,ui){
+              console.log('mobileinit');  
+              //pagebeforecreate
+              $('#signdisplay').live('pagecreate',function(event,ui){
                   console.log(this);
                   console.log(event);
                   console.log(ui);

@@ -10,7 +10,8 @@ from xml.dom.minidom import parse
 
 FILES = {
     'paths':'paths.txt',
-    'pathsjs':'paths.js',
+    'pathmin':'pathsmin.txt',
+    'pathrest':'pathsrest.txt',
     'shapes':'shapes.txt',
     'entries':'entries.txt',
     'entry_dependencies':'entry_deps.txt',
@@ -29,6 +30,20 @@ def clean_path(d):
     #too many decimals
     d = re.sub(r'(.\d{3})\d+',r'\1',d)
     return d
+
+def pathdata_struct(path_ary):
+    return [
+        str(path_ary[2]),#number
+        path_ary[0][0],#element first letter
+        ('%sxx' % path_ary[3].get('fill',''))[1], #0 or f for fill
+        path_ary[4] #goodattr
+        ]
+
+def shapedata_struct(shapes,fkey):
+    return (fkey,
+            ','.join(shapes[fkey]["paths"]),
+            ';'.join( shapes[fkey]["transforms"] )
+            )
 
 def find_paths(dir,allpaths={},shapefile=None):
     cnt = 0
@@ -69,20 +84,6 @@ def find_paths(dir,allpaths={},shapefile=None):
             "cnt":cnt,
             "pathlen":len(allpaths),
             }
-
-def pathdata_struct(path_ary):
-    return [
-        str(path_ary[2]),#number
-        path_ary[0][0],#element first letter
-        ('%sxx' % path_ary[3].get('fill',''))[1], #0 or f for fill
-        path_ary[4] #goodattr
-        ]
-
-def shapedata_struct(shapes,fkey):
-    return (fkey,
-            ','.join(shapes[fkey]["paths"]),
-            ';'.join( shapes[fkey]["transforms"] )
-            )
 
 def find_all_paths(dir):
     allpaths={}
@@ -174,7 +175,6 @@ def spml2tables(spmlfile,shape_data=None):
     sgn.spml file doesn't seem to have any ^'s or $'s, so these are good chars
     """
     spml = parse_spml(spmlfile)
-    edeps = open(FILES['entry_dependencies'],'w')
     deps = {'shapes':{},'paths':{}}
     es = open(FILES['entries'],'w')
     for entry in spml:
@@ -193,21 +193,19 @@ def spml2tables(spmlfile,shape_data=None):
             if shape_data: #output path #'s instead of shapes
                 deps['paths'].update([(int(p),1) for p in 
                                       shape_data['shapes'][c[0]]['paths'] ])
-            
-    pathjs=open(FILES['pathsjs'],'w')
-    pathjs.write("window.SignPaths = [\n")
-    for p in sorted(deps['paths'].keys()):
-        pathjs.write("'%s',\n" % "$".join(
-                pathdata_struct(
-                    shape_data['paths'][shape_data['ordered_paths'][p]])[1:]
-                ))
-    pathjs.write("'LAST'];\n")
 
-    for s in sorted(deps['shapes'].keys()):
-        edeps.write('$'.join(shapedata_struct(shape_data['shapes'],s))+"\n")
+    if shape_data:
+        edeps = open(FILES['entry_dependencies'],'w')
+        pathmin=open(FILES['pathmin'],'w')
+        for p in sorted(deps['paths'].keys()):
+            pathmin.write('$'.join(pathdata_struct(
+                        shape_data['paths'][shape_data['ordered_paths'][p]]
+                        ))+"\n")
+        for s in sorted(deps['shapes'].keys()):
+            edeps.write('$'.join(shapedata_struct(shape_data['shapes'],s))+"\n")
+        edeps.close()
+        pathmin.close()
     es.close()
-    edeps.close()
-    pathjs.close()
 
 def main():
     whattodo= dict([(a.split('=')[0],a.split('=').pop()) for a in  sys.argv])

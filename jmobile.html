@@ -21,8 +21,6 @@
               });
           });
         </script>
-	<script src="jquery-mobile/jquery.mobile.js"></script> 
-	<script src="jquery-mobile/scrollview/jquery.mobile.scrollview.js"></script> 
   </head>
   <body>
     <!-- do not put @ID here or we lose state! -->
@@ -32,6 +30,7 @@
           <ul> 
             <li><a href="#errorpage" data-rel="dialog">Load Data</a></li> 
             <li><a href="jmobile.html" class="ui-btn-active ui-state-persist">Word Search</a></li> 
+            <li><a href="composer.html">Compose</a></li> 
             <li><a href="about.html">About</a></li> 
             <!--li><a href="signsearch.html">Sign Search</a></li> 
             <li><a href="addsign.html">Add Sign</a></li--> 
@@ -120,7 +119,7 @@
 	  //is not currently working.  why not?
 	  PhoneGap.onDeviceReady.subscribeOnce(window.initSkyS);
       } else {
-	  initSkyS();
+          jQuery(document).bind('mobileinit',initSkyS);
       }
       jQuery(window).bind('load',function() {
          $('#q').focus();
@@ -130,5 +129,8 @@
       });
     </script>              
     <!--script async src="http://debug.phonegap.com/target/target-script-min.js#sksky"></script-->
+    <script src="jquery-mobile/jquery.mobile.js"></script> 
+    <script src="jquery-mobile/scrollview/jquery.mobile.scrollview.js"></script> 
+
   </body>
 </html>

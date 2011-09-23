@@ -7,13 +7,16 @@ window.si.init(window.ss,window.sd,{
     viewer:CanvgViewer,
     loadpaths:true
 });
-var list = jQuery('#letterlist').get(0);
-for (a in Composer.prototype) {
-    var glyphs = Composer.prototype[a];
-    for (var i=0,l=glyphs.length;i<l;i++) {
-        addShape(glyphs[i],list);
+
+$('#composer-page').live('pagecreate',function(event,ui){
+    var list = jQuery('#letterlist').get(0);
+    for (a in Composer.prototype) {
+        var glyphs = Composer.prototype[a];
+        for (var i=0,l=glyphs.length;i<l;i++) {
+            addShape(glyphs[i],list);
+        }
     }
-}
+});
 
 
 function putShape(ctx,key) {
