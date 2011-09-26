@@ -1,12 +1,13 @@
 /*
-
+          remote_path:'http://skyb.us/static/signlanguage/',
 */
 
 function SkyInterface(){}
 SkyInterface.prototype = {
     init:function(signs,dict,opts) {
         var self = this;
-	var progress = self.progress.bind(self);
+        ///func.bind() NOT supported in 1.5 android!
+	var progress = function(x){return self.progress(x);};
         jQuery('#error').append('<li>pre</li>');
         this.db = new SkyDB().open(progress);
         this.dict = dict.open(this.db,opts);
@@ -68,7 +69,7 @@ SkyInterface.prototype = {
     loadinterface:function() {
 	var loads = {paths:1,signs:1,dict:1};
 	var self = this;
-	var progress = this.progress.bind(this)
+	var progress = function(x){return self.progress(x);};
 	var decorate = function(what) {
 	    var display = jQuery('#'+what+'test').get(0);
 	    jQuery('button',display).click(function(evt){
@@ -115,7 +116,7 @@ SkyInterface.prototype = {
     },
     checkloaded:function() {
         var self = this;
-	var callback = self.progress.bind(self);
+	var callback = function(x){return self.progress(x);};
         this.signs.loaded(callback);
         this.dict.loaded(callback);
     },

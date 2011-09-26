@@ -4,8 +4,8 @@
     <meta charset="utf-8"> 
       <meta name="viewport" content="width=device-width, initial-scale=1"> 
 	<title>SkySigns</title> 
-	<link rel="stylesheet"  href="jquery-mobile/jquery.mobile.css" />  
-	<link rel="stylesheet"  href="style/style.css" />  
+	<link rel="stylesheet" href="jquery-mobile/jquery.mobile.css" />  
+	<link rel="stylesheet" href="style/style.css" />  
 	<script src="js/jquery.min.js"></script> 
 	<!--script src="js/phonegap-1.0.0.js"></script--> 
 	<script src="js/skystore.js"></script> 
@@ -14,53 +14,42 @@
 	<script src="js/skysign.js"></script> 
         <script>
           jQuery(document).bind('mobileinit',function() {
-              console.log('mobileinit');  
-              //pagebeforecreate
-              $('#signdisplay').live('pagecreate',function(event,ui){
+              $('#signdisplay').live('pagebeforecreate',function(event,ui){
                   console.log(this);
                   console.log(event);
                   console.log(ui);
               });
           });
         </script>
-	<script src="jquery-mobile/jquery.mobile.js"></script> 
-	<script src="jquery-mobile/scrollview/jquery.mobile.scrollview.js"></script> 
   </head>
   <body>
-    <!-- do not put @ID here or we lose state! -->
-    <div data-role="page" class="type-interior"> 
+    <!-- do NOT put @ID here or we lose state! -->
+    <div no-id="home-page" data-role="page" class="type-interior"> 
       <div data-role="header" data-position="fixed" style="background-color:white;"> 
-        <div data-role="navbar"> 
-          <ul> 
-            <li><a href="#errorpage" data-rel="dialog">Load Data</a></li> 
-            <li><a href="jmobile.html" class="ui-btn-active ui-state-persist">Word Search</a></li>
-            <li><a href="composer.html">Compose</a></li> 
-            <li><a href="about.html">About</a></li> 
-            <!--li><a href="signsearch.html">Sign Search</a></li> 
-            <li><a href="addsign.html">Add Sign</a></li--> 
-          </ul> 
-        </div><!-- /navbar --> 
-
-        <div class="">
-          <div id="header-wordsearch">
-            <div id="" data-role="fieldcontain" style="padding:0px;">
-              <form name="wordsearch" id="wordsearch" class="ui-bar-c" role="search"
-                    data-role="none" data-ajax="false">
-                <input type="search" id="q" name="q" />
-              </form>
-            </div>
-          </div>
-        </div>
-        <!--h1>Albums</h1> 
-        <a href="../../" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-home">Home</a--> 
+        <form name="wordsearch" id="wordsearch" class="ui-bar-c" role="search"
+              data-role="none" data-ajax="false"
+              style="padding-right:50px;'" >
+          <input type="search" id="q" name="q" placeholder="Search Signs" />
+        </form>
+        <a href="cheatsheet.html" data-icon="star" data-iconpos="notext" data-rel="dialog" class="ui-btn-right jqm-home">Cheatsheet</a> 
       </div> <!--header-->
 	
       <div data-role="content"> 
         <div class="content-secondary"> 
           <ul id="results" data-role="listview" data-inset="true" 
               class="ui-scrolllistview"> 
-            <li><a href="#signdisplay" data-rel="dialog">sign display</a></li> 
-            <li><a href="#" onclick="$('#text').text('hello');$.mobile.changePage( '#signdisplay', {} );console.log(this);">foo</a></li> 
+          </ul> 
+          
+          <ul id="links" data-role="listview" data-inset="true" 
+              class="ui-scrolllistview"> 
+            <li><a href="#errorpage" data-rel="dialog">Load Data: Dictionary, Sign Glyphs</a></li> 
+            <li>
+              Click the star in the upper right anywhere to see the SignWriting Cheatsheet!
+            </li>
+            <li>
+              <a href="composer.html" data-rel="dialog">Create new signs</a>
+            </li>
+            <li><a href="about.html" data-rel="dialog">About SkySigns</a></li> 
           </ul> 
           
           
@@ -69,9 +58,11 @@
       </div><!-- /content search --> 
     </div><!-- /page search --> 
 
-    <div id="signdisplay" data-role="dialog"> 
+    <div id="signdisplay" data-role="page"> 
       <div data-role="header" data-theme="d"> 
+        <a href="#" data-rel="back" data-direction="reverse" data-icon="delete" data-iconpos="notext">Back</a> 
         <h2 id="terms" style="text-overflow:inherit;white-space:normal;"></h2> 
+        <a href="cheatsheet.html" data-icon="star" data-iconpos="notext" data-rel="dialog" class="ui-btn-right jqm-home">Cheatsheet</a> 
       </div> 
       <div data-role="content" style="background-color:white;"> 
         <div id="text"></div>
@@ -83,29 +74,33 @@
       <div data-role="header" data-theme="d"> 
         <h1>Data</h1> 
       </div> 
-      <ul id="error" data-role="listview" data-inset="true">
-        <li id="dicttest" class="loadaction"><button>Load Dictionary</button>
+      <div data-role="content"  class="ui-body">
+        <ul id="error" data-role="listview">
+          <li id="dicttest" class="loadaction">
+            <button>Load Dictionary</button>
+              <div class="progress"><div class="bar"></div></div>
+              <div class="msg">not loaded</div>
+          </li>
+          <li id="signstest" class="loadaction"><button>Load Signs</button>
           <div class="progress"><div class="bar"></div></div>
 	  <div class="msg">not loaded</div>
-	</li>
-        <li id="signstest" class="loadaction"><button>Load Signs</button>
+          </li>
+          <li id="pathstest" class="loadaction"><button>Load Paths</button>
           <div class="progress"><div class="bar"></div></div>
 	  <div class="msg">not loaded</div>
-	</li>
-        <li id="pathstest" class="loadaction"><button>Load Paths</button>
-          <div class="progress"><div class="bar"></div></div>
-	  <div class="msg">not loaded</div>
-	</li>
-	<li>Debugging:</li>
-        <li id="ajaxtest"><button>text remote ajax</button></li>
-        <li id="canvastest"><button>test canvas</button>
+          </li>
+          <li>Debugging:</li>
+          <li id="ajaxtest"><button>text remote ajax</button></li>
+          <li id="canvastest"><button>test canvas</button>
 	  <div class="msg"></div>
-	</li>
-      </ul>
+          </li>
+        </ul>
+      </div>
     </div>
     <script>
       window.initSkyS = function() {
 	    jQuery('#error').append('<li>deviceready orig?:'+window.openDatabase_orig+'</li>');
+	    jQuery('#error').append('<li>location: '+document.location+'</li>');
       window.si.init(window.ss,window.sd,{
           base_path:'',
           remote_path:'http://skyb.us/static/signlanguage/',
@@ -114,19 +109,25 @@
               shapes:'sql'
           },
           viewer:CanvgViewer,
-          loadpaths:true//false
+          loadpaths:true
       });
       }
       if (window.PhoneGap) {
 	  //is not currently working.  why not?
 	  PhoneGap.onDeviceReady.subscribeOnce(window.initSkyS);
       } else {
-	  initSkyS();
+          jQuery(document).bind('mobileinit',initSkyS);
       }
       jQuery(window).bind('load',function() {
          $('#q').focus();
       });
+      jQuery('.type-interior').bind('pageshow',function() {
+         $('#q').select();
+      });
     </script>              
     <!--script async src="http://debug.phonegap.com/target/target-script-min.js#sksky"></script-->
+    <script src="jquery-mobile/jquery.mobile.js"></script> 
+    <script src="jquery-mobile/scrollview/jquery.mobile.scrollview.js"></script> 
+
   </body>
 </html>
