@@ -14,7 +14,7 @@ SkyInterface.prototype = {
         if (opts.loadpaths) {
             setTimeout(function() {
                 self.signs.loadPaths(progress); 
-            },2000);
+            },0); //breaks composer if non-zer0 visited first
         }
 	this.loadinterface();
 	var debug = this.debug();
@@ -97,7 +97,7 @@ SkyInterface.prototype = {
         var self = this;
         self.viewer.clear();//remove any previous sign
         this.dict.getEntry(entry,function(x) {
-		switch(x.type) {
+	    switch(x.type) {
             case 'entry': 
                 self.signs.showSign(self.viewer,x.item.shapes);
                 $('#text').html(x.item.txt);
@@ -194,6 +194,9 @@ SkySigns.prototype = {
     },
     getPath:function(i) { return this.paths[i]; },
     showSign:function(viewer,shapetext) {
+        if (!shapetext) {
+            throw Error("no shapetext");
+        }
         var shapes = this.ksw2cluster(shapetext);
         for (var i=0;i<shapes.length;i++) {
             var s = shapes[i];

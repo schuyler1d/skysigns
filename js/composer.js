@@ -1,12 +1,16 @@
-window.si.init(window.ss,window.sd,{
-    base_path:'',
-    storage:{
-        paths:'sql',
-        shapes:'sql'
-    },
-    viewer:CanvgViewer,
-    loadpaths:true
-});
+if (!window.si.db) {
+    window.si.init(window.ss,window.sd,{
+        base_path:'',
+        storage:{
+            paths:'sql',
+            shapes:'sql'
+        },
+        viewer:CanvgViewer,
+        loadpaths:true
+    });
+}
+
+console.log('composer.js loading');
 
 $('#composer-page').live('pagecreate',function(event,ui){
     var list = jQuery('#letterlist').get(0);

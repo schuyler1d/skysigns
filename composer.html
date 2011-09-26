@@ -4,42 +4,24 @@
     <title>Sign Writing Dictionary</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet"  href="jquery-mobile/jquery.mobile.css" />  
+    <link rel="stylesheet"  href="style/style.css" />  
     <style>
-      #editor {
-        float:right;
-      }
-      #composer-page {
-        background-color:white;
-      }
-      .canvas {border:1px solid black;}
-      li {display:inline-block;
-          list-style-type:none;
-          border:1px solid black;
-          padding:2px;
-          }
     </style>
     <script src="js/jquery.min.js"></script> 
     <script src="js/skystore.js"></script> 
     <script src="js/canvg.js"></script> 
     <script src="js/svg2canvas.js"></script> 
     <script src="js/skysign.js"></script>
-    <script src="js/select.js"></script> 
     <script src="jquery-mobile/jquery.mobile.js"></script> 
   </head>
   <body>
-    <div data-role="page" class="type-interior"> 
+    <div id="composer-page" data-role="page"> 
       <div data-role="header" data-position="fixed" style="background-color:white;"> 
-        <div data-role="navbar"> 
-          <ul> 
-            <li><a href="#errorpage" data-rel="dialog">Load Data</a></li> 
-            <li><a href="jmobile.html">Word Search</a></li> 
-            <li><a href="composer.html" class="ui-btn-active ui-state-persist">Compose</a></li> 
-            <li><a href="about.html">About</a></li> 
-            <!--li><a href="signsearch.html">Sign Search</a></li> 
-            <li><a href="addsign.html">Add Sign</a></li--> 
-          </ul> 
-        </div><!-- /navbar --> 
-        <div id="composer-page" data-role="content" data-theme="d"> 
+        <input type="text" name="word" value="" placeholder="Word (comma-separate terms)" style="margin-left:50px;"/>        
+        <input type="button" value="Save"  />        
+        <a href="cheatsheet.html" data-icon="star" data-iconpos="notext" data-rel="dialog" class="ui-btn-right jqm-home">Cheatsheet</a> 
+      </div>
+      <div id="composer-page-content" data-role="content" data-theme="d"> 
           <div id="editor">
             <canvas id="current" class="canvas" width="60" height="60"></canvas>
             <form id="handshape">
@@ -74,8 +56,17 @@
           <ul id="letterlist">
           </ul>
         </div>
+        <div id="searchchoices">
+          these need to be tagged in files/database
+          head? trunk? arm?
+          touch: contact/rub/hold/strike/brush?
+          motion: straight, circle, other
+          hand: shape (common confusions: a/s,b/open,g/L/bent,k/2,v/bent,1/x,6/w,f/open,m/3-closed)
+          motion: curl/uncurl, bend, piano
+          
+        </div>
+        <script src="js/select.js"></script> 
+        <script src="js/composer.js"></script> 
       </div>
-    </div>
-    <script src="js/composer.js"></script> 
   </body>
 </html>

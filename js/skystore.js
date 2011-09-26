@@ -78,7 +78,6 @@ if (window.openDatabase) {
 	},
 	getShape:function(key,callback) {
 	    var self = this;
-	    console.log(key);
 	    this.db.transaction(function(tx) {
 		tx.executeSql('SELECT * FROM shapes WHERE key=?',[key],function(tx,res) {
 		    if (res.rows.length) {

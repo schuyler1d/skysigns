@@ -17,3 +17,23 @@
    text-align:center;
 }
 
+/****
+   Composer
+****/
+#editor 
+{
+  float:right;
+  }
+#composer-page-content 
+{
+  background-color:white;
+  }
+.canvas {border:1px solid black;}
+
+#letterlist li 
+{
+  display:inline-block;
+  list-style-type:none;
+  border:1px solid black;
+  padding:2px;
+  }

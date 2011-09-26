@@ -167,7 +167,8 @@ def parse_spml(spmlfile):
                 entry['ksw'] = csw2ksw(val.wholeText)
             elif val.nodeType==4: #cdata
                 entry['terms'].append(val.wholeText)
-        rv.append(entry)
+        if 'ksw' in entry:
+            rv.append(entry)
     return rv
         
 def spml2tables(spmlfile,shape_data=None):
