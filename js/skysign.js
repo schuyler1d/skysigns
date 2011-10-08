@@ -30,6 +30,16 @@ SkyInterface.prototype = {
             if (this.value.length > 1)
                 self.search(this.value);
         });
+
+        $('#composer-page').live('pagecreate',function(event,ui){
+            console.log('hi');
+            jQuery.getScript('js/select.js',function() {
+                console.log(this);
+                console.log('hi');
+                self.composer = new Composer().init(self);
+            });
+        });
+
 	debug.middle();
         jQuery('#ajaxtest button').click(this.ajax);
 	try { // this will fail if openDatabase returns NULL
