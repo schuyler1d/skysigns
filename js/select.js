@@ -3,6 +3,7 @@ Composer.prototype = {
     init:function(si) {
         this.si = si;
         var list = jQuery('#letterlist').get(0);
+        console.log(this.glyphs);
         for (a in this.glyphs) {
             var glyphs = this.glyphs[a];
             for (var i=0,l=glyphs.length;i<l;i++) {

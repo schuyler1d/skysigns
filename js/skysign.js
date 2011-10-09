@@ -32,6 +32,9 @@ SkyInterface.prototype = {
         });
 
         $('#composer-page').live('pagecreate',function(event,ui){
+            /* This could be run every time, but we set data-dom-cache="true" in html,
+               so we don't re-render all the glyphs if someone loads this page.
+             */
             jQuery.getScript('js/select.js',function() {
                 self.composer = new Composer().init(self);
             });

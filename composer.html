@@ -16,15 +16,15 @@
     <script src="js/select.js"></script> 
   </head>
   <body>
-    <div id="composer-page" data-role="page"> 
+    <div id="composer-page" data-role="page" data-dom-cache="true"> 
       <div data-role="header"> 
         <input type="text" name="word" value="" placeholder="Word (comma-separate terms)" style="margin-left:50px;"/>        
-        <input type="button" value="Save"  />        
         <a href="cheatsheet.html" data-icon="star" data-iconpos="notext" data-rel="dialog" class="ui-btn-right jqm-home">Cheatsheet</a> 
       </div>
       <div id="composer-page-content" data-role="content" data-theme="d"> 
           <div id="editor">
             <canvas id="current" class="canvas" width="60" height="60"></canvas>
+            <input type="button" value="Save"  />        
             <form id="handshape">
               hand
               <fieldset>
