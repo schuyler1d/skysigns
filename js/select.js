@@ -3,14 +3,14 @@ Composer.prototype = {
     init:function(si) {
         this.si = si;
         var list = jQuery('#letterlist').get(0);
-        for (a in this.guides) {
-            var glyphs = [a];
+        for (a in this.glyphs) {
+            var glyphs = this.glyphs[a];
             for (var i=0,l=glyphs.length;i<l;i++) {
                 this.addShape(glyphs[i],list);
             }
         }
         return this;
-    }
+    },
     putShape:function(ctx,key) {
         var self = this;
         this.si.signs.getShape(key, function(s) {

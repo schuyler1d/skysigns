@@ -1,6 +1,5 @@
 /*
-          remote_path:'http://skyb.us/static/signlanguage/',
-*/
+ */
 
 function SkyInterface(){}
 SkyInterface.prototype = {
@@ -9,6 +8,7 @@ SkyInterface.prototype = {
         ///func.bind() NOT supported in 1.5 android!
 	var progress = function(x){return self.progress(x);};
         jQuery('#error').append('<li>pre</li>');
+        this.opts = opts;
         this.db = new SkyDB().open(progress);
         this.dict = dict.open(this.db,opts);
         this.signs = signs.open(this.db,opts);
@@ -32,10 +32,7 @@ SkyInterface.prototype = {
         });
 
         $('#composer-page').live('pagecreate',function(event,ui){
-            console.log('hi');
             jQuery.getScript('js/select.js',function() {
-                console.log(this);
-                console.log('hi');
                 self.composer = new Composer().init(self);
             });
         });

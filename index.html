@@ -28,7 +28,7 @@
       <div data-role="header" data-position="fixed" style="background-color:white;"> 
         <form name="wordsearch" id="wordsearch" class="ui-bar-c" role="search"
               data-role="none" data-ajax="false"
-              style="padding-right:50px;'" >
+              style="padding-right:50px;">
           <input type="search" id="q" name="q" placeholder="Search Signs" />
         </form>
         <a href="cheatsheet.html" data-icon="star" data-iconpos="notext" data-rel="dialog" class="ui-btn-right jqm-home">Cheatsheet</a> 
@@ -42,7 +42,7 @@
           
           <ul id="links" data-role="listview" data-inset="true" 
               class="ui-scrolllistview"> 
-            <li><a href="#errorpage" data-rel="dialog">Load Data: Dictionary, Sign Glyphs</a></li> 
+            <li><a href="#errorpage" data-rel="dialog">Load Dictionary and Glyphs</a></li> 
             <li>
               Click the star in the upper right anywhere to see the SignWriting Cheatsheet!
             </li>
@@ -103,7 +103,9 @@
 	    jQuery('#error').append('<li>location: '+document.location+'</li>');
       window.si.init(window.ss,window.sd,{
           base_path:'',
-          remote_path:'http://skyb.us/static/signlanguage/',
+          remote_path:((document.location.protocol==='file:')
+                  ? 'http://skyb.us/static/signlanguage/'
+                  : ''),
           storage:{
               paths:'sql',
               shapes:'sql'
