@@ -18,33 +18,39 @@
   <body>
     <div id="composer-page" data-role="page" data-dom-cache="true"> 
       <div data-role="header">
-        <input type="text" name="word" value="" placeholder="Word (comma-separate terms)" style="margin-left:50px;"/>        
+        <input id="compose-term" type="text" name="word" value="" placeholder="Terms: comma-separate" class="ui-bar-c" />
         <a href="cheatsheet.html" data-icon="star" data-iconpos="notext" data-rel="dialog" class="ui-btn-right jqm-home">Cheatsheet</a> 
       </div>
       <div id="composer-page-content" data-role="content" data-theme="d"> 
-        <div id="composer-top">
-          <input type="button" disabled="disabled" value="Save"  />        
-          <select id="composer-add" data-native-menu="false">
-            <option value="Add" selected="selected">Add</option>
-            <option value="hand">hand shape</option>
-            <option value="context">context or facial expression</option>
-            <option value="contact">touch/contact</option>
-            <option value="motion">motion</option>
-            <option value="sequence">symbols to indicate sequence (1st, 2nd..)</option>
-          </select>
-
+        <div id="composer-top" data-role="listview">
+            <fieldset> 
+              <div id="composer-save-wrapper">
+                <input id="composer-save" type="button" disabled="disabled" 
+                       value="Save"  />        
+              </div>
+              <div id="composer-add-wrapper">
+              <select id="composer-add" data-native-menu="false">
+                <option value="Add" selected="selected">Add</option>
+                <option value="hand">hand shape</option>
+                <option value="context">context or facial expression</option>
+                <option value="contact">touch/contact</option>
+                <option value="motion">motion</option>
+                <option value="sequence">symbols to indicate sequence (1st, 2nd..)</option>
+              </select>
+              </div>
+            </fieldset>
         </div>
-        <canvas id="composer-canvas" class="canvas" width="200" height="200"></canvas>
-        <ul id="current-shapes">
-          <!--li>
-            <canvas id="current" class="canvas" width="60" height="60"></canvas>
-          </li-->
-        </ul>
-        <div>
+        <div id="composer-shapes">
+          <canvas id="composer-canvas" class="canvas" width="200" height="200"></canvas>
+          <ul id="current-shapes">
+            <!--li>
+              <canvas id="current" class="canvas" width="60" height="60"></canvas>
+            </li-->
+          </ul>
         </div>
         <div id="editor">
           <div id="hand">
-            <form id="hand-custom">
+            <form id="hand-custom" class="composer-select">
               <ul id="hand-custom-list" data-role="listview">
                 <li data-role="list-divider">Edit Hand</li> 
                 <li data-role="fieldcontain">
@@ -58,11 +64,11 @@
                            name="hand" value="right" />
                   </fieldset>
                 </li>
-                <li data-role="fieldcontain">
+                <li id="hand-palm" data-role="fieldcontain">
                   <fieldset data-role="controlgroup" data-type="horizontal">
                     <legend>palm faces</legend>
-                    <label for="palm-forward">forward</label>
-                    <input id="palm-forward" type="radio" 
+                    <label for="palm-away">forward</label>
+                    <input id="palm-away" type="radio" 
                            name="palm" value="forward" />
                     <label for="palm-back">back</label>
                     <input id="palm-back" type="radio" 
@@ -85,24 +91,16 @@
                 <li data-role="fieldcontain">
                   <button>delete hand shape</button>                  
                 </li>
+              </ul>
             </form>
-            <ul id="hand-select" data-role="listview">
+            <ul id="hand-select" class="composer-select" data-role="listview">
               <li data-role="list-divider">Select Hand Shape</li>
-              <li>
+              <li class="nopadding">
                 <div id="hand-letterlist">
                 </div>
               </li>
             </ul>
           </div>
-        </div>
-        <div id="searchchoices">
-          these need to be tagged in files/database
-          head? trunk? arm?
-          touch: contact/rub/hold/strike/brush?
-          motion: straight, circle, other
-          hand: shape (common confusions: a/s,b/open,g/L/bent,k/2,v/bent,1/x,6/w,f/open,m/3-closed)
-          motion: curl/uncurl, bend, piano
-          
         </div>
       </div>
   </body>

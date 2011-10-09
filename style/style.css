@@ -22,13 +22,22 @@
 ****/
 #composer-top
 {
-  float:right;
+  margin-bottom:2px;
   }
+
+input#compose-term
+{ 
+  width:auto; 
+  margin-right:50px;/*avoid star link*/ 
+  margin-left:50px;
+}
+
 #composer-page-content 
 {
   background-color:white;
   }
-.canvas {border:1px solid black;}
+.canvas 
+{ border:1px solid black;}
 
 #composer-add-button
 { min-width:8em; }
@@ -39,9 +48,9 @@ ul#current-shapes
   margin:0;
  }
 
-#composer-canvas
+#composer-shapes
 { 
-  margin-bottom:50px;
+  margin-bottom:30px;
  }
 #current-shapes li 
 { 
@@ -57,3 +66,27 @@ ul#current-shapes
   border:1px solid black;
   padding:2px;
   }
+
+.composer-select 
+{ 
+  display:none;
+ }
+#hand-select .nopadding 
+{ padding:0; }
+#hand-palm .ui-btn-inner
+{ 
+  padding-left:19px;
+  padding-right:19px;
+ }
+#composer-save-wrapper 
+{ 
+  float:left;
+  width:8em;
+  /*margin-top:-0.5em;
+  margin-bottom:0.5em;*/
+ }
+#composer-add-wrapper 
+{ 
+  float:right;
+ }
+
