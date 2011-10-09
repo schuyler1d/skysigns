@@ -11,14 +11,16 @@ motion: curl/uncurl, bend, piano
 
 Composer = function(){}
 Composer.prototype = {
+    opened_sections:{},
     init:function(si) {
         var self = this;
         this.si = si;
         jQuery('#composer-add').change(function(evt,ui) {
             var section = $(this).val();
-            $(this).val('Add').selectmenu('refresh');;
-            console.log(section);
-            self.selectSection(section);
+            $(this).val('Add').selectmenu('refresh');
+            setTimeout(function() {
+                self.selectSection(section);
+            },100);
         });
         var sec = this.sections.hand;
         this.createSymbolList(jQuery('#hand-letterlist').get(0),
@@ -31,9 +33,12 @@ Composer.prototype = {
         this.shown = $('#'+section+'-select').show();
         var sec = this.sections[section];
         console.log(this.shown);
-        this.createSymbolList($('#'+section+'-letterlist').get(0),
-                              sec.first,
-                              {size:sec.size});
+        if (!(section in this.opened_sections)) {
+            this.opened_sections[sections] = {};
+            this.createSymbolList($('#'+section+'-letterlist').get(0),
+                                  sec.first,
+                                  {size:sec.size});
+        }
     },
     createSymbolList:function(target,glyphs,opts) {
         var self = this;
