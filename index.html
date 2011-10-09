@@ -97,36 +97,6 @@
         </ul>
       </div>
     </div>
-    <script>
-      window.initSkyS = function() {
-	    jQuery('#error').append('<li>deviceready orig?:'+window.openDatabase_orig+'</li>');
-	    jQuery('#error').append('<li>location: '+document.location+'</li>');
-      window.si.init(window.ss,window.sd,{
-          base_path:'',
-          remote_path:((document.location.protocol==='file:')
-                  ? 'http://skyb.us/static/signlanguage/'
-                  : ''),
-          storage:{
-              paths:'sql',
-              shapes:'sql'
-          },
-          viewer:CanvgViewer,
-          loadpaths:true
-      });
-      }
-      if (window.PhoneGap) {
-	  //is not currently working.  why not?
-	  PhoneGap.onDeviceReady.subscribeOnce(window.initSkyS);
-      } else {
-          jQuery(document).bind('mobileinit',initSkyS);
-      }
-      jQuery(window).bind('load',function() {
-         $('#q').focus();
-      });
-      jQuery('.type-interior').bind('pageshow',function() {
-         $('#q').select();
-      });
-    </script>              
     <!--script async src="http://debug.phonegap.com/target/target-script-min.js#sksky"></script-->
     <script src="jquery-mobile/jquery.mobile.js"></script> 
     <script src="jquery-mobile/scrollview/jquery.mobile.scrollview.js"></script> 

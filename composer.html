@@ -17,45 +17,83 @@
   </head>
   <body>
     <div id="composer-page" data-role="page" data-dom-cache="true"> 
-      <div data-role="header"> 
+      <div data-role="header">
         <input type="text" name="word" value="" placeholder="Word (comma-separate terms)" style="margin-left:50px;"/>        
         <a href="cheatsheet.html" data-icon="star" data-iconpos="notext" data-rel="dialog" class="ui-btn-right jqm-home">Cheatsheet</a> 
       </div>
       <div id="composer-page-content" data-role="content" data-theme="d"> 
-          <div id="editor">
+        <div id="composer-top">
+          <input type="button" disabled="disabled" value="Save"  />        
+          <select id="composer-add" data-native-menu="false">
+            <option value="Add" selected="selected">Add</option>
+            <option value="hand">hand shape</option>
+            <option value="context">context or facial expression</option>
+            <option value="contact">touch/contact</option>
+            <option value="motion">motion</option>
+            <option value="sequence">symbols to indicate sequence (1st, 2nd..)</option>
+          </select>
+
+        </div>
+        <canvas id="composer-canvas" class="canvas" width="200" height="200"></canvas>
+        <ul id="current-shapes">
+          <!--li>
             <canvas id="current" class="canvas" width="60" height="60"></canvas>
-            <input type="button" value="Save"  />        
-            <form id="handshape">
-              hand
-              <fieldset>
-                left
-                <input type="radio" name="hand" value="left" />
-                right
-                <input type="radio" name="hand" value="right" />
-              </fieldset>
-              palm faces
-              <fieldset>
-                forward
-                <input type="radio" name="hand" value="forward" />
-                back
-                <input type="radio" name="hand" value="back" />
-                side
-                <input type="radio" name="hand" value="side" />
-              </fieldset>
-              fingers point
-              <fieldset>
-                <input type="radio" name="orientation" value="up" />
-                <input type="radio" name="orientation" value="forward" />
-                <input type="radio" name="orientation" value="side" />
-              </fieldset>
-              <button>rotate</button>
+          </li-->
+        </ul>
+        <div>
+        </div>
+        <div id="editor">
+          <div id="hand">
+            <form id="hand-custom">
+              <ul id="hand-custom-list" data-role="listview">
+                <li data-role="list-divider">Edit Hand</li> 
+                <li data-role="fieldcontain">
+                  <fieldset data-role="controlgroup" data-type="horizontal">
+                    <legend>hand</legend>
+                    <label for="hand-left">left</label>
+                    <input id="hand-left" type="radio" 
+                           name="hand" value="left" />
+                    <label for="hand-right">right</label>
+                    <input id="hand-right" type="radio" 
+                           name="hand" value="right" />
+                  </fieldset>
+                </li>
+                <li data-role="fieldcontain">
+                  <fieldset data-role="controlgroup" data-type="horizontal">
+                    <legend>palm faces</legend>
+                    <label for="palm-forward">forward</label>
+                    <input id="palm-forward" type="radio" 
+                           name="palm" value="forward" />
+                    <label for="palm-back">back</label>
+                    <input id="palm-back" type="radio" 
+                           name="palm" value="back" />
+                    <label for="palm-side">side</label>
+                    <input id="palm-side" type="radio" 
+                           name="palm" value="side" />
+                  </fieldset>
+                </li>
+                <li data-role="fieldcontain">
+                  finger orientation
+                  <select id="hand-orientation" data-native-menu="false">
+                    <option value="floor">forward</option>
+                    <option value="body">up or to the side</option>
+                  </select>
+                </li>
+                <li data-role="fieldcontain">
+                  <button>rotate</button>
+                </li>
+                <li data-role="fieldcontain">
+                  <button>delete hand shape</button>                  
+                </li>
             </form>
-            <ul id="canvasqueue">
+            <ul id="hand-select" data-role="listview">
+              <li data-role="list-divider">Select Hand Shape</li>
+              <li>
+                <div id="hand-letterlist">
+                </div>
+              </li>
             </ul>
           </div>
-          <canvas id="canvas" class="canvas" width="200" height="200"></canvas>
-          <ul id="letterlist">
-          </ul>
         </div>
         <div id="searchchoices">
           these need to be tagged in files/database

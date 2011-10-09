@@ -20,7 +20,7 @@
 /****
    Composer
 ****/
-#editor 
+#composer-top
 {
   float:right;
   }
@@ -30,7 +30,27 @@
   }
 .canvas {border:1px solid black;}
 
-#letterlist li 
+#composer-add-button
+{ min-width:8em; }
+
+ul#current-shapes 
+{ 
+  padding:0;
+  margin:0;
+ }
+
+#composer-canvas
+{ 
+  margin-bottom:50px;
+ }
+#current-shapes li 
+{ 
+  display:inline-block;
+  list-style-type:none;
+ }
+
+#hand-letterlist li,
+#hand-letterlist .hand-shape-choice
 {
   display:inline-block;
   list-style-type:none;

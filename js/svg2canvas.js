@@ -47,14 +47,16 @@ SvgNormal.prototype = {
 
 CanvgViewer = function(){}
 CanvgViewer.prototype = {
-    init:function(cb) {
+    init:function(cb,id) {
         var self = this;
         var onload = function() {
-            self.ctx=self.canvas.getContext('2d');
-	    if (cb) cb();
+            if (self.canvas) {
+                self.ctx=self.canvas.getContext('2d');
+	        if (cb) cb();
+            }
         }
         jQuery(function() {
-            self.canvas = document.getElementById('canvas');
+            self.canvas = document.getElementById(id);
             if (!window.canvg) {
                 var y = document.createElement('script');y.src = 'js/canvg.js';
                 document.body.appendChild(y);

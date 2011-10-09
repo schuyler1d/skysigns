@@ -19,7 +19,7 @@ SkyInterface.prototype = {
         }
 	this.loadinterface();
 	var debug = this.debug();
-        this.viewer = new opts.viewer().init(debug.onviewer);
+        this.viewer = new opts.viewer().init(debug.onviewer,'canvas');
 
         jQuery(document.forms.wordsearch).submit(function(evt) {
             evt.preventDefault();
@@ -305,3 +305,31 @@ window.ss = new SkySigns();
 window.sd = new SkyDictionary();
 window.si = new SkyInterface();
 
+window.initSkyS = function() {
+    jQuery('#error').append('<li>deviceready orig?:'+window.openDatabase_orig+'</li>');
+    jQuery('#error').append('<li>location: '+document.location+'</li>');
+    window.si.init(window.ss,window.sd,{
+        base_path:'',
+        remote_path:((document.location.protocol==='file:')
+                     ? 'http://skyb.us/static/signlanguage/'
+                     : ''),
+        storage:{
+            paths:'sql',
+            shapes:'sql'
+        },
+        viewer:CanvgViewer,
+        loadpaths:true
+    });
+}
+if (window.PhoneGap) {
+    //is not currently working.  why not?
+    PhoneGap.onDeviceReady.subscribeOnce(window.initSkyS);
+} else {
+    jQuery(document).bind('mobileinit',initSkyS);
+}
+jQuery(window).bind('load',function() {
+    $('#q').focus();
+});
+jQuery('.type-interior').bind('pageshow',function() {
+    $('#q').select();
+});

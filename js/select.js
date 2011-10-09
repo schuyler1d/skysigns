@@ -2,8 +2,11 @@ Composer = function(){}
 Composer.prototype = {
     init:function(si) {
         this.si = si;
-        var list = jQuery('#letterlist').get(0);
-        console.log(this.glyphs);
+        jQuery('#composer-add').change(function(evt,ui) {
+            console.log($(this).val());
+            $(this).val('Add').selectmenu('refresh');;
+        });
+        var list = jQuery('#hand-letterlist').get(0);
         for (a in this.glyphs) {
             var glyphs = this.glyphs[a];
             for (var i=0,l=glyphs.length;i<l;i++) {
@@ -20,7 +23,7 @@ Composer.prototype = {
     },
     addShape:function(sym,list) {
         var key = sym[1];
-        var li = jQuery("<li>").appendTo(list).get(0);
+        var li = jQuery("<div class='hand-shape-choice'>").appendTo(list).get(0);
         var abc = jQuery("<span>").appendTo(li).text(sym[0]);
         var ctx = this.si.viewer.createContext(li,30,30,key);
         this.putShape(ctx,key);
@@ -88,8 +91,8 @@ Composer.prototype = {
         'hand motion': [
             ['curl','21600'],
             ['uncurl finger','21b00'],
-            ['bend (back and forth)','22104'], //multiple,rotate
-            ['piano fingers','']
+            ['bend (back and forth)','22104'] //multiple,rotate
+            //,['piano fingers','']
         ]
     }
 }
