@@ -12,7 +12,7 @@ motion: curl/uncurl, bend, piano
 Composer = function(){}
 Composer.prototype = {
     opened_sections:{},
-    current_shapes:[],
+    current_shapes:{},
     id_suffix:0,
     init:function(si) {
         var self = this;
@@ -30,7 +30,6 @@ Composer.prototype = {
         var self = this;
         this.switchShown(section+'-select');
         var sec = this.sections[section];
-        console.log(this.shown);
         if (!(section in this.opened_sections)) {
             this.createSymbolList($('#'+section+'-letterlist').get(0),
                                   sec.first,
@@ -81,27 +80,50 @@ Composer.prototype = {
     },
     editNewShape:function(opts) {
         var self = this;
-        var dom = this.addShape([false,opts.key],
+        opts.dom = this.addShape([false,opts.key],
                                 $('#current-shapes').get(0),
                                 {size:50,
                                  onclick:function(evt){
                                      self.selectShape(this,opts);
                                  }
                                 });
-        this.current_shapes.push({'dom':dom,
-                                  'section':opts.section,
-                                  'key':opts.key});
-        this.selectShape(dom,opts);
+        this.current_shapes[opts.dom.id] = opts;
+        this.selectShape(opts.dom,opts);
     },
     selectShape:function(dom,shobj) {
         //when someone selects one of the 'current-shapes' to re-edit
         this.switchShown(shobj.section+'-custom');
+        if (this.current_shape) 
+            $(this.current_shape.dom).removeClass('ui-btn-active');
+        this.current_shape = this.current_shapes[shobj.dom.id];
         $(dom).addClass('ui-btn-active')
-        console.log(shobj.key);
     },
     sections: {
         "hand":{
             "size":34, "ranges":['10000','20400'],
+            "transforms":{
+                'side':function(key,side){
+                    var cur = parseInt(key[4],16);
+                    var dig = ((side==='right') ? 0 : 8);
+                    if (cur > 7) cur=cur-8;
+                    return key.substr(0,4)+((cur+dig).toString(16));
+                },
+                'palm':function(key,palm) {
+                    var cur = ((parseInt(key[3],16)>2)?3:0);
+                    var p = {'back':0,'side':1,'away':2};
+                    return (key.substr(0,3)+(cur+p[palm])+key.substr(4,1));
+                },
+                'orient':function(key,orient) { //broken fingers
+                    var cur = parseInt(key[3],16) % 3;
+                    var o = {'floor':3,'body':0};
+                    return (key.substr(0,3)+(cur+o[orient])+key.substr(4,1));
+                },
+                'rotate':function(key,rot) {
+                    var cur = parseInt(parseInt(key[4],16) / 8,10);
+                    rot = rot % 8;
+                    return key.substr(0,4)+((cur+rot).toString(16));
+                }
+            },
             "first":[
                 ['a','1f720'],['b','14720'],['c','16d20'],
                 ['d','10128'],['e','14a20'],['f','1ce20'],
