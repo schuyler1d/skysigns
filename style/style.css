@@ -59,7 +59,7 @@ ul#current-shapes
  }
 
 #hand-letterlist li,
-#hand-letterlist .hand-shape-choice
+.glyph
 {
   display:inline-block;
   list-style-type:none;

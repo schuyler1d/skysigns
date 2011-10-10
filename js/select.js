@@ -12,6 +12,8 @@ motion: curl/uncurl, bend, piano
 Composer = function(){}
 Composer.prototype = {
     opened_sections:{},
+    current_shapes:[],
+    id_suffix:0,
     init:function(si) {
         var self = this;
         this.si = si;
@@ -22,29 +24,32 @@ Composer.prototype = {
                 self.selectSection(section);
             },100);
         });
-        var sec = this.sections.hand;
-        this.createSymbolList(jQuery('#hand-letterlist').get(0),
-                              sec.first,
-                              {size:sec.size});
         return this;
     },
     selectSection:function(section) {
-        if (this.shown) this.shown.hide();
-        this.shown = $('#'+section+'-select').show();
+        var self = this;
+        this.switchShown(section+'-select');
         var sec = this.sections[section];
         console.log(this.shown);
         if (!(section in this.opened_sections)) {
-            this.opened_sections[sections] = {};
             this.createSymbolList($('#'+section+'-letterlist').get(0),
                                   sec.first,
-                                  {size:sec.size});
+                                  {size:sec.size,
+                                   section:section,
+                                   onclick:function(evt) {
+                                       self.editNewShape(evt.data);
+                                   }
+                                  });
         }
     },
     createSymbolList:function(target,glyphs,opts) {
         var self = this;
+        if (opts.section && ! this.opened_sections[opts.section]) {
+            this.opened_sections[opts.section] = {};
+        }
         var addAsync = function(g) {
             setTimeout(function() {
-                self.addShape(g,target,opts.size);
+                self.addShape(g,target,opts);
             },100);
         }
         for (var i=0,l=glyphs.length;i<l;i++) {
@@ -57,15 +62,42 @@ Composer.prototype = {
             self.si.viewer.insertShape(s,0,0,'#000000',ctx);
         })
     },
-    addShape:function(sym,list,size) {
-        var key = sym[1];
-        var li = jQuery("<div class='hand-shape-choice'>").appendTo(list).get(0);
-        var abc = jQuery("<span>").appendTo(li).text(sym[0]);
-        var ctx = this.si.viewer.createContext(li,size,size,key);
-        this.putShape(ctx,key);
-        jQuery(li).click(function(evt) {
-            console.log(key);
-        });
+    addShape:function(sym,list,opts) {
+        var self = this;
+        var shobj = {}; for (var a in opts) {shobj[a]=opts[a];}
+        shobj.key = sym[1];
+        var li = jQuery("<div class='glyph'>").appendTo(list).get(0);
+        li.id = 'composer-glyph-'+(++self.id_suffix);
+        if (sym[0]) $("<span>").appendTo(li).text(sym[0]);
+        shobj.ctx = this.si.viewer.createContext(li,opts.size,opts.size,
+                                                 shobj.key);
+        this.putShape(shobj.ctx,shobj.key);
+        if (opts.onclick) $(li).click(shobj,opts.onclick);
+        return li;
+    },
+    switchShown: function(id) {
+        if (this.shown) this.shown.hide();
+        this.shown = $('#'+id).show();        
+    },
+    editNewShape:function(opts) {
+        var self = this;
+        var dom = this.addShape([false,opts.key],
+                                $('#current-shapes').get(0),
+                                {size:50,
+                                 onclick:function(evt){
+                                     self.selectShape(this,opts);
+                                 }
+                                });
+        this.current_shapes.push({'dom':dom,
+                                  'section':opts.section,
+                                  'key':opts.key});
+        this.selectShape(dom,opts);
+    },
+    selectShape:function(dom,shobj) {
+        //when someone selects one of the 'current-shapes' to re-edit
+        this.switchShown(shobj.section+'-custom');
+        $(dom).addClass('ui-btn-active')
+        console.log(shobj.key);
     },
     sections: {
         "hand":{
@@ -89,7 +121,7 @@ Composer.prototype = {
                 ['8','1bb20'],
                 ['sick','1c500'],
                 ['know','15a00'],
-                ['applause','14c00'],
+                ['applause','14c20'],
                 ['rain','15050'],
                 ['hard','11040'],
                 ['moon','1ed10'],
