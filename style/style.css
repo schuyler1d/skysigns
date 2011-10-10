@@ -71,6 +71,12 @@ ul#current-shapes
 { 
   display:none;
  }
+#composer-side-fs .ui-controlgroup-label
+{ 
+  float:left;
+  padding-right:3em;
+ }
+
 #hand-select .nopadding 
 { padding:0; }
 #hand-palm .ui-btn-inner
@@ -90,3 +96,7 @@ ul#current-shapes
   float:right;
  }
 
+.ui-selectmenu .ui-li .ui-btn-text a.ui-link-inherit
+{ 
+  white-space:normal;
+ }

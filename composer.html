@@ -50,7 +50,7 @@
               <ul id="hand-custom-list" data-role="listview">
                 <li data-role="list-divider">Edit Hand</li> 
                 <li data-role="fieldcontain">
-                  <fieldset data-role="controlgroup" data-type="horizontal">
+                  <fieldset id="composer-side-fs" data-role="controlgroup" data-type="horizontal">
                     <legend>hand</legend>
                     <label for="hand-left">left</label>
                     <input id="hand-left" type="radio" 
@@ -74,11 +74,11 @@
                            name="palm" value="side" />
                   </fieldset>
                 </li>
-                <li data-role="fieldcontain">
-                  finger orientation
+                <li id="hand-orient" data-role="fieldcontain">
+                  <label for="hand-orientation">finger orientation</label>
                   <select id="hand-orientation" data-native-menu="false">
-                    <option value="floor">forward</option>
-                    <option value="body">up or to the side</option>
+                    <option value="floor">pointing forward ------- plane of hand position is parallel to the floor</option>
+                    <option value="body">pointing up or to the side ------ plane of hand position is parallel to your body</option>
                   </select>
                 </li>
                 <li data-role="fieldcontain">

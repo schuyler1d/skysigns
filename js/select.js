@@ -24,7 +24,30 @@ Composer.prototype = {
                 self.selectSection(section);
             },100);
         });
+        this.view = new si.opts.viewer().init(null,'composer-canvas');
+        jQuery('#composer-canvas').mousedown({self:this},this.placeGlyph);
         return this;
+    },
+    placeGlyph:function(evt) {
+        var self = evt.data.self;
+        var pos = $(this).offset();
+        if (self.current_shape) {
+            self.current_shape.pos = {'x':evt.pageX-pos.left,
+                                      'y':evt.pageY-pos.top
+                                     };
+            self.repaintCanvas();
+        }
+    },
+    repaintCanvas:function() {
+        //this.view.
+        this.view.clearpure();//clear() messes up positioning
+        for (var a in this.current_shapes) {
+            var c = this.current_shapes[a];
+            if (c.shape && c.pos) {
+                console.log(c.shape);
+                this.view.insertShape(c.shape,c.pos.x,c.pos.y);
+            }
+        }
     },
     selectSection:function(section) {
         var self = this;
@@ -55,10 +78,11 @@ Composer.prototype = {
             addAsync(glyphs[i]);
         }
     },
-    putShape:function(ctx,key) {
+    putShape:function(ctx,key,cb) {
         var self = this;
         this.si.signs.getShape(key, function(s) {
             self.si.viewer.insertShape(s,0,0,'#000000',ctx);
+            if (cb) cb(key,s);
         })
     },
     addShape:function(sym,list,opts) {
@@ -70,7 +94,9 @@ Composer.prototype = {
         if (sym[0]) $("<span>").appendTo(li).text(sym[0]);
         shobj.ctx = this.si.viewer.createContext(li,opts.size,opts.size,
                                                  shobj.key);
-        this.putShape(shobj.ctx,shobj.key);
+        this.putShape(shobj.ctx,shobj.key,function(k,s){
+            shobj.shape = s;
+        });
         if (opts.onclick) $(li).click(shobj,opts.onclick);
         return li;
     },

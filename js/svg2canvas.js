@@ -67,11 +67,19 @@ CanvgViewer.prototype = {
         });
         return this;
     },
-    clear:function() {
-        this.w = this.canvas.width = this.canvas.width;
-        this.ctx.translate(this.w/2,this.w/2);
-        this.ctx.scale(1.5,1.5);
-        this.ctx.save();
+    clearpure:function(ctx) {
+        ctx = ctx || this.ctx;
+        var w = ctx.canvas.width = ctx.canvas.width;
+        if (this.ctx == ctx) this.w=w;
+        ctx.save();
+    },
+    clear:function(ctx) {
+        ctx = ctx || this.ctx;
+        var w = ctx.canvas.width = ctx.canvas.width;
+        if (this.ctx == ctx) this.w=w;
+        ctx.translate(w/2,w/2);
+        ctx.scale(1.5,1.5);
+        ctx.save();
     },
     _transform:SvgNormal.prototype._transform,
     createContext:function(domparent,w,h) {
