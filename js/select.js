@@ -26,7 +26,26 @@ Composer.prototype = {
         });
         this.view = new si.opts.viewer().init(null,'composer-canvas');
         jQuery('#composer-canvas').mousedown({self:this},this.placeGlyph);
+        var x = jQuery('input,select','form.composer-custom')
+            .change({self:this},this.customListener)
+            .click({self:this},this.customListener)//for buttons
         return this;
+    },
+    customListener:function(evt) {
+        var self = evt.data.self;
+        var m = String(this.id).match(/^(\w+)-(\w+)/);
+        var shobj = self.current_shape;
+        if (shobj && m) {
+            var section = m[1], 
+                field = this.name,
+                val = $(this).val();
+            shobj.key = self.sections[section]
+                .transforms[field](shobj.key,val);
+            self.view.clearpure(shobj.shape_ctx);
+            self.putShape(shobj.shape_ctx,shobj.key,function(k,s){
+                shobj.shape = s;
+            });
+        }
     },
     placeGlyph:function(evt) {
         var self = evt.data.self;
@@ -44,7 +63,6 @@ Composer.prototype = {
         for (var a in this.current_shapes) {
             var c = this.current_shapes[a];
             if (c.shape && c.pos) {
-                console.log(c.shape);
                 this.view.insertShape(c.shape,c.pos.x,c.pos.y);
             }
         }
@@ -98,31 +116,32 @@ Composer.prototype = {
             shobj.shape = s;
         });
         if (opts.onclick) $(li).click(shobj,opts.onclick);
-        return li;
+        return {dom:li,shape_ctx:shobj.ctx};
     },
     switchShown: function(id) {
         if (this.shown) this.shown.hide();
-        this.shown = $('#'+id).show();        
+        return (this.shown = $('#'+id).show());
     },
     editNewShape:function(opts) {
         var self = this;
-        opts.dom = this.addShape([false,opts.key],
+        var shobj = this.addShape([false,opts.key],
                                 $('#current-shapes').get(0),
                                 {size:50,
                                  onclick:function(evt){
                                      self.selectShape(this,opts);
                                  }
                                 });
+        for (var a in shobj) {opts[a] = shobj[a];}
         this.current_shapes[opts.dom.id] = opts;
         this.selectShape(opts.dom,opts);
     },
     selectShape:function(dom,shobj) {
         //when someone selects one of the 'current-shapes' to re-edit
-        this.switchShown(shobj.section+'-custom');
         if (this.current_shape) 
             $(this.current_shape.dom).removeClass('ui-btn-active');
         this.current_shape = this.current_shapes[shobj.dom.id];
         $(dom).addClass('ui-btn-active')
+        this.switchShown(shobj.section+'-custom');
     },
     sections: {
         "hand":{
@@ -145,8 +164,11 @@ Composer.prototype = {
                     return (key.substr(0,3)+(cur+o[orient])+key.substr(4,1));
                 },
                 'rotate':function(key,rot) {
-                    var cur = parseInt(parseInt(key[4],16) / 8,10);
-                    rot = rot % 8;
+                    if (rot==='rotate') rot = false;
+                    var cur_rot = parseInt(key[4],16);
+                    var cur = parseInt(cur_rot / 8,10);
+                    //if no rot val, then shift-rotate 45deg
+                    rot = (rot || cur_rot + 1) % 8;
                     return key.substr(0,4)+((cur+rot).toString(16));
                 }
             },
