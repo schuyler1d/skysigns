@@ -79,10 +79,11 @@ ul#current-shapes
 
 #hand-select .nopadding 
 { padding:0; }
+#hand-side .ui-btn-inner,
 #hand-palm .ui-btn-inner
 { 
-  padding-left:19px;
-  padding-right:19px;
+  padding-left:16px;
+  padding-right:16px;
  }
 #composer-save-wrapper 
 { 

@@ -297,7 +297,7 @@ SkyDictionary.prototype = {
             },
             error:function(xhr,st,e) { cb({'log':'noentries:'+e}); }
         });
-	cb({'event':"request",'type':"dict"});
+	cb({'event':"request",'type':"dict",'log':"dict.load()"});
     }
 }
 
