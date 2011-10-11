@@ -2,8 +2,7 @@
 TODO:
   1. separate out 'motion modifiers' -- adverbs
   2. if glyph paths are not loaded, then we need to load the full list.
-BUG: same glyph twice selection fails
-    FEATURE: add 'copy' -- since duplicating is common
+  3. FEATURE: add 'copy' -- since duplicating is common
 
    NEED:
 these need to be tagged in files/database
@@ -130,16 +129,17 @@ Composer.prototype = {
     },
     editNewShape:function(opts) {
         var self = this;
-        var shobj = this.addShape([false,opts.key],
+        var shobj;
+        shobj = this.addShape([false,opts.key],
                                 $('#current-shapes').get(0),
                                 {size:50,
                                  onclick:function(evt){
-                                     self.selectShape(this,opts);
+                                     self.selectShape(this,shobj);
                                  }
                                 });
-        for (var a in shobj) {opts[a] = shobj[a];}
-        this.current_shapes[opts.dom.id] = opts;
-        this.selectShape(opts.dom,opts);
+        for (var a in opts) {shobj[a] = opts[a];}
+        this.current_shapes[shobj.dom.id] = shobj;
+        this.selectShape(shobj.dom,shobj);
     },
     selectShape:function(dom,shobj) {
         //when someone selects one of the 'current-shapes' to re-edit
