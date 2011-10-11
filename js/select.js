@@ -1,6 +1,9 @@
 /*
 TODO:
-  if glyph paths are not loaded, then we need to load the full list.
+  1. separate out 'motion modifiers' -- adverbs
+  2. if glyph paths are not loaded, then we need to load the full list.
+BUG: same glyph twice selection fails
+    FEATURE: add 'copy' -- since duplicating is common
 
    NEED:
 these need to be tagged in files/database
@@ -223,14 +226,14 @@ Composer.prototype = {
             'size':30, 'ranges':['21400','2f7ff'],
             'first': [
                 //modifiers: separate section?
-                ['tension','2f900'],//~ -- can also be in face ?
+                //http://std.dkuug.dk/jtc1/sc2/wg2/docs/n4090.pdf
                 ['fast','2f700'],//< 
-                //http://www.signwriting.org/lessons/elessons/less004.html
-                ['alternate','2fd04'],
-                ['','2fc04'],//stacked simultaneous
-                ['','2fa00'],//outlined tilde
-                ['',''],
-                ['',''],
+                ['slow','2f800'],//big arc
+                ['tension','2f900'],//~
+                ['relaxed','2fa00'],//outlined tilde
+                ['every other time','2fd04'],//crossing arcs
+                ['alternating','2fc04'],//stacked arcs
+                ['gradual','2fe00'],//opposing arcs
                 //real motion
                 ['curl','21600'],
                 ['uncurl finger','21b00'],
