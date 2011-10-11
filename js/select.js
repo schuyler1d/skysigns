@@ -216,10 +216,13 @@ Composer.prototype = {
         'contact':{
             'size':30, 'ranges':['20500','21300'],
             'first':[
-                ['contact','20500','twice','20600','thrice','20610'],//rotate
+                //rotate
+                ['contact','20500','twice','20600','thrice','20610'],
                 ['hold','20800'],
-                ['strike','20b00','twice','20c00','thrice','20c10'],//rotate
+                //rotate
+                ['strike','20b00','twice','20c00','thrice','20c10'],
                 ['brush','20e00'],
+                ['touch between','20700'],//maybe combine inside contact/strike
             ]
         },
         'motion':{
