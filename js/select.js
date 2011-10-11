@@ -1,4 +1,7 @@
 /*
+TODO:
+  if glyph paths are not loaded, then we need to load the full list.
+
    NEED:
 these need to be tagged in files/database
 head? trunk? arm?
@@ -214,7 +217,6 @@ Composer.prototype = {
                 ['hold','20800'],
                 ['strike','20b00','twice','20c00','thrice','20c10'],//rotate
                 ['brush','20e00'],
-                ['simultaneous','2fb00'] //rotate
             ]
         },
         'motion':{
@@ -226,6 +228,11 @@ Composer.prototype = {
                 //,['piano fingers','']
             ]
         },
-        'sequence':{}
+        'sequence':{
+            'size':30, 'ranges':[],
+            'first':[
+                ['simultaneous','2fb00'] //rotate
+            ]
+        }
     }
 }
