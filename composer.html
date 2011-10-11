@@ -30,9 +30,10 @@
               </div>
               <div id="composer-add-wrapper">
               <select id="composer-add" data-native-menu="false">
-                <option value="Add" selected="selected">Add</option>
+                <option value="Add" selected="selected" 
+                        data-placeholder="true">Add</option>
                 <option value="hand">hand shape</option>
-                <option value="context">context or facial expression</option>
+                <option value="context">context: head, facial expressions, arm, trunk</option>
                 <option value="contact">touch/contact</option>
                 <option value="motion">motion</option>
                 <option value="sequence">symbols to indicate sequence (1st, 2nd..)</option>
@@ -105,7 +106,7 @@
             <form id="context-custom" class="composer-select composer-custom">
             </form>
             <ul id="context-select" class="composer-select" data-role="listview">
-              <li data-role="list-divider">Select Hand Shape</li>
+              <li data-role="list-divider">Select Context Glyph</li>
               <li class="nopadding">
                 <div id="context-letterlist"></div>
               </li>

@@ -7,6 +7,7 @@ http://www.signbank.org/signpuddle1.6/glyphogram.php?text=AS14c50S14c58S20600S20
 """
 import re,sys,os
 from xml.dom.minidom import parse
+import operator
 
 FILES = {
     'paths':'paths.txt',
@@ -190,7 +191,8 @@ def spml2tables(spmlfile,shape_data=None):
         except UnicodeEncodeError:
             print "Entry %s was laden with too much blessed Unicode" % entry['id']
         for c in cluster:
-            deps['shapes'][ c[0] ] = 1
+            deps['shapes'].setdefault(c[0],0)
+            deps['shapes'][ c[0] ] += 1
             if shape_data: #output path #'s instead of shapes
                 deps['paths'].update([(int(p),1) for p in 
                                       shape_data['shapes'][c[0]]['paths'] ])
@@ -202,7 +204,8 @@ def spml2tables(spmlfile,shape_data=None):
             pathmin.write('$'.join(pathdata_struct(
                         shape_data['paths'][shape_data['ordered_paths'][p]]
                         ))+"\n")
-        for s in sorted(deps['shapes'].keys()):
+        #sort by value, so most common are first
+        for s in sorted(deps['shapes'],key=deps['shapes'].get,reverse=True):
             edeps.write('$'.join(shapedata_struct(shape_data['shapes'],s))+"\n")
         edeps.close()
         pathmin.close()

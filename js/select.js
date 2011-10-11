@@ -203,15 +203,15 @@ Composer.prototype = {
                 ['new','18220']
             ]
         },
-        'context':{
-            'size':50, 'ranges':[],
+        'context':{//head,trunk,limb
+            'size':50, 'ranges':['2ff00','37eff'],
             "first":[
                 ['head','2ff00'],
                 ['trunk','36d00']
             ]
         },
         'contact':{
-            'size':30, 'ranges':[],
+            'size':30, 'ranges':['20500','21300'],
             'first':[
                 ['contact','20500','twice','20600','thrice','20610'],//rotate
                 ['hold','20800'],
@@ -220,8 +220,18 @@ Composer.prototype = {
             ]
         },
         'motion':{
-            'size':30, 'ranges':[],
+            'size':30, 'ranges':['21400','2f7ff'],
             'first': [
+                //modifiers: separate section?
+                ['tension','2f900'],//~ -- can also be in face ?
+                ['fast','2f700'],//< 
+                //http://www.signwriting.org/lessons/elessons/less004.html
+                ['alternate','2fd04'],
+                ['','2fc04'],//stacked simultaneous
+                ['','2fa00'],//outlined tilde
+                ['',''],
+                ['',''],
+                //real motion
                 ['curl','21600'],
                 ['uncurl finger','21b00'],
                 ['bend (back and forth)','22104'] //multiple,rotate
@@ -229,9 +239,9 @@ Composer.prototype = {
             ]
         },
         'sequence':{
-            'size':30, 'ranges':[],
+            'size':30, 'ranges':['2f700','2feff'],
             'first':[
-                ['simultaneous','2fb00'] //rotate
+                ['simultaneous','2fb04'] //rotate
             ]
         }
     }
