@@ -1,8 +1,6 @@
 /*
 TODO:
-  1. separate out 'motion modifiers' -- adverbs
-  2. if glyph paths are not loaded, then we need to load the full list.
-  3. FEATURE: add 'copy' -- since duplicating is common
+  1. FEATURE: add 'copy' -- since duplicating is common
 
    NEED:
 these need to be tagged in files/database
@@ -209,8 +207,18 @@ Composer.prototype = {
         'context':{//head,trunk,limb
             'size':50, 'ranges':['2ff00','37eff'],
             "first":[
+                //grep '^\(2ff\|30\)' entry_deps.txt  |head
                 ['head','2ff00'],
-                ['trunk','36d00']
+                ['trunk','36d00'],
+                ['chin','30004'],
+                ['temple','30007'],
+                ['cheek','30005'],
+                ['ear','30006'],
+                ['top','30000'], 
+                ['tilt up','30300'],
+                ['raise eyebrows','30a00'],
+                ['concern','30e00'],
+                ['mad','30c00']
             ]
         },
         'contact':{
@@ -227,9 +235,41 @@ Composer.prototype = {
         },
         'motion':{
             'size':30, 'ranges':['21400','2f7ff'],
+            "transforms":{
+                'side':function(key,side) {
+                    
+                }
+            },
             'first': [
-                //modifiers: separate section?
+                /* conceptual categories:
+                   straight: forward/up, left/right, toward/away body, *rotate
+                   round, full circle, twist axis
+                   straight,round,jagged,toward/away from body,arm,wrist,finger
+                 */
+                ['','22a00','22b00','22a14'],
+                ['','26500'],
+                ['','28900'],
+                ['','2b700'],
+                ['','2e300'],
+                ['','2e700'],
+                ['','2d500'],
+                ['','29a00'],
+                ['','2a200'],
+                ['','2a800'],
+                ['','24200'],
+                ['','2e300'],
+                ['finger','2f100'],
+                ['curl','21600'],
+                ['uncurl finger','21b00'],
+                ['bend (back and forth)','22104'], //multiple,rotate
+                //,['piano fingers','']
+            ]
+        },
+        'modifiers':{
+            'size':30, 'ranges':['2f700','2feff'],
+            'first':[
                 //http://std.dkuug.dk/jtc1/sc2/wg2/docs/n4090.pdf
+                ['simultaneous','2fb04'] //rotate
                 ['fast','2f700'],//< 
                 ['slow','2f800'],//big arc
                 ['tension','2f900'],//~
@@ -237,17 +277,6 @@ Composer.prototype = {
                 ['every other time','2fd04'],//crossing arcs
                 ['alternating','2fc04'],//stacked arcs
                 ['gradual','2fe00'],//opposing arcs
-                //real motion
-                ['curl','21600'],
-                ['uncurl finger','21b00'],
-                ['bend (back and forth)','22104'] //multiple,rotate
-                //,['piano fingers','']
-            ]
-        },
-        'sequence':{
-            'size':30, 'ranges':['2f700','2feff'],
-            'first':[
-                ['simultaneous','2fb04'] //rotate
             ]
         }
     }

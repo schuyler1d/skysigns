@@ -1,4 +1,9 @@
 /*
+TODO: 
+  1. connect initial paths file with shapes file and confirm that they're
+      the same version (or path should include a version)
+  2. upload: choose username, region
+  3. saving
  */
 
 function SkyInterface(){}
@@ -15,7 +20,7 @@ SkyInterface.prototype = {
         if (opts.loadpaths) {
             setTimeout(function() {
                 self.signs.loadPaths(progress); 
-            },0); //breaks composer if non-zer0 visited first
+            },100); //breaks composer if non-zer0 visited first
         }
 	this.loadinterface();
 	var debug = this.debug();
@@ -197,13 +202,32 @@ SkySigns.prototype = {
             var shape = s.data;
             if (shape) {
             	var sparts = shape.split('$');
-            	rv.paths = sparts[0].split(',').map(self.getPath,self);
             	rv.transforms = sparts[1].split(';')
+                self.marshallPaths(
+                    sparts[0].split(','),
+                    function(paths) {rv.paths = paths; cb(rv);});
+            } else {
+                cb(rv);
             }
-            cb(rv);
         });
     },
+    marshallPaths:function(path_ids,cb) {
+        var len = path_ids.length,
+            todo=len;
+        var rv = [];
+        for (var i=0;i<len;i++) {
+            this.getAsyncPath(
+                path_ids[i], i,
+                function(x,path) {
+                    rv[x] = path;
+                    if (--todo===0) cb(rv)
+                });
+        }
+    },
     getPath:function(i) { return this.paths[i]; },
+    getAsyncPath:function(path_id,i,cb) { 
+        cb(i,this.paths[path_id]); 
+    },
     showSign:function(viewer,shapetext) {
         if (!shapetext) {
             throw Error("no shapetext");
@@ -243,7 +267,7 @@ SkySigns.prototype = {
         var self = this;
 	cb = cb || function(){};
         jQuery.ajax({
-	    url:this.opts.base_path+'iswa/pathsmin.txt', dataType:'text',
+	    url:this.opts.base_path+'iswa/paths.txt', dataType:'text',
             success:function(text){
                 self.paths = new Array(30602);
                 var text_arr = text.split("\n");
@@ -266,12 +290,13 @@ SkySigns.prototype = {
 	    url:(this.opts.remote_path||this.opts.base_path)+'iswa/shapes.txt',
             dataType:'text',
             success:function(text){
-                self.db.clearShapes();
-                self.db.addmany(text,'addShapes',cb,'signs',
+                self.db.clearShapes(function() {
+                    self.db.addmany(text,'addShapes',cb,'signs',
                                 function (x,lines) {
                                     var line = x.match(/^(\w+)\$(.+)$/);
                                     if (line) lines.push(line.slice(1));
                                 });
+                });
             },
             error:function(xhr,stat,e) {cb({'log':'noshapes:'+stat,'error':e});}
         });
@@ -291,9 +316,10 @@ SkyDictionary.prototype = {
 	    url:(this.opts.remote_path||this.opts.base_path)+'iswa/entries.txt',
             dataType:'text',
             success:function(text){
-                self.db.clearEntries();
-                self.db.addmany(text,'addEntries',cb,'dict',
-                     function (x,lines) { lines.push(x.split('$')); });
+                self.db.clearEntries(function() {
+                    self.db.addmany(text,'addEntries',cb,'dict',
+                       function (x,lines) { lines.push(x.split('$')); });
+                });
             },
             error:function(xhr,st,e) { cb({'log':'noentries:'+e}); }
         });

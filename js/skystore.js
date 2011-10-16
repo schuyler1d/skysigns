@@ -122,14 +122,50 @@ if (window.openDatabase) {
         clearEntries:function(callback) {
             var self = this;
             this.db.transaction(function(tx) {
-                tx.executeSql('DELETE FROM terms',[],callback);
+                tx.executeSql('DELETE FROM tags');
+                tx.executeSql('DELETE FROM terms');
                 tx.executeSql('DELETE FROM entries',[],callback);
             });
         },
         clearShapes:function(callback) {
             var self = this;
             this.db.transaction(function(tx) {
+                tx.executeSql('DELETE FROM paths');
                 tx.executeSql('DELETE FROM shapes',[],callback);
+            });
+        },
+        addTag:function(entry,tag,callback) {
+            callback = callback || function(){};
+            var self = this;
+            this.tagQuery({entry:entry,tag:tag}, function(res) {
+                if (!res.total) {
+                    self.db.transaction(function(tx) {
+                        tx.executeSql('INSERT INTO tags VALUES (?,?)',
+                                      [entry,tag],
+                                      callback,self.errback(callback));
+                    });
+                }
+            });
+        },
+        tagQuery:function(fields,cb) {
+            var q = {where:'',fields:[]};
+            if (fields.tag) {
+                q.where = 'tag=?';
+                q.fields.push(fields.tag);
+            }
+            if (fields.entry) {
+                if (fields.tag) q.where += ' AND ';
+                q.where += 'entry=?';
+                q.fields.push(fields.entry);
+            }
+            this.db.transaction(function(tx) {
+                tx.executeSql("SELECT * FROM tags WHERE "+q.where, q.fields,
+                              function(tx,res) { 
+                                  var len = res.rows.length;
+                                  cb({'type':"tag",
+                                      'total':len,
+                                      'item':len && res.rows.item(0)
+                                     }); });
             });
         },
         open:function(logback) {
@@ -168,6 +204,9 @@ if (window.openDatabase) {
                               +'term TEXT'
                               +')'
                              );
+                tx.executeSql('CREATE INDEX IF NOT EXISTS termindex '
+                              +'ON terms (term)'
+                             );
                 tx.executeSql('CREATE TABLE IF NOT EXISTS entries ( '
                               +'entry INTEGER UNIQUE,'
                               +'shapes TEXT,'
@@ -186,6 +225,13 @@ if (window.openDatabase) {
                               +'data TEXT'
                               +')'
                              );
+                ///TAGGING
+                tx.executeSql('CREATE TABLE IF NOT EXISTS tags ( '
+                              +'entry INTEGER,'
+                              +'tag TEXT'
+                              +')'
+                             );
+
             });
         }
     };
