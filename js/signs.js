@@ -226,7 +226,20 @@ SkySigns.prototype = {
     },
     getPath:function(i) { return this.paths[i]; },
     getAsyncPath:function(path_id,i,cb) { 
-        cb(i,this.paths[path_id]); 
+        var self = this;
+        if (this.paths[path_id]) {
+            cb(i,this.paths[path_id]); 
+        } else {
+            this.db.getPath(path_id,function(p) {
+                if (p.item) {
+                    console.log(p);
+                    var path = self.paths[path_id] = p.item.data.split('$');
+                    cb(i,path);
+                } else {
+                    //TODO: error! -- load path data!
+                }
+            });
+        }
     },
     showSign:function(viewer,shapetext) {
         if (!shapetext) {
@@ -259,17 +272,17 @@ SkySigns.prototype = {
         }
         return rv;
     },
-    open:function(db,opts){ this.db=db; this.opts=opts; return this; },
-    load:function(cb){ this.db.create(); this.loadShapes(cb); },
+    open:function(db,opts){ this.db=db; this.opts=opts; this.paths = new Array(30602);
+                            return this; },
+    load:function(cb){ this.db.create(); this.loadShapes(cb); this.loadPathsDB(cb); },
     loaded:function(cb){ this.db.haveShapes(cb); },
     loadPaths:function(cb) {
         //needs to happen every page-load
         var self = this;
 	cb = cb || function(){};
         jQuery.ajax({
-	    url:this.opts.base_path+'iswa/paths.txt', dataType:'text',
+	    url:this.opts.base_path+'iswa/pathsmin.txt', dataType:'text',
             success:function(text){
-                self.paths = new Array(30602);
                 var text_arr = text.split("\n");
                 cb({'total':text_arr.length,'type':"paths"});
                 for(var i=0,l=text_arr.length;i<l;i++) {
@@ -283,6 +296,18 @@ SkySigns.prototype = {
             }
         });
 	cb({'event':"request",'type':"paths"});
+    },
+    loadPathsDB:function(cb) {
+        //needs to happen every page-load
+        var self = this;
+	cb = cb || function(){};
+        jQuery.ajax({
+	    url:(this.opts.remote_path||this.opts.base_path)+'iswa/paths.txt', dataType:'text',
+            success:function(text){
+                self.db.addmany(text,'addPaths',cb,'paths',
+                                function (x,lines) { lines.push(x.split('$')); });
+            }
+        });
     },
     loadShapes:function(cb) {
         var self = this;
@@ -344,7 +369,7 @@ window.initSkyS = function() {
             shapes:'sql'
         },
         viewer:CanvgViewer,
-        loadpaths:true
+        loadpaths:false
     });
 }
 if (window.PhoneGap) {

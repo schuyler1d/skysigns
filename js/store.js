@@ -22,7 +22,7 @@ if (window.openDatabase) {
     SkyDB.prototype = {
         searchTerms:function(q,cb) {
             this.db.transaction(function(tx) {
-                tx.executeSql("SELECT * FROM terms WHERE term LIKE '"+q.replace("'","''")+"%' ORDER BY term",[],
+                tx.executeSql("SELECT * FROM terms WHERE term LIKE (?||'%') ORDER BY term",[q],
                               function(tx,res) { cb({'results':res,'type':"terms"}); }
                              );
             });
@@ -76,6 +76,34 @@ if (window.openDatabase) {
 		}
             });
 	},
+        addPaths:function(paths,callback,i) {
+	    var self = this;
+	    var getcb = function(i,j,cols,typ) {
+		return function() { 
+		    callback({'index':i+j,'item':cols,'type':typ}); 
+		}
+	    }
+	    this.db.transaction(function(tx) {
+		for (var j=0;j<paths.length;j++) {
+		    var cols = paths[j];
+		    tx.executeSql('INSERT INTO paths VALUES (?,?)',
+				  [parseInt(cols[0]),cols.slice(1).join('$')],
+                                  getcb(i,j,cols,'paths'),self.errback(callback));
+		}
+            });
+	},
+	getPath:function(key,callback) {
+	    var self = this;
+	    this.db.transaction(function(tx) {
+		tx.executeSql('SELECT * FROM paths WHERE id=?',[key],function(tx,res) {
+		    if (res.rows.length) {
+			callback({'key':key,'type':'path','item':res.rows.item(0)});
+		    } else {
+			callback({'key':key,'type':'path','error':'path '+key+' not found'});
+                    }
+                });
+            });
+        },
 	getShape:function(key,callback) {
 	    var self = this;
 	    this.db.transaction(function(tx) {
