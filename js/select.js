@@ -268,10 +268,10 @@ Composer.prototype = {
             ]
         },
         'modifiers':{
-            'size':30, 'ranges':['2f700','2feff'],
+            'size':40, 'ranges':['2f700','2feff'],
             'first':[
                 //http://std.dkuug.dk/jtc1/sc2/wg2/docs/n4090.pdf
-                ['simultaneous','2fb04'] //rotate
+                ['simultaneous','2fb04'], //rotate
                 ['fast','2f700'],//< 
                 ['slow','2f800'],//big arc
                 ['tension','2f900'],//~
