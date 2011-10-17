@@ -141,13 +141,30 @@ Composer.prototype = {
         this.current_shapes[shobj.dom.id] = shobj;
         this.selectShape(shobj.dom,shobj);
     },
+    refreshForm:function(form) {
+        var chkradio = {checkbox:1,radio:1}
+        form.reset();
+        for (var a in form.elements) {
+            var e = form.elements[a];
+            if (e.tagName==='SELECT')
+                jQuery(e).selectmenu("refresh");
+            else if (e.type in chkradio)
+                jQuery(e).checkboxradio("refresh");
+        }
+    },
     selectShape:function(dom,shobj) {
         //when someone selects one of the 'current-shapes' to re-edit
-        if (this.current_shape) 
-            $(this.current_shape.dom).removeClass('ui-btn-active');
-        this.current_shape = this.current_shapes[shobj.dom.id];
+        var self = this;
+        var new_shape = this.current_shapes[shobj.dom.id];
+        var form_css = shobj.section+'-custom';
+        if (this.current_shape != new_shape) {
+            jQuery('#'+form_css).each(function(){self.refreshForm(this);});
+            if (this.current_shape)
+                $(this.current_shape.dom).removeClass('ui-btn-active');
+        }
+        this.current_shape = new_shape;
         $(dom).addClass('ui-btn-active')
-        this.switchShown(shobj.section+'-custom');
+        this.switchShown(form_css);
     },
     sections: {
         "hand":{
