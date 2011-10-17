@@ -68,23 +68,25 @@
       <div data-role="content"  class="ui-body">
         <ul id="error" data-role="listview">
           <li id="dicttest" class="loadaction">
-            <button>Load Dictionary</button>
+            <button>Load U.S. Dictionary</button>
               <div class="progress"><div class="bar"></div></div>
               <div class="msg">not loaded</div>
           </li>
-          <li id="signstest" class="loadaction"><button>Load Signs</button>
-          <div class="progress"><div class="bar"></div></div>
-	  <div class="msg">not loaded</div>
-          </li>
-          <li id="pathstest" class="loadaction"><button>Load Paths</button>
-          <div class="progress"><div class="bar"></div></div>
-	  <div class="msg">not loaded</div>
+          <li>
+            <div id="signstest" class="loadaction">
+              <button>Load Signs</button>
+              Glyphs
+              <div class="progress"><div class="bar"></div></div>
+              <div class="msg">not loaded</div>
+            </div>
+            <div id="pathstest" class="loadaction">
+              Lines
+              <div class="progress"><div class="bar"></div></div>
+              <div class="msg">not loaded</div>
+            </div>
           </li>
           <li>Debugging:</li>
-          <li id="ajaxtest"><button>test remote ajax</button></li>
-          <li id="canvastest"><button>test canvas</button>
-	  <div class="msg"></div>
-          </li>
+          <li id="ajaxtest"><button>test server access</button></li>
         </ul>
       </div>
     </div>

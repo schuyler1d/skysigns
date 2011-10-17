@@ -1,24 +1,5 @@
-
 function SkyDB(){}
 if (window.openDatabase) {
-    ///paths should be in memory (in array)
-    ///shapes can use localStorage since it just needs .get()
-    ///localStorage can be used for word-shape list and word data
-
-    /*
-    db.transaction(function (tx) {
-       tx.executeSql('CREATE TABLE IF NOT EXISTS foo (id unique, text)');
-       tx.executeSql('INSERT INTO foo (id, text) VALUES (1, "synergies")');
-    });
-    tx.executeSql('INSERT INTO foo (id, text) VALUES (?, ?)', [id, userValue]);
-    tx.executeSql('SELECT * FROM foo', [], function (tx, results) {
-       var len = results.rows.length
-       results.rows.item(i).text
-    })
-    */
-    //addcallback(), 
-    //countcallback(), 
-    //getcallback()
     SkyDB.prototype = {
         searchTerms:function(q,cb) {
             this.db.transaction(function(tx) {
@@ -33,9 +14,9 @@ if (window.openDatabase) {
                               function(tx,res) { cb({'type':"entry",'item':res.rows.item(0)}); });
                 tx.executeSql("SELECT * FROM terms WHERE entry=?",[entry],
                               function(tx,res) { cb({'type':"terms",'results':res}); });
-            });            
+            });
         },
-        _add:function(tx,cols,callback,i) {
+        _addEntry:function(tx,cols,callback,i) {
             //cols=[id,terms,code,text]
             var terms = cols[1].split('^');
             for (var t=0;t<terms.length;t++) {
@@ -52,7 +33,7 @@ if (window.openDatabase) {
 		    for (var j=0;j<rows.length;j++) {
 			var cols = rows[j];
                         if (cols.length > 1)
-			    self._add(tx,cols,callback,i+j);
+			    self._addEntry(tx,cols,callback,i+j);
 		    }
 		});
         },
@@ -119,15 +100,25 @@ if (window.openDatabase) {
 	},
 	haveShapes:function(callback) {
 	    var self = this;
-	    callback({'log':'haveShapes:'+this.db});
-	    callback({'log':'haveShapes f:'+(typeof this.haveShapes)});
 	    this.db.transaction(function(tx) {
 		tx.executeSql('SELECT COUNT(*) FROM shapes WHERE key=? OR key=?',
 			      ['10000','38b07'],function(tx,res) {
 				  if (res.rows.item(0)['COUNT(*)'] == 2) {
-				      callback({'loaded':2,'type':"signs"});
+				      callback({'loaded':37811,'type':"signs"});
 				  } else callback({'loaded':false,'type':"signs"});
 			      },function(tx,e){callback({'loaded':false,'error':e,'type':"signs"});});
+	    });
+	},
+	havePaths:function(callback) {
+	    var self = this;
+	    this.db.transaction(function(tx) {
+		tx.executeSql('SELECT COUNT(*) FROM paths',[],
+                              function(tx,res) {
+				  if (res.rows.item(0)['COUNT(*)'] == 21090) {
+				      callback({'loaded':21090,'type':"paths"});
+				  } else callback({'loaded':false,'type':"paths"});
+			      },
+                              function(tx,e){callback({'loaded':false,'error':e,'type':"paths"});});
 	    });
 	},
 	addmany:function(text,add_func,cb,typ,process_func) {
@@ -199,10 +190,10 @@ if (window.openDatabase) {
         open:function(logback) {
             //iOS webview actually enforces the quota: seems to max out at 2.75M
 	    logback = logback || function(){};
-	    logback({'log':'db orig?:'+window.openDatabase_orig});
+	    //logback({'log':'db_orig:'+window.openDatabase_orig});
             try {
                 this.db = openDatabase('skysign11','1.0','signbank',60*1024*1024);
-		logback({'log':'db opening:'+this.db});
+		logback({'log':'db opening...:'+this.db});
             } catch(e) {
 		logback({'log':'db error:'+e.message,'error':e});
             }
@@ -210,7 +201,6 @@ if (window.openDatabase) {
         },
         count:function(cb) {
             //more complicated, because we want it to call cb, no matter what;
-                jQuery('#error').append('<li>count: '+this.db+'</li>');
             this.db.transaction(function (tx) {
                 tx.executeSql("SELECT tbl_name from sqlite_master WHERE type = 'table' and tbl_name='entries'",[],function(tx,results) {
                     if (results.rows.length) {

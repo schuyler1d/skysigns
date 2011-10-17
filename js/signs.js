@@ -2,8 +2,6 @@
 TODO: 
   1. connect initial paths file with shapes file and confirm that they're
       the same version (or path should include a version)
-  2. upload: choose username, region
-  3. saving
  */
 
 function SkyInterface(){}
@@ -12,18 +10,16 @@ SkyInterface.prototype = {
         var self = this;
         ///func.bind() NOT supported in 1.5 android!
 	var progress = function(x){return self.progress(x);};
-        jQuery('#error').append('<li>pre</li>');
+	var debug = this.debug();
+        debug.begin();
         this.opts = opts;
         this.db = new SkyDB().open(progress);
         this.dict = dict.open(this.db,opts);
         this.signs = signs.open(this.db,opts);
         if (opts.loadpaths) {
-            setTimeout(function() {
-                self.signs.loadPaths(progress); 
-            },100); //breaks composer if non-zer0 visited first
+            setTimeout(function() { self.signs.loadPaths(progress); },100);
         }
 	this.loadinterface();
-	var debug = this.debug();
         this.viewer = new opts.viewer().init(debug.onviewer,'canvas');
 
         jQuery(document.forms.wordsearch).submit(function(evt) {
@@ -45,7 +41,6 @@ SkyInterface.prototype = {
             });
         });
 
-	debug.middle();
         jQuery('#ajaxtest button').click(this.ajax);
 	try { // this will fail if openDatabase returns NULL
 	    this.checkloaded();
@@ -58,9 +53,6 @@ SkyInterface.prototype = {
 		    self.search(document.location.search.substr(1),true);
 		},1000)
 	}
-	this.paths = {
-	    load:function(cb) { self.signs.loadPaths(cb); }
-	}
 
 	debug.end();
         return this;
@@ -68,21 +60,13 @@ SkyInterface.prototype = {
     debug:function() {
 	var self = this;
 	return {
-	    'end':function() { jQuery('#error').append('<li>end</li>'); },
-	    'middle':function() { jQuery('#error').append('<li>middle</li>'); },
-	    'onviewer':function() {
-		//debug
-		jQuery('#canvastest div').text('viewer loaded')
-		jQuery('#canvastest button')
-		    .click(function() {
-			    self.viewer.ctx.drawSvg('<circle r="20" cx="20" cy="20" fill="red" />',0,0,100,100);
-			});
-		
-	    }
+            'begin':function() { jQuery('#error').append('<li>initializing...</li>'); },
+	    'end':function() { jQuery('#error').append('<li>initialization complete</li>'); },
+	    'onviewer':function() {}
 	}
     },
     loadinterface:function() {
-	var loads = {paths:1,signs:1,dict:1};
+	var loads = {signs:1,dict:1};
 	var self = this;
 	var progress = function(x){return self.progress(x);};
 	var decorate = function(what) {
@@ -147,7 +131,6 @@ SkyInterface.prototype = {
 	var display = jQuery('#'+x.type+'test').get(0);
 	jQuery('.msg',display).text('not loaded');
 	var what = x.type;
-        
     },
     _prog_max:{},
     progress:function(x) {
@@ -232,7 +215,6 @@ SkySigns.prototype = {
         } else {
             this.db.getPath(path_id,function(p) {
                 if (p.item) {
-                    console.log(p);
                     var path = self.paths[path_id] = p.item.data.split('$');
                     cb(i,path);
                 } else {
@@ -275,9 +257,8 @@ SkySigns.prototype = {
     open:function(db,opts){ this.db=db; this.opts=opts; this.paths = new Array(30602);
                             return this; },
     load:function(cb){ this.db.create(); this.loadShapes(cb); this.loadPathsDB(cb); },
-    loaded:function(cb){ this.db.haveShapes(cb); },
+    loaded:function(cb){ this.db.haveShapes(cb); this.db.havePaths(cb); },
     loadPaths:function(cb) {
-        //needs to happen every page-load
         var self = this;
 	cb = cb || function(){};
         jQuery.ajax({
@@ -298,9 +279,7 @@ SkySigns.prototype = {
 	cb({'event':"request",'type':"paths"});
     },
     loadPathsDB:function(cb) {
-        //needs to happen every page-load
         var self = this;
-	cb = cb || function(){};
         jQuery.ajax({
 	    url:(this.opts.remote_path||this.opts.base_path)+'iswa/paths.txt', dataType:'text',
             success:function(text){
@@ -357,23 +336,19 @@ window.sd = new SkyDictionary();
 window.si = new SkyInterface();
 
 window.initSkyS = function() {
-    jQuery('#error').append('<li>deviceready orig?:'+window.openDatabase_orig+'</li>');
+    //jQuery('#error').append('<li>db_orig:'+window.openDatabase_orig+'</li>');
     jQuery('#error').append('<li>location: '+document.location+'</li>');
     window.si.init(window.ss,window.sd,{
         base_path:'',
         remote_path:((document.location.protocol==='file:')
-                     ? 'http://skyb.us/static/signlanguage/'
+                     ? 'http://skyb.us/static/signlanguage/v1/'
                      : ''),
-        storage:{
-            paths:'sql',
-            shapes:'sql'
-        },
+        storage:{ paths:'sql', shapes:'sql' },
         viewer:CanvgViewer,
         loadpaths:false
     });
 }
-if (window.PhoneGap) {
-    //is not currently working.  why not?
+if (window.PhoneGap) { //is not currently working.  why not?
     PhoneGap.onDeviceReady.subscribeOnce(window.initSkyS);
 } else {
     jQuery(document).bind('mobileinit',initSkyS);

@@ -2,8 +2,6 @@
 ------------
 1. better help
 2. turn off composer for now
-3. loading pathsmin.js better/faster
-   first try memory, then db, then files
 4. a way to force (re)load of shapes data and database
    or optional: 
      'update your shapes data for new features!'

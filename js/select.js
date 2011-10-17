@@ -1,6 +1,8 @@
 /*
 TODO:
   1. FEATURE: add 'copy' -- since duplicating is common
+  2. upload: choose username, region
+  3. saving
 
    NEED:
 these need to be tagged in files/database
