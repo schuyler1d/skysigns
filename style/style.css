@@ -146,6 +146,7 @@ div#composer-page .show
 
 div.mode-composer .only-help,
 .mode-composer #composer-header h1,
-.mode-composer .help-toggle
+.mode-composer .help-toggle,
+.mode-composer .help-extra
 { display:none; }
 
