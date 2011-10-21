@@ -22,7 +22,9 @@
               style="padding-right:50px;">
           <input type="search" id="q" name="q" placeholder="Search Signs" />
         </form>
-        <a href="cheatsheet.html" data-icon="star" data-iconpos="notext" data-rel="dialog" class="ui-btn-right jqm-home">Cheatsheet</a> 
+        <a href="composer.html" 
+           onclick="si.composer_mode = 'help'"
+           data-icon="star" data-iconpos="notext" data-rel="dialog" class="ui-btn-right jqm-home">Cheatsheet</a> 
       </div> <!--header-->
 	
       <div data-role="content"> 
@@ -35,10 +37,14 @@
               class="ui-scrolllistview"> 
             <li><a href="#errorpage" data-rel="dialog">Load Dictionary and Glyphs</a></li> 
             <li>
-              Click the star in the upper right anywhere to see the SignWriting Cheatsheet!
+                <div class="help-toggle ui-icon ui-icon-star ui-icon-shadow" 
+                     style="float:left;margin-right:10px;margin-bottom:2em;"></div>
+                Click the star in the upper right anywhere to see the SignWriting Cheatsheet!
             </li>
             <li>
-              <a href="composer.html" data-rel="dialog">Create new signs</a>
+              <a href="composer.html" 
+                 onclick="si.composer_mode = 'composer';"
+                 data-rel="dialog">Create new signs</a>
             </li>
             <li><a href="about.html" data-rel="dialog">About SkySigns</a></li> 
           </ul> 
@@ -53,7 +59,9 @@
       <div data-role="header" data-theme="d"> 
         <a href="#" data-rel="back" data-direction="reverse" data-icon="delete" data-iconpos="notext">Back</a> 
         <h2 id="terms" style="text-overflow:inherit;white-space:normal;"></h2> 
-        <a href="cheatsheet.html" data-icon="star" data-iconpos="notext" data-rel="dialog" class="ui-btn-right jqm-home">Cheatsheet</a> 
+        <a href="composer.html" 
+                 onclick="si.composer_mode = 'help';"
+                 data-icon="star" data-iconpos="notext" data-rel="dialog" class="ui-btn-right jqm-home">Cheatsheet</a> 
       </div> 
       <div data-role="content" style="background-color:white;"> 
         <div id="text"></div>

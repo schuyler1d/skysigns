@@ -6,6 +6,7 @@ TODO:
 
 function SkyInterface(){}
 SkyInterface.prototype = {
+    composer_mode:'help',
     init:function(signs,dict,opts) {
         var self = this;
         ///func.bind() NOT supported in 1.5 android!
@@ -38,7 +39,12 @@ SkyInterface.prototype = {
              */
             jQuery.getScript('js/select.js',function() {
                 self.composer = new Composer().init(self);
+                self.composer.switchMode(self.composer_mode);
             });
+        });
+        $('#composer-page').live('pagebeforeshow',function(event,ui){
+            if (self.composer)
+                self.composer.switchMode(self.composer_mode);
         });
 
         jQuery('#ajaxtest button').click(this.ajax);

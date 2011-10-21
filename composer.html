@@ -48,7 +48,7 @@
           <ul id="perspective" class="only-help" data-role="listview">
             <li class="composer-select-header" data-role="list-divider"><div class="help-toggle ui-icon ui-icon-plus ui-icon-shadow"></div>Perspective</li> 
             <li id="perspective-select" class="help-extra">
-              right=signer's right side, left=signer's left side
+              left=signer's left side, right=signer's right side; i.e. 'stage' perspective.
             </li>
           </ul>
           <div id="hand">
@@ -110,8 +110,7 @@
                     <li>disconnected fingers: fingers point forward instead of up (floor plane)</li>
                     <li>circle=open fist ('o' sign)</li>
                     <li>square=closed fist ('s' sign)</li>
-            </ul>
-                  
+                  </ul>
                 </div>
                 <div id="hand-letterlist"></div>
               </li>
@@ -146,6 +145,14 @@
             <ul id="motion-select" class="composer-select" data-role="listview">
               <li data-role="list-divider" class="composer-select-header"><div class="help-toggle ui-icon ui-icon-plus ui-icon-shadow"></div><span class="only-composer">Select </span>Motion</li>
               <li class="nopadding">
+                <div class="help-extra">
+                  <ul>
+                    <li>single line: forward/back plane (floor plane)</li>
+                    <li>double line: up/down plane</li>
+                    <li>white head=left hand, black head=right hand</li>
+                    <li>thick part of arrow (tail or just below arrowhead) is closer to the body</li>
+                </ul>
+                </div>
                 <div id="motion-letterlist"></div>
               </li>
               <li class="only-composer"><button>More Motion Shapes</button></li>
@@ -155,11 +162,11 @@
             <form id="modifiers-custom" class="composer-custom">
             </form>
             <ul id="modifiers-select" class="composer-select" data-role="listview">
-              <li data-role="list-divider" class="composer-select-header"><div class="help-toggle ui-icon ui-icon-plus ui-icon-shadow"></div><span class="only-composer">Select </span>Modifiers</li>
+              <li data-role="list-divider" class="composer-select-header"><div class="help-toggle ui-icon ui-icon-plus ui-icon-shadow"></div><span class="only-composer">Select </span>Motion Modifiers</li>
               <li class="nopadding">
                 <div id="modifiers-letterlist"></div>
               </li>
-              <li class="only-composer"><button>More XXX Shapes</button></li>
+              <li class="only-composer"><button>More Motion Modifiers</button></li>
             </ul>
           </div><!--id="modifiers"-->
           <!-- div id="xxx">
