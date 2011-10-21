@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet"  href="jquery-mobile/jquery.mobile.css" />  
     <link rel="stylesheet"  href="style/style.css" />  
-    <style>
-    </style>
     <script src="js/jquery.min.js"></script> 
     <script src="js/store.js"></script> 
     <script src="js/canvg.js"></script> 
@@ -16,8 +14,9 @@
     <script src="js/select.js"></script> 
   </head>
   <body>
-    <div id="composer-page" data-role="page" data-dom-cache="true"> 
-      <div data-role="header">
+    <div id="composer-page" class="mode-help" data-role="page" data-dom-cache="true"> 
+      <div data-role="header" id="composer-header">
+        <h1>Cheatsheet</h1>
         <input id="compose-term" type="text" name="word" value="" placeholder="Terms: comma-separate" class="ui-bar-c" />
         <a href="cheatsheet.html" data-icon="star" data-iconpos="notext" data-rel="dialog" class="ui-btn-right jqm-home">Cheatsheet</a> 
       </div>
@@ -46,8 +45,14 @@
           <ul id="current-shapes"></ul>
         </div>
         <div id="editor">
+          <ul id="perspective" class="only-help" data-role="listview">
+            <li class="composer-select-header" data-role="list-divider"><div class="help-toggle ui-icon ui-icon-plus ui-icon-shadow"></div>Perspective</li> 
+            <li id="perspective-select" class="help-extra">
+              right=signer's right side, left=signer's left side
+            </li>
+          </ul>
           <div id="hand">
-            <form id="hand-custom" class="composer-select composer-custom">
+            <form id="hand-custom" class="composer-custom">
               <ul id="hand-custom-list" data-role="listview">
                 <li data-role="list-divider">Edit Hand</li> 
                 <li id="hand-side" data-role="fieldcontain">
@@ -95,59 +100,70 @@
               </ul>
             </form>
             <ul id="hand-select" class="composer-select" data-role="listview">
-              <li data-role="list-divider">Select Hand Shape</li>
+              <li data-role="list-divider" class="composer-select-header"><span class="only-composer">Select </span><div class="help-toggle ui-icon ui-icon-plus ui-icon-shadow"></div>Hand Shape</li>
               <li class="nopadding">
+                <div class="help-extra">
+                  <ul>
+                    <li>white: palm faces signer</li>
+                    <li>black: palm faces away</li>
+                    <li>black and white stripes: palm faces the side</li>
+                    <li>disconnected fingers: fingers point forward instead of up (floor plane)</li>
+                    <li>circle=open fist ('o' sign)</li>
+                    <li>square=closed fist ('s' sign)</li>
+            </ul>
+                  
+                </div>
                 <div id="hand-letterlist"></div>
               </li>
-              <li><button>More Hand Shapes</button></li>
+              <li class="only-composer"><button>More Hand Shapes</button></li>
             </ul>
           </div><!-- id="hand"-->
           <div id="context">
-            <form id="context-custom" class="composer-select composer-custom">
+            <form id="context-custom" class="composer-custom">
             </form>
             <ul id="context-select" class="composer-select" data-role="listview">
-              <li data-role="list-divider">Select Context Glyph</li>
+              <li data-role="list-divider" class="composer-select-header"><div class="help-toggle ui-icon ui-icon-plus ui-icon-shadow"></div><span class="only-composer">Select </span>Context</li>
               <li class="nopadding">
                 <div id="context-letterlist"></div>
               </li>
-              <li><button>More Context Shapes</button></li>
+              <li class="only-composer"><button>More Context Shapes</button></li>
             </ul>
           </div><!--id="context"-->
           <div id="contact">
-            <form id="contact-custom" class="composer-select composer-custom">
+            <form id="contact-custom" class="composer-custom">
             </form>
             <ul id="contact-select" class="composer-select" data-role="listview">
-              <li data-role="list-divider">Select Hand Shape</li>
+              <li data-role="list-divider" class="composer-select-header"><div class="help-toggle ui-icon ui-icon-plus ui-icon-shadow"></div><span class="only-composer">Select </span>Contact</li>
               <li class="nopadding">
                 <div id="contact-letterlist"></div>
               </li>
-              <li><button>More Contact Shapes</button></li>
+              <li class="only-composer"><button>More Contact Shapes</button></li>
             </ul>
           </div><!--id="contact"-->
           <div id="motion">
-            <form id="motion-custom" class="composer-select composer-custom">
+            <form id="motion-custom" class="composer-custom">
             </form>
             <ul id="motion-select" class="composer-select" data-role="listview">
-              <li data-role="list-divider">Select Hand Shape</li>
+              <li data-role="list-divider" class="composer-select-header"><div class="help-toggle ui-icon ui-icon-plus ui-icon-shadow"></div><span class="only-composer">Select </span>Motion</li>
               <li class="nopadding">
                 <div id="motion-letterlist"></div>
               </li>
-              <li><button>More Motion Shapes</button></li>
+              <li class="only-composer"><button>More Motion Shapes</button></li>
             </ul>
           </div><!--id="motion"-->
           <div id="modifiers">
-            <form id="modifiers-custom" class="composer-select composer-custom">
+            <form id="modifiers-custom" class="composer-custom">
             </form>
             <ul id="modifiers-select" class="composer-select" data-role="listview">
-              <li data-role="list-divider">Select Hand Shape</li>
+              <li data-role="list-divider" class="composer-select-header"><div class="help-toggle ui-icon ui-icon-plus ui-icon-shadow"></div><span class="only-composer">Select </span>Modifiers</li>
               <li class="nopadding">
                 <div id="modifiers-letterlist"></div>
               </li>
-              <li><button>More XXX Shapes</button></li>
+              <li class="only-composer"><button>More XXX Shapes</button></li>
             </ul>
           </div><!--id="modifiers"-->
           <!-- div id="xxx">
-            <form id="xxx-custom" class="composer-select composer-custom">
+            <form id="xxx-custom" class="composer-custom">
             </form>
             <ul id="xxx-select" class="composer-select" data-role="listview">
               <li data-role="list-divider">Select Hand Shape</li>

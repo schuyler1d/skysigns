@@ -19,9 +19,11 @@ Composer.prototype = {
     opened_sections:{},
     current_shapes:{},
     id_suffix:0,
+    modes:['help','composer'],
     init:function(si) {
         var self = this;
         this.si = si;
+        this.mode = 'help';
         jQuery('#composer-add').change(function(evt,ui) {
             var section = $(this).val();
             $(this).val('Add').selectmenu('refresh');
@@ -29,12 +31,24 @@ Composer.prototype = {
                 self.selectSection(section);
             },100);
         });
-        this.view = new si.opts.viewer().init(null,'composer-canvas');
-        jQuery('#composer-canvas').mousedown({self:this},this.placeGlyph);
+        this.view = new si.opts.viewer().init(null, 'composer-canvas');
+        jQuery('#composer-canvas').mousedown({self:this}, this.placeGlyph);
         var x = jQuery('input,select','form.composer-custom')
-            .change({self:this},this.customListener)
-            .click({self:this},this.customListener)//for buttons
+            .change({self:this}, this.customListener)
+            .click({self:this}, this.customListener)//for buttons
+        //for mode-help
+        jQuery('.composer-select-header','#composer-page').click(function() {
+            self.selectSection(String(this.parentNode.id).match(/^\w+/)[0]);
+        });
         return this;
+    },
+    switchMode:function(mode) {
+        this.mode = mode;
+        var page = $('#composer-page');
+        for (var i=0,l=this.modes.length;i<l;i++) {
+            page.removeClass('mode-'+this.modes[i]);
+        }
+        page.addClass('mode-'+mode);
     },
     customListener:function(evt) {
         var self = evt.data.self;
@@ -76,13 +90,14 @@ Composer.prototype = {
         var self = this;
         this.switchShown(section+'-select');
         var sec = this.sections[section];
-        if (!(section in this.opened_sections)) {
+        if (sec && !(section in this.opened_sections)) {
             this.createSymbolList($('#'+section+'-letterlist').get(0),
                                   sec.first,
                                   {size:sec.size,
                                    section:section,
                                    onclick:function(evt) {
-                                       self.editNewShape(evt.data);
+                                       if (self.mode=='composer')
+                                           self.editNewShape(evt.data);
                                    }
                                   });
         }
@@ -124,8 +139,8 @@ Composer.prototype = {
         return {dom:li,shape_ctx:shobj.ctx};
     },
     switchShown: function(id) {
-        if (this.shown) this.shown.hide();
-        return (this.shown = $('#'+id).show());
+        if (this.shown) this.shown.removeClass('show');
+        return (this.shown = $('#'+id).addClass('show'));
     },
     editNewShape:function(opts) {
         var self = this;

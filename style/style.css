@@ -67,7 +67,8 @@ ul#current-shapes
   padding:2px;
   }
 
-.composer-select 
+.composer-select,
+.composer-custom
 { 
   display:none;
  }
@@ -101,3 +102,50 @@ ul#current-shapes
 { 
   white-space:normal;
  }
+
+div.mode-help .only-composer { display:none!important; }
+div.mode-help .composer-custom,
+div.mode-help #composer-shapes,
+div.mode-help #composer-top,
+div#composer-page.mode-help .composer-custom.show,
+.mode-help #composer-header input,
+.mode-help #composer-header a[data-icon=star],
+div.mode-help .help-extra,
+div.mode-help .composer-select li
+{ display:none; }
+
+div.mode-help .composer-select,
+div.mode-help .composer-select.show li,
+div.mode-help .show .help-extra
+{ display:block; }
+
+div.mode-help .help-toggle
+{ 
+  float:left;
+  margin-right:10px;
+}
+
+div.mode-help .show .help-toggle
+{ background-position: -36px 50%; /*icon-minus*/ }
+
+
+div.mode-help li.composer-select-header 
+{ 
+  display:block;
+  height:40px;
+  cursor: pointer; 
+}
+.mode-help .ui-content .ui-listview
+{ 
+  margin-top:0px;
+  margin-bottom:0px;
+ }
+
+div#composer-page .show
+{ display:block; }
+
+div.mode-composer .only-help,
+.mode-composer #composer-header h1,
+.mode-composer .help-toggle
+{ display:none; }
+
