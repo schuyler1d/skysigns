@@ -57,13 +57,27 @@ Composer.prototype = {
         if (shobj && m) {
             var section = m[1], 
                 field = this.name,
-                val = $(this).val();
+                val = ((this.checked === false) ? '' :$(this).val());
+            if (field=='delete') {
+                return self.deleteGlyph();
+            }
             shobj.key = self.sections[section]
-                .transforms[field](shobj.key,val);
+                .transforms[field](shobj.key,val,shobj.orig_key);
             self.view.clearpure(shobj.shape_ctx);
             self.putShape(shobj.shape_ctx,shobj.key,function(k,s){
                 shobj.shape = s;
             });
+        }
+    },
+    deleteGlyph:function() {
+        var shobj = this.current_shape;
+        if (shobj) {
+            delete this.current_shapes[shobj.dom.id];
+            $(shobj.dom).remove();
+            this.current_shape = null;
+            this.repaintCanvas();
+            this.switchShown('nothing');
+            //TODO:clear form or somethinb
         }
     },
     placeGlyph:function(evt) {
@@ -127,8 +141,10 @@ Composer.prototype = {
         var self = this;
         var shobj = {}; for (var a in opts) {shobj[a]=opts[a];}
         shobj.key = sym[1];
+        shobj.orig_key = sym[1];
         var li = jQuery("<div class='glyph'>").appendTo(list).get(0);
         li.id = 'composer-glyph-'+(++self.id_suffix);
+        if (sym[2] == 'only-help') $(li).addClass('only-help');
         if (sym[0]) $("<span>").appendTo(li).text(sym[0]);
         shobj.ctx = this.si.viewer.createContext(li,opts.size,opts.size,
                                                  shobj.key);
@@ -257,20 +273,35 @@ Composer.prototype = {
         },
         'contact':{
             'size':30, 'ranges':['20500','21300'],
+            "transforms":{
+                'numtimes':function(key,num,orig_key){
+                    var c = parseInt(orig_key[2],16);
+                    var three = '0';
+                    if (num > 1) {
+                        c += 1;
+                        if (num >2) three = '1';
+                    }
+                    return key.substr(0,2)+c.toString(16)+three+key.substr(4);
+                },
+                'between':function(key,betw,orig_key){
+                    var c = (betw ? 2 : 0)+parseInt(orig_key[2],16);
+                    return key.substr(0,2)+c.toString(16)+key.substr(3);
+                }
+                //rotate, but why necessary?
+            },
             'first':[
-                //rotate
                 ['contact','20500','twice','20600','thrice','20610'],
                 ['hold','20800'],
-                //rotate
                 ['strike','20b00','twice','20c00','thrice','20c10'],
                 ['brush','20e00'],
-                ['touch between','20700'],//maybe combine inside contact/strike
+                //only show this in help--otherwise transformation
+                ['touch between','20700','only-help'],
             ]
         },
         'motion':{
             'size':30, 'ranges':['21400','2f7ff'],
             "transforms":{
-                'side':function(key,side) {
+                'rotate':function(key,rot) {
                     
                 }
             },
