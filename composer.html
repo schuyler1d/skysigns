@@ -116,7 +116,7 @@
                 </div>
                 <div id="hand-letterlist"></div>
               </li>
-              <li class="only-composer"><button>More Hand Shapes</button></li>
+              <!--li class="only-composer"><button>More Hand Shapes</button></li-->
             </ul>
           </div><!-- id="hand"-->
           <div id="context">
@@ -132,7 +132,7 @@
               <li class="nopadding">
                 <div id="context-letterlist"></div>
               </li>
-              <li class="only-composer"><button>More Context Shapes</button></li>
+              <!--li class="only-composer"><button>More Context Shapes</button></li-->
             </ul>
           </div><!--id="context"-->
           <div id="contact">
@@ -170,12 +170,47 @@
               <li class="nopadding">
                 <div id="contact-letterlist"></div>
               </li>
-              <li class="only-composer"><button>More Contact Shapes</button></li>
+              <!--li class="only-composer"><button>More Contact Shapes</button></li-->
             </ul>
           </div><!--id="contact"-->
           <div id="motion">
             <form id="motion-custom" class="composer-custom">
               <ul id="motion-custom-list" data-role="listview">
+                <li data-role="list-divider">Edit Motion</li>
+                <li id="motion-hand" data-role="fieldcontain">
+                  <fieldset id="motion-hand-fs" data-role="controlgroup" data-type="horizontal">
+                    <legend>Hand</legend>
+                    <label for="motion-hand1">left</label>
+                    <input id="motion-hand1" type="radio" 
+                           name="hand" value="left" />
+                    <label for="motion-hand2">right</label>
+                    <input id="motion-hand2" type="radio" 
+                           name="hand" value="right" />
+                    <label for="motion-hand3">both</label>
+                    <input id="motion-hand3" type="radio" 
+                           name="hand" value="both" />
+                  </fieldset>
+                </li>
+                <li data-role="fieldcontain">
+                  <input id="motion-rotate" name="rotate" type="button" value="rotate" />
+                </li>
+                <li id="motion-dist" data-role="fieldcontain">
+                  <fieldset id="motion-dist-fs" data-role="controlgroup" data-type="horizontal">
+                    <legend>Distance</legend>
+                    <label for="motion-dist1">short</label>
+                    <input id="motion-dist1" type="radio" 
+                           name="dist" value="1" />
+                    <label for="motion-dist2">medium</label>
+                    <input id="motion-dist2" type="radio" 
+                           name="dist" value="2" />
+                    <label for="motion-dist3">long</label>
+                    <input id="motion-dist3" type="radio" 
+                           name="dist" value="3" />
+                    <label for="motion-dist4">longer</label>
+                    <input id="motion-dist4" type="radio" 
+                           name="dist" value="4" />
+                  </fieldset>
+                </li>
                 <li data-role="fieldcontain">
                   <input id="motion-delete" type="button" name="delete" value="delete glyph" />
                 </li>
@@ -188,13 +223,13 @@
                   <ul>
                     <li>single line: forward/back plane (floor plane)</li>
                     <li>double line: up/down plane</li>
-                    <li>white head=left hand, black head=right hand</li>
+                    <li>white head=left hand, black head=right hand, line head=both hands</li>
                     <li>thick part of arrow (tail or just below arrowhead) is closer to the body</li>
                 </ul>
                 </div>
                 <div id="motion-letterlist"></div>
               </li>
-              <li class="only-composer"><button>More Motion Shapes</button></li>
+              <!--li class="only-composer"><button>More Motion Shapes</button></li-->
             </ul>
           </div><!--id="motion"-->
           <div id="modifiers">
@@ -210,7 +245,7 @@
               <li class="nopadding">
                 <div id="modifiers-letterlist"></div>
               </li>
-              <li class="only-composer"><button>More Motion Modifiers</button></li>
+              <!--li class="only-composer"><button>More Motion Modifiers</button></li-->
             </ul>
           </div><!--id="modifiers"-->
           <!-- div id="xxx">

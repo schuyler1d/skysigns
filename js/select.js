@@ -66,6 +66,7 @@ Composer.prototype = {
             self.view.clearpure(shobj.shape_ctx);
             self.putShape(shobj.shape_ctx,shobj.key,function(k,s){
                 shobj.shape = s;
+                self.repaintCanvas();
             });
         }
     },
