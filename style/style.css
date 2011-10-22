@@ -150,3 +150,15 @@ div.mode-composer .only-help,
 .mode-composer .help-extra
 { display:none; }
 
+@media all and (min-width:600px) 
+{
+ .mode-composer #editor 
+  { width:400px;
+    float:right;
+    }
+ .mode-composer #composer-shapes
+  { float:left;
+    max-width:240px;
+    }
+
+}

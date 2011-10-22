@@ -292,7 +292,7 @@ Composer.prototype = {
                 ['','2a800'],
                 ['','24200'],
                 ['','2e300'],
-                ['finger','2f100'],
+                ['finger swirl','2f100'],
                 ['curl','21600'],
                 ['uncurl finger','21b00'],
                 ['bend (back and forth)','22104'], //multiple,rotate
