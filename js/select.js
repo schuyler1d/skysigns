@@ -62,7 +62,7 @@ Composer.prototype = {
                 return self.deleteGlyph();
             }
             shobj.key = self.sections[section]
-                .transforms[field](shobj.key,val,shobj.orig_key);
+                .transforms[field].call(self,shobj.key,val,shobj.orig_key);
             self.view.clearpure(shobj.shape_ctx);
             self.putShape(shobj.shape_ctx,shobj.key,function(k,s){
                 shobj.shape = s;
@@ -198,6 +198,16 @@ Composer.prototype = {
         $(dom).addClass('ui-btn-active')
         this.switchShown(form_css);
     },
+    general_transforms: {
+        'rotate':function(key,rot) {
+            if (rot==='rotate') rot = false;
+            var cur_rot = parseInt(key[4],16);
+            var cur = parseInt(cur_rot / 8,10);
+            //if no rot val, then shift-rotate 45deg
+            rot = (rot || cur_rot + 1) % 8;
+            return key.substr(0,4)+((cur+rot).toString(16));
+        }
+    },
     sections: {
         "hand":{
             "size":34, "ranges":['10000','20400'],
@@ -218,14 +228,7 @@ Composer.prototype = {
                     var o = {'floor':3,'body':0};
                     return (key.substr(0,3)+(cur+o[orient])+key.substr(4,1));
                 },
-                'rotate':function(key,rot) {
-                    if (rot==='rotate') rot = false;
-                    var cur_rot = parseInt(key[4],16);
-                    var cur = parseInt(cur_rot / 8,10);
-                    //if no rot val, then shift-rotate 45deg
-                    rot = (rot || cur_rot + 1) % 8;
-                    return key.substr(0,4)+((cur+rot).toString(16));
-                }
+                'rotate':function(key,rot){return this.general_transforms['rotate'](key,rot);}
             },
             "first":[
                 ['a','1f720'],['b','14720'],['c','16d20'],
@@ -302,8 +305,10 @@ Composer.prototype = {
         'motion':{
             'size':30, 'ranges':['21400','2f7ff'],
             "transforms":{
-                'rotate':function(key,rot) {
-                    
+                'rotate':function(key,rot){return this.general_transforms['rotate'](key,rot);},
+                'hand':function(key,hand){
+                    var h = {'left':0,'right':1,'both':2};
+                    return (key.substr(0,3)+h[hand]+key.substr(4,1));
                 }
             },
             'first': [
@@ -327,8 +332,8 @@ Composer.prototype = {
                 ['finger swirl','2f100'],
                 ['curl','21600'],
                 ['uncurl finger','21b00'],
-                ['bend (back and forth)','22104'], //multiple,rotate
-                //,['piano fingers','']
+                ['bend fingers together','22104'], //multiple,rotate
+                ['piano fingers','22520']
             ]
         },
         'modifiers':{
