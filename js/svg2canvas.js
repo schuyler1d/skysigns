@@ -67,6 +67,12 @@ CanvgViewer.prototype = {
         });
         return this;
     },
+    box:function(ctx,w,border) {
+        ctx = ctx || this.ctx;
+        w = w || this.w;
+        var b = border || 40;
+        ctx.drawSvg('<rect x="0" y="0" width="10" height="10" fill="transparent" stroke="#bbbbff" />',b,b,w-b*2,w-b*2);
+    },
     clearpure:function(ctx) {
         ctx = ctx || this.ctx;
         var w = ctx.canvas.width = ctx.canvas.width;

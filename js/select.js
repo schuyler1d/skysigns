@@ -32,6 +32,7 @@ Composer.prototype = {
             },100);
         });
         this.view = new si.opts.viewer().init(null, 'composer-canvas');
+        this.repaintCanvas();
         jQuery('#composer-canvas').mousedown({self:this}, this.placeGlyph);
         var x = jQuery('input,select','form.composer-custom')
             .change({self:this}, this.customListener)
@@ -85,15 +86,16 @@ Composer.prototype = {
         var self = evt.data.self;
         var pos = $(this).offset();
         if (self.current_shape) {
-            self.current_shape.pos = {'x':evt.pageX-pos.left,
-                                      'y':evt.pageY-pos.top
-                                     };
+            self.current_shape.pos = {
+                'x':evt.pageX-pos.left,
+                'y':evt.pageY-pos.top 
+            };
             self.repaintCanvas();
         }
     },
     repaintCanvas:function() {
-        //this.view.
         this.view.clearpure();//clear() messes up positioning
+        this.view.box();
         for (var a in this.current_shapes) {
             var c = this.current_shapes[a];
             if (c.shape && c.pos) {
@@ -137,6 +139,21 @@ Composer.prototype = {
             self.si.viewer.insertShape(s,0,0,'#000000',ctx);
             if (cb) cb(key,s);
         })
+    },
+    shape2Entry:function() {
+        var shapes = []; 
+        var offset = {x:0, y:0};
+        for (var a in this.current_shapes) {
+            var sh = this.current_shapes[a],
+                x = sh.pos.x, y = sh.pos.y;
+            offset.x = Math.max(x,offset.x);
+            offset.y = Math.max(y,offset.y);
+            shapes.push({'key':sh.key, 'x':x, 'y':y});
+        }
+        return this.si.signs.clusters2ksw(shapes.map(function(s) {
+            s.x -= offset.x; s.y -= offset.y;
+            return s;
+        },this));
     },
     addShape:function(sym,list,opts) {
         var self = this;

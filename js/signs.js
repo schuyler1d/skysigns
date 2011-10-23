@@ -245,6 +245,13 @@ SkySigns.prototype = {
             viewer.insertShape(s,x,y);
         });
     },
+    clusters2ksw:function(clusters) {
+        return clusters.map(function(c) {
+            return (c.key
+                    +((c.x<0)?'n':'')+Math.abs(c.x)+'x'
+                    +((c.y<0)?'n':'')+Math.abs(c.y));
+        }).join('S');
+    },
     ksw2cluster:function(ksw) {
         var rv = [];
         var ksw_sym = '([123][a-f0-9]{2}[012345][a-f0-9])',
