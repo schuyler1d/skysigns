@@ -90,7 +90,6 @@ Composer.prototype = {
                 'x':evt.pageX-pos.left,
                 'y':evt.pageY-pos.top 
             };
-            console.log(self.current_shape.pos);
             self.repaintCanvas();
         }
     },
@@ -99,9 +98,7 @@ Composer.prototype = {
         this.view.box();
         for (var a in this.current_shapes) {
             var c = this.current_shapes[a];
-            console.log('c.shape');
-            console.log(c.shape);
-            if (c.shape && c.pos) {
+            if (c.pos && c.shape && c.shape.transforms) {
                 this.view.insertShape(c.shape,c.pos.x,c.pos.y);
             }
         }
@@ -158,20 +155,31 @@ Composer.prototype = {
             return s;
         },this));
     },
+    clearEntry:function() {
+        this.view.clearpure();
+        this.switchShown('nothing');
+        $('#current-shapes').empty();
+        this.current_shapes = [];
+        this.current_shape = null;
+    },
     loadEntry:function(entry) {
         var self = this;
+        this.clearEntry();
         this.si.dict.getEntry(entry,function(x) {
             switch(x.type) {
             case 'entry': 
                 var shs = self.si.signs.ksw2cluster(x.item.shapes);
                 for (var i=0;i<shs.length;i++) {
                     var s = shs[i];
-                    self.editNewShape({key:s.key, section:'hand'});
-                    console.log(s.key);
-                    console.log(self.current_shape);
-                    self.current_shape.pos = {x:s.x+200, y:s.y+200};
+                    self.editNewShape({key:s.key, 
+                                       section:'hand',
+                                       onload:function(shobj) {
+                                           self.repaintCanvas();
+                                       }
+                                      });
+                    self.current_shape.pos = {x:s.x+100, y:s.y+100};
                 }
-                self.repaintCanvas();
+                //self.repaintCanvas();
                 //TODO: $('#text').html(x.item.txt);
                 break;
             case 'terms':
@@ -190,11 +198,17 @@ Composer.prototype = {
         if (sym[0]) $("<span>").appendTo(li).text(sym[0]);
         shobj.ctx = this.si.viewer.createContext(li,opts.size,opts.size,
                                                  shobj.key);
+        shobj.shape = {};//pointer
         this.putShape(shobj.ctx,shobj.key,function(k,s){
-            shobj.shape = s;
+            for (var b in s) {
+                shobj.shape[b] = s[b];
+            }
+            if (typeof shobj.onload==='function') {
+                shobj.onload(shobj)
+            }
         });
         if (opts.onclick) $(li).click(shobj,opts.onclick);
-        return {'dom':li, 'shape_ctx':shobj.ctx};
+        return {'dom':li, 'shape_ctx':shobj.ctx, 'shape':shobj.shape};
     },
     switchShown: function(id) {
         if (this.shown) this.shown.removeClass('show');
@@ -209,7 +223,8 @@ Composer.prototype = {
                                 {size:50,
                                  onclick:function(evt){
                                      self.selectShape(this,shobj);
-                                 }
+                                 },
+                                 onload:opts.onload
                                 });
         for (var a in opts) {shobj[a] = opts[a];}
         this.current_shapes[shobj.dom.id] = shobj;

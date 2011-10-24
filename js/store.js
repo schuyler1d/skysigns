@@ -159,14 +159,14 @@ if (window.openDatabase) {
                 tx.executeSql('DELETE FROM shapes',[],callback);
             });
         },
-        addTag:function(entry,tag,callback) {
+        addTag:function(entry,tag,extra,callback) {
             callback = callback || function(){};
             var self = this;
             this.tagQuery({entry:entry,tag:tag}, function(res) {
                 if (!res.total) {
                     self.db.transaction(function(tx) {
-                        tx.executeSql('INSERT INTO tags VALUES (?,?)',
-                                      [entry,tag],
+                        tx.executeSql('INSERT INTO tags VALUES (?,?,?)',
+                                      [entry,tag,extra||null],
                                       callback,self.errback(callback));
                     });
                 }
@@ -250,9 +250,11 @@ if (window.openDatabase) {
                               +')'
                              );
                 ///TAGGING
+                //@extra for things like tag='_duplicate',extra=<dup_entry>
                 tx.executeSql('CREATE TABLE IF NOT EXISTS tags ( '
                               +'entry INTEGER,'
-                              +'tag TEXT'
+                              +'tag TEXT,'
+                              +'extra TEXT'
                               +')'
                              );
 
