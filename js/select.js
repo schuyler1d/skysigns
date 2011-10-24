@@ -11,7 +11,7 @@ touch: contact/rub/hold/strike/brush?
 motion: straight, circle, other
 hand: shape (common confusions: a/s,b/open,g/L/bent,k/2,v/bent,1/x,6/w,f/open,m/3-closed)
 motion: curl/uncurl, bend, piano
-          
+
 */
 
 Composer = function(){}
@@ -65,7 +65,7 @@ Composer.prototype = {
             shobj.key = self.sections[section]
                 .transforms[field].call(self,shobj.key,val,shobj.orig_key);
             self.view.clearpure(shobj.shape_ctx);
-            self.putShape(shobj.shape_ctx,shobj.key,function(k,s){
+            self.putShape(shobj.shape_ctx, shobj.key, function(k,s){
                 shobj.shape = s;
                 self.repaintCanvas();
             });
@@ -90,6 +90,7 @@ Composer.prototype = {
                 'x':evt.pageX-pos.left,
                 'y':evt.pageY-pos.top 
             };
+            console.log(self.current_shape.pos);
             self.repaintCanvas();
         }
     },
@@ -98,6 +99,8 @@ Composer.prototype = {
         this.view.box();
         for (var a in this.current_shapes) {
             var c = this.current_shapes[a];
+            console.log('c.shape');
+            console.log(c.shape);
             if (c.shape && c.pos) {
                 this.view.insertShape(c.shape,c.pos.x,c.pos.y);
             }
@@ -155,6 +158,27 @@ Composer.prototype = {
             return s;
         },this));
     },
+    loadEntry:function(entry) {
+        var self = this;
+        this.si.dict.getEntry(entry,function(x) {
+            switch(x.type) {
+            case 'entry': 
+                var shs = self.si.signs.ksw2cluster(x.item.shapes);
+                for (var i=0;i<shs.length;i++) {
+                    var s = shs[i];
+                    self.editNewShape({key:s.key, section:'hand'});
+                    console.log(s.key);
+                    console.log(self.current_shape);
+                    self.current_shape.pos = {x:s.x+200, y:s.y+200};
+                }
+                self.repaintCanvas();
+                //TODO: $('#text').html(x.item.txt);
+                break;
+            case 'terms':
+                $('#compose-term').val(x.item.join(', '));
+            }
+        });
+    },
     addShape:function(sym,list,opts) {
         var self = this;
         var shobj = {}; for (var a in opts) {shobj[a]=opts[a];}
@@ -170,13 +194,14 @@ Composer.prototype = {
             shobj.shape = s;
         });
         if (opts.onclick) $(li).click(shobj,opts.onclick);
-        return {dom:li,shape_ctx:shobj.ctx};
+        return {'dom':li, 'shape_ctx':shobj.ctx};
     },
     switchShown: function(id) {
         if (this.shown) this.shown.removeClass('show');
         return (this.shown = $('#'+id).addClass('show'));
     },
     editNewShape:function(opts) {
+        //assumes opts.key,opts.shape,opts.section
         var self = this;
         var shobj;
         shobj = this.addShape([false,opts.key],

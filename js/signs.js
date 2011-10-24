@@ -109,11 +109,7 @@ SkyInterface.prototype = {
                 $('#text').html(x.item.txt);
                 break;
             case 'terms':
-                var terms = [];
-                for (var i=0;i<x.results.rows.length;i++) {
-                    terms.push(x.results.rows.item(i).term);
-                }
-                $('#terms').html(terms.join(', '))
+                $('#terms').html(x.item.join(', '))
                 break;
             }
         });

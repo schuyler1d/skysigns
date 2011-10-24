@@ -13,7 +13,13 @@ if (window.openDatabase) {
                 tx.executeSql("SELECT * FROM entries WHERE entry=?",[entry],
                               function(tx,res) { cb({'type':"entry",'item':res.rows.item(0)}); });
                 tx.executeSql("SELECT * FROM terms WHERE entry=?",[entry],
-                              function(tx,res) { cb({'type':"terms",'results':res}); });
+                              function(tx,res) { 
+                                  var terms = [];
+                                  for (var i=0;i<res.rows.length;i++) {
+                                      terms.push(res.rows.item(i).term);
+                                  }
+                                  cb({'type':"terms",'item':terms,'results':res}); 
+                              });
             });
         },
         _addEntry:function(tx,cols,callback,i) {
