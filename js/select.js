@@ -2,7 +2,13 @@
 TODO:
   1. FEATURE: add 'copy' -- since duplicating is common
   2. upload: choose username, region
-  3. saving
+      - 'after curation, we'd like to be able to potentially 
+         add signs to the public dictionary, is that ok?'
+      - ask on first entry into create new
+  3. saving: if no entry#, then tag as created,
+             if entry, tag as edited
+  4. curate mode? (tag as dupe, edit entry)
+     maybe wait to expose editing non-created entries
 
    NEED:
 these need to be tagged in files/database
@@ -18,6 +24,7 @@ Composer = function(){}
 Composer.prototype = {
     opened_sections:{},
     current_shapes:{},
+    current_entry:null,
     id_suffix:0,
     modes:['help','composer'],
     init:function(si) {
@@ -254,6 +261,23 @@ Composer.prototype = {
         this.current_shape = new_shape;
         $(dom).addClass('ui-btn-active')
         this.switchShown(form_css);
+    },
+    saveGlyph:function() {
+        //do i have an entry_id?
+        var db = this.si.db;
+        var terms = $('#compose-term').val().split(/\s*,\s*/).map(function(s) {
+            return s.replace(/^\s*/,'').replace(/\s*$/,'')
+        });
+        if (this.current_entry) {
+            if (this.current_entry > 0) {
+                db.addTag(this.current_entry,'_edited');
+            }
+            db.updateEntry([this.current_entry,this.shape2Entry(),''],terms);
+        } else {
+            this.current_entry = -db.lastEntry(true);
+            db.addTag(this.current_entry,'_mine');
+            db.addEntries([[this.current_entry,terms.join("^"),this.shape2Entry(),'']]);
+        }
     },
     general_transforms: {
         'rotate':function(key,rot) {

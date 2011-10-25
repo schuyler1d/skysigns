@@ -1,3 +1,8 @@
+/*
+  Store last updated
+  update is a request with a last-updated and then we get 
+    replacements, deletions, new signs
+*/
 function SkyDB(){}
 if (window.openDatabase) {
     SkyDB.prototype = {
@@ -22,12 +27,29 @@ if (window.openDatabase) {
                               });
             });
         },
+        updateEntry:function(cols,terms,callback) {
+            var self = this;
+            callback = callback || function(){};
+            this.db.transaction(function(tx) {
+                cols.push(cols[0]);
+                tx.executeSql("UPDATE entries VALUES (?,?,?) WHERE entry=?", cols,
+                   function(tx,res) {
+                       callback({'type':"entry",'results':res});
+                   }, self.errback(callback));
+                tx.executeSql("DELETE terms WHERE entry=?", cols[0],
+                   function(tx,res) {
+                       self._addTerms(tx, cols[0], terms, callback);
+                   }, self.errback(callback));
+            });
+        },
+        _addTerms:function(tx,entry,terms,callback) {
+            for (var t=0;t<terms.length;t++) {
+                tx.executeSql('INSERT INTO terms VALUES (?,?)',[entry,terms[t]]);
+            }
+        },
         _addEntry:function(tx,cols,callback,i) {
             //cols=[id,terms,code,text]
-            var terms = cols[1].split('^');
-            for (var t=0;t<terms.length;t++) {
-                tx.executeSql('INSERT INTO terms VALUES (?,?)',[cols[0],terms[t]]);
-            }
+            this._addTerms(tx, cols[0], cols[1].split('^'), callback);
             tx.executeSql('INSERT INTO entries VALUES (?,?,?)',[cols[0],cols[2],cols[3]],
 			  function() { 
 			      callback({'index':i,'type':"dict",'item':cols}); 
@@ -43,9 +65,14 @@ if (window.openDatabase) {
 		    }
 		});
         },
+        lastEntry:function(add) {
+            var val = parseInt(localStorage['lastEntry']) || 0;
+            if (add) localStorage['lastEntry'] = (++val);
+            return val;
+        },
 	errback:function(cb) {
 	    return function(tx, err) {
-		cb({log:'db error',error:err});
+		cb({log:'db error',error:err,'tx':tx});
 	    }
 	},
         addShapes:function(shapes,callback,i) {
@@ -189,7 +216,8 @@ if (window.openDatabase) {
                                   var len = res.rows.length;
                                   cb({'type':"tag",
                                       'total':len,
-                                      'item':len && res.rows.item(0)
+                                      'item':len && res.rows.item(0),
+                                      'results':res
                                      }); });
             });
         },
