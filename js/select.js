@@ -69,7 +69,9 @@ Composer.prototype = {
         if (shobj && m) {
             var section = m[1], 
                 field = this.name,
-                val = ((this.checked === false) ? '' :$(this).val());
+            //this.value for buttons
+                val = ((this.type === 'checkbox' && this.checked === false) 
+                       ? '' : $(this).val());
             if (field=='delete') {
                 return self.deleteGlyph();
             }
@@ -402,12 +404,19 @@ Composer.prototype = {
             ]
         },
         'motion':{
-            'size':30, 'ranges':['21400','2f7ff'],
+            'size':40, 'ranges':['21400','2f7ff'],
             "transforms":{
-                'rotate':function(key,rot){return this.general_transforms['rotate'](key,rot);},
-                'hand':function(key,hand){
+                'rotate':function(key,rot) {
+                    return this.general_transforms['rotate'](key,rot);
+                },
+                'hand':function(key,hand) {
                     var h = {'left':0,'right':1,'both':2};
                     return (key.substr(0,3)+h[hand]+key.substr(4,1));
+                },
+                'shiftsymbol':function(key,dir,orig_key) {
+                    dir =  ((dir=='back') ? -1 : 1 );
+                    var c = parseInt(key[2],16)+dir;
+                    return key.substr(0,2)+c.toString(16)[0]+key.substr(3);
                 }
             },
             'first': [
@@ -416,22 +425,32 @@ Composer.prototype = {
                    round, full circle, twist axis
                    straight,round,jagged,toward/away from body,arm,wrist,finger
                  */
-                ['','22a00','22b00','22a14'],
-                ['','26500'],
-                ['','28900'],
-                ['','2b700'],
-                ['','2e300'],
-                ['','2e700'],
-                ['','2d500'],
-                ['','29a00'],
-                ['','2a200'],
-                ['','2a800'],
+                ['up','22a00','22b00','22a14'],
+                ['forward','26500'],
+                ['diagonal','26100'],
+                ['wrist flex','26900'],
+                ['repeated','26a00',/*to*/'27200'],
+                ['','27300'],
+                ['','28000'],
+                ['wrist/arm twist','28100'],
+                ['','24b00'],
                 ['','24200'],
-                ['','2e300'],
+                ['','28800'],
+                ['','29000'],
+                ['','29a00'],
+                ['','2e300'],//looks like 29a00
+                ['','2a200'],
+                ['g','2b000'],
+                ['from/to body','2b700'],
+                ['h','2c000'],
+                ['i','2d000'],
+                ['p','2d500'],
+                ['j','2e000'],
+                ['o','2e700'],
                 ['finger swirl','2f100'],
-                ['curl','21600'],
+                ['curl finger','21600'],
                 ['uncurl finger','21b00'],
-                ['bend fingers together','22104'], //multiple,rotate
+                ['bend fingers together','22104'],
                 ['piano fingers','22520']
             ]
         },
