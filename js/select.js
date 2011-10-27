@@ -1,5 +1,6 @@
 /*
 TODO:
+  0. List 'my additions' -- maybe right by upload 
   1. FEATURE: add 'copy' -- since duplicating is common
   2. upload: choose username, region
       - 'after curation, we'd like to be able to potentially 
@@ -48,6 +49,9 @@ Composer.prototype = {
         jQuery('.composer-select-header','#composer-page').click(function() {
             self.selectSection(String(this.parentNode.id).match(/^\w+/)[0]);
         });
+        $('#compose-term').change(function(){self.isSavable()});
+        $('#composer-save').click(function(){self.saveGlyph()});
+        
         return this;
     },
     switchMode:function(mode) {
@@ -98,6 +102,7 @@ Composer.prototype = {
                 'y':evt.pageY-pos.top 
             };
             self.repaintCanvas();
+            self.isSavable();
         }
     },
     repaintCanvas:function() {
@@ -261,6 +266,19 @@ Composer.prototype = {
         this.current_shape = new_shape;
         $(dom).addClass('ui-btn-active')
         this.switchShown(form_css);
+    },
+    isSavable:function() {
+        var hasshapes=false;
+        for (var a in this.current_shapes) { 
+            hasshapes=true; break; 
+        }
+        if (hasshapes && /\w+/.test($('#compose-term').val())) {
+            $('#composer-save').button('enable');
+            return true;
+        } else {
+            $('#composer-save').button('disable');
+            return false;
+        }
     },
     saveGlyph:function() {
         //do i have an entry_id?

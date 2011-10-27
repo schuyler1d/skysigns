@@ -32,11 +32,11 @@ if (window.openDatabase) {
             callback = callback || function(){};
             this.db.transaction(function(tx) {
                 cols.push(cols[0]);
-                tx.executeSql("UPDATE entries VALUES (?,?,?) WHERE entry=?", cols,
+                tx.executeSql("UPDATE entries SET entry=?,shapes=?,txt=? WHERE entry=?", cols,
                    function(tx,res) {
                        callback({'type':"entry",'results':res});
                    }, self.errback(callback));
-                tx.executeSql("DELETE terms WHERE entry=?", cols[0],
+                tx.executeSql("DELETE FROM terms WHERE entry=?", [cols[0]],
                    function(tx,res) {
                        self._addTerms(tx, cols[0], terms, callback);
                    }, self.errback(callback));
@@ -49,6 +49,7 @@ if (window.openDatabase) {
         },
         _addEntry:function(tx,cols,callback,i) {
             //cols=[id,terms,code,text]
+            callback = callback || function(){};
             this._addTerms(tx, cols[0], cols[1].split('^'), callback);
             tx.executeSql('INSERT INTO entries VALUES (?,?,?)',[cols[0],cols[2],cols[3]],
 			  function() { 
@@ -72,6 +73,8 @@ if (window.openDatabase) {
         },
 	errback:function(cb) {
 	    return function(tx, err) {
+                console.log('errback');
+                console.log(err);
 		cb({log:'db error',error:err,'tx':tx});
 	    }
 	},
