@@ -43,10 +43,15 @@ SkyInterface.prototype = {
             });
         });
         $('#composer-page').live('pagebeforeshow',function(event,ui){
+            console.log('onbeforepage');
             if (self.composer)
                 self.composer.switchMode(self.composer_mode);
         });
-
+        $('#signdisplay-edit-link').click(function() {
+            console.log('onclick');
+            self.composer_mode = 'composer';
+            self.composer.loadEntry(self.current_entry);
+        });
         jQuery('#ajaxtest button').click(this.ajax);
 	try { // this will fail if openDatabase returns NULL
 	    this.checkloaded();
@@ -101,7 +106,8 @@ SkyInterface.prototype = {
     },
     showTerm:function(entry) {
         var self = this;
-        self.viewer.clear();//remove any previous sign
+        this.viewer.clear();//remove any previous sign
+        this.current_entry = entry;
         this.dict.getEntry(entry,function(x) {
 	    switch(x.type) {
             case 'entry': 

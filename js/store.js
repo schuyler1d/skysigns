@@ -13,19 +13,30 @@ if (window.openDatabase) {
                              );
             });
         },
-        getEntry:function(entry,cb) {
+        getEntry:function(entry,cb,opts) {
             this.db.transaction(function(tx) {
                 tx.executeSql("SELECT * FROM entries WHERE entry=?",[entry],
-                              function(tx,res) { cb({'type':"entry",'item':res.rows.item(0)}); });
+                   function(tx,res) { cb({'type':"entry",'item':res.rows.item(0)}); });
                 tx.executeSql("SELECT * FROM terms WHERE entry=?",[entry],
-                              function(tx,res) { 
-                                  var terms = [];
-                                  for (var i=0;i<res.rows.length;i++) {
-                                      terms.push(res.rows.item(i).term);
-                                  }
-                                  cb({'type':"terms",'item':terms,'results':res}); 
-                              });
+                   function(tx,res) { 
+                       var terms = [];
+                       for (var i=0;i<res.rows.length;i++) {
+                           terms.push(res.rows.item(i).term);
+                       }
+                       cb({'type':"terms",'item':terms,'results':res}); 
+                   });
+                if (opts && opts.tags) {
+                   tx.executeSql("SELECT * FROM tags WHERE entry=?",[entry],
+                      function(tx,res) { 
+                          var tags = [];
+                          for (var i=0;i<res.rows.length;i++) {
+                              tags.push(res.rows.item(i));
+                          }
+                          cb({'type':"tags",'item':tags,'results':res}); 
+                      });
+                }
             });
+
         },
         updateEntry:function(cols,terms,callback) {
             var self = this;
