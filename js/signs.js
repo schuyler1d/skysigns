@@ -37,20 +37,19 @@ SkyInterface.prototype = {
             /* This could be run every time, but we set data-dom-cache="true" in html,
                so we don't re-render all the glyphs if someone loads this page.
              */
-            jQuery.getScript('js/select.js',function() {
-                self.composer = new Composer().init(self);
-                self.composer.switchMode(self.composer_mode);
-            });
+            self.initComposer();
         });
         $('#composer-page').live('pagebeforeshow',function(event,ui){
-            console.log('onbeforepage');
-            if (self.composer)
-                self.composer.switchMode(self.composer_mode);
+            self.initComposer(function() {
+                if (self.edit_current_entry) {
+                    self.composer.loadEntry(self.edit_current_entry);
+                    self.edit_current_entry = null;
+                } 
+            });
         });
         $('#signdisplay-edit-link').click(function() {
-            console.log('onclick');
             self.composer_mode = 'composer';
-            self.composer.loadEntry(self.current_entry);
+            self.edit_current_entry = self.current_entry;
         });
         jQuery('#ajaxtest button').click(this.ajax);
 	try { // this will fail if openDatabase returns NULL
@@ -67,6 +66,19 @@ SkyInterface.prototype = {
 
 	debug.end();
         return this;
+    },
+    initComposer:function(cb) {
+        var self = this;
+        if (this.composer) {
+            this.composer.switchMode(this.composer_mode);
+            if (cb) cb();
+        } else {
+            jQuery.getScript('js/select.js',function() {
+                self.composer = new Composer().init(self);
+                self.composer.switchMode(self.composer_mode);
+                if (cb) cb();
+            });
+        }
     },
     debug:function() {
 	var self = this;

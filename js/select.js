@@ -175,6 +175,7 @@ Composer.prototype = {
         $('#current-shapes').empty();
         this.current_shapes = [];
         this.current_shape = null;
+        $('#compose-term').val('');
     },
     loadEntry:function(entry) {
         var self = this;
@@ -206,7 +207,8 @@ Composer.prototype = {
         var shobj = {}; for (var a in opts) {shobj[a]=opts[a];}
         shobj.key = sym[1];
         shobj.orig_key = sym[1];
-        var li = jQuery("<div class='glyph'>").appendTo(list).get(0);
+        var li = jQuery("<div class='glyph'>")
+            .attr('data-glyph',shobj.key).appendTo(list).get(0);
         li.id = 'composer-glyph-'+(++self.id_suffix);
         if (sym[2] == 'only-help') $(li).addClass('only-help');
         if (sym[0]) $("<span>").appendTo(li).text(sym[0]);
@@ -301,7 +303,7 @@ Composer.prototype = {
     },
     general_transforms: {
         'rotate':function(key,rot) {
-            if (rot==='rotate') rot = false;
+            if (typeof rot==='string') rot = false;
             var cur_rot = parseInt(key[4],16);
             var cur = parseInt(cur_rot / 8,10);
             //if no rot val, then shift-rotate 45deg
@@ -361,9 +363,13 @@ Composer.prototype = {
         },
         'context':{//head,trunk,limb
             'size':50, 'ranges':['2ff00','37eff'],
+            'transforms': {
+                'shiftsymbol':function(key,rot){return this.general_transforms['rotate'](key,rot);}
+            },
             "first":[
                 //grep '^\(2ff\|30\)' entry_deps.txt  |head
                 ['head','2ff00'],
+                ['arms','37600'],
                 ['trunk','36d00'],
                 ['chin','30004'],
                 ['temple','30007'],
