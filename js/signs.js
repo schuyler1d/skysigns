@@ -33,6 +33,10 @@ SkyInterface.prototype = {
                 self.search(this.value);
         });
 
+        if (localStorage['config_edit_allowed']) {
+            jQuery(document.body).addClass('edit_allowed');
+        }
+
         $('#composer-page').live('pagecreate',function(event,ui){
             /* This could be run every time, but we set data-dom-cache="true" in html,
                so we don't re-render all the glyphs if someone loads this page.

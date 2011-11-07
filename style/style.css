@@ -162,3 +162,13 @@ div.mode-composer .only-help,
     }
 
 }
+
+.only_edit_allowed
+{ 
+  display:none;
+ }
+
+body.edit_allowed .only_edit_allowed
+{ 
+  display:block;
+ }

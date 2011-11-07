@@ -41,7 +41,8 @@
                      style="float:left;margin-right:10px;margin-bottom:1.5em;"></div>
                 Click the star in the upper right anywhere to see the SignWriting Cheatsheet!
             </li>
-            <li><a href="composer.html" 
+            <li class="only_edit_allowed"
+                ><a href="composer.html" 
                  onclick="si.composer_mode = 'composer';"
                  data-rel="dialog" style="clear:both;">Create new signs</a>
             </li>
@@ -65,7 +66,7 @@
       <div data-role="content" style="background-color:white;"> 
         <div id="text"></div>
         <canvas id="canvas" width="300" height="400"></canvas>
-        <div id="signdisplay-controls">
+        <div class="only_edit_allowed" id="signdisplay-controls">
           <a id="signdisplay-edit-link" href="composer.html" data-rel="dialog">edit</a>
         </div>
       </div> <!-- /content signdisplay -->
