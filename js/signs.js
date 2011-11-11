@@ -37,12 +37,6 @@ SkyInterface.prototype = {
             jQuery(document.body).addClass('edit_allowed');
         }
 
-        $('#composer-page').live('pagecreate',function(event,ui){
-            /* This could be run every time, but we set data-dom-cache="true" in html,
-               so we don't re-render all the glyphs if someone loads this page.
-             */
-            self.initComposer();
-        });
         $('#composer-page').live('pagebeforeshow',function(event,ui){
             self.initComposer(function() {
                 if (self.edit_current_entry) {

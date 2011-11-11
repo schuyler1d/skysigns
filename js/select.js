@@ -42,7 +42,7 @@ Composer.prototype = {
         this.view = new si.opts.viewer().init(null, 'composer-canvas');
         this.repaintCanvas();
         jQuery('#composer-canvas').mousedown({self:this}, this.placeGlyph);
-        var x = jQuery('input,select','form.composer-custom')
+        jQuery('input,select','form.composer-custom')
             .change({self:this}, this.customListener)
             .click({self:this}, this.customListener)//for buttons
         //for mode-help
