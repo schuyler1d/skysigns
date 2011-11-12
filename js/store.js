@@ -206,8 +206,8 @@ if (window.openDatabase) {
             this.tagQuery({entry:entry,tag:tag}, function(res) {
                 if (!res.total) {
                     self.db.transaction(function(tx) {
-                        tx.executeSql('INSERT INTO tags VALUES (?,?,?)',
-                                      [entry,tag,extra||null],
+                        tx.executeSql('INSERT INTO tags VALUES (?,?,?,?)',
+                                      [entry,tag,extra||null,0],
                                       callback,self.errback(callback));
                     });
                 }
@@ -296,9 +296,11 @@ if (window.openDatabase) {
                 tx.executeSql('CREATE TABLE IF NOT EXISTS tags ( '
                               +'entry INTEGER,'
                               +'tag TEXT,'
-                              +'extra TEXT'
+                              +'extra TEXT,'
+                              +'synced INTEGER'//boolean: synced with server
                               +')'
                              );
+              //TODO: alter column add tags.synced if not exists
 
             });
         }
