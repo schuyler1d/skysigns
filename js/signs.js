@@ -111,6 +111,14 @@ SkyInterface.prototype = {
             if (r.length===1 || autoshow && r.length) {
                 self.showTerm(r.item(0).entry);
             }
+            if (r.length===0) {
+              var extra = '';
+              if (self.server_connection) {
+                extra = '<p class="" style="margin-top:1em;"><a href="#" onclick="si.requestTerm('
+                  +q+');">Request dictionary addition</a></p>';
+              }
+              $(dom).append('<li>No results found.'+extra+'</li>');       
+            }
             $(dom).listview('refresh');
         });
     },
@@ -365,6 +373,7 @@ window.initSkyS = function() {
     jQuery('#error').append('<li>location: '+document.location+'</li>');
     window.si.init(window.ss,window.sd,{
         base_path:'',
+        is_mobile:(document.location.protocol==='file:'),
         remote_path:((document.location.protocol==='file:')
                      ? 'http://skyb.us/static/signlanguage/v1/'
                      : ''),
