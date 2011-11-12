@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"> 
+      <meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<title>Community</title> 
+	<link rel="stylesheet"  href="jquery-mobile/jquery.mobile.css" />  
+	<link rel="stylesheet"  href="style/style.css" />  
+	<script src="js/jquery.min.js"></script> 
+	<script src="jquery-mobile/jquery.mobile.js"></script> 
+	<script src="jquery-mobile/scrollview/jquery.mobile.scrollview.js"></script> 
+  </head>
+  <body>
+    <!-- do not put @ID here or we lose state! -->
+    <div data-role="page" data-theme="d"> 
+      <div data-role="header" data-position="fixed"> 
+	<h1>Community</h1>
+      </div> <!--/header-->
+      <div data-role="content"> 
+        <div class="content-primary"> 
+          <ul id="" data-role="listview">
+            <li data-role="fieldcontain">
+              <label for="flip-c">Compose/Edit Features:</label>
+              <select name="slider" id="flip-c" data-role="slider" 
+                      data-theme="a">
+		<option value="">Disabled</option>
+		<option value="enable">Enable</option>
+              </select> 
+              <p style="margin-top:1em;white-space:normal;">Terms &amp; Conditions: You allow us and the world to store, alter, and share
+              (after curation) the signs you compose, so we can improve
+              the dictionary for everyone.
+              <br />
+              No warranties or guarantees of any kind, express or implied.
+              </p>
+            </li>
+            <li>Newest Signs
+               <ol id="comm-newest">
+                 <li>correct, incorrect, unclear, redundant, (comment)</li>
+               </ol>
+            </li>
+            <li>Requested Signs
+               <ol id="comm-requestedsigns">
+                 <li>(if enabled, show 'edit' button)</li>
+               </ol>
+            </li>
+            <li>Top Contributors
+               <ol id="comm-contributors">
+                 <li>foo</li>
+               </ol>
+            </li>
+            <li>Sharing/My Info
+               <ul id="comm-myinfo">
+                 <li>
+                   <label for="comm-username">Name/Alias</label>
+                   <input id="comm-username" type="text" name="username" value="" class="ui-bar-c" />
+                 </li>
+                 <li>
+                   <label for="comm-password">Password</label>
+                   <input id="comm-password" type="password" name="password" value="" class="ui-bar-c" />
+                 </li>
+                 <li>Region (state/country)
+                 </li>
+                 <li data-role="list-divider" >Optional</li>
+                 <li>
+                   <label for="comm-email">Email</label>
+                   <input id="comm-email" type="email" name="email" value="" class="ui-bar-c" />
+                 </li>
+                 <li>
+                   <select id="comm-deafness">
+                     <option value="deafness" selected="selected" 
+                             data-placeholder="true">deafness</option>
+                     <option value="hearing">hearing</option>
+                     <option value="hh">hard-of-hearing</option>
+                     <option value="deaf">deaf</option>
+                   </select>
+                 </li>
+                 <li>
+                   <select id="comm-deafness">
+                     <option value="asl" selected="selected" 
+                             data-placeholder="true">Deafness</option>
+                     <option value="native">native</option>
+                     <option value="fluent">fluent</option>
+                     <option value="intermediate">intermediate</option>
+                     <option value="beginner">beginner</option>
+                   </select>
+                 </li>
+               </ul>
+            </li>
+            <li>
+              My Entries
+               <ol id="comm-myentries">
+                 <li>foo</li>
+               </ol>
+            </li>
+          </ul>
+        </div><!--/content-primary -->		
+      </div><!-- /content --> 
+    </div><!-- /page  --> 
+    <!--script async src="http://debug.phonegap.com/target/target-script-min.js#sksky"></script-->
+  </body>
+</html>
