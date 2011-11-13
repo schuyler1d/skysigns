@@ -17,12 +17,26 @@ SkyInterface.prototype = {
         this.db = new SkyDB().open(progress);
         this.dict = dict.open(this.db,opts);
         this.signs = signs.open(this.db,opts);
-        if (opts.loadpaths) {
-            setTimeout(function() { self.signs.loadPaths(progress); },100);
-        }
-	this.loadinterface();
         this.viewer = new opts.viewer().init(debug.onviewer,'canvas');
 
+	this.loadInterface(); //interface to load data
+        this.initListeners();
+
+        if (localStorage['config_edit_allowed']) {
+            jQuery(document.body).addClass('edit_allowed');
+        }
+
+	if (document.location.search) {
+	    setTimeout(function() {
+		    self.search(document.location.search.substr(1),true);
+		},1000)
+	}
+
+	debug.end();
+        return this;
+    },
+    initListeners:function() {
+        var self = this;
         jQuery(document.forms.wordsearch).submit(function(evt) {
             evt.preventDefault();
             self.search(this.elements['q'].value,true);
@@ -32,10 +46,6 @@ SkyInterface.prototype = {
             if (this.value.length > 1)
                 self.search(this.value);
         });
-
-        if (localStorage['config_edit_allowed']) {
-            jQuery(document.body).addClass('edit_allowed');
-        }
 
         $('#composer-page').live('pagebeforeshow',function(event,ui){
             self.initComposer(function() {
@@ -55,15 +65,7 @@ SkyInterface.prototype = {
 	} catch(e) {
 	    jQuery('#error').append('<li>e:'+e.message+'</li>');
 	}
-
-	if (document.location.search) {
-	    setTimeout(function() {
-		    self.search(document.location.search.substr(1),true);
-		},1000)
-	}
-
-	debug.end();
-        return this;
+        
     },
     initComposer:function(cb) {
         var self = this;
@@ -86,7 +88,7 @@ SkyInterface.prototype = {
 	    'onviewer':function() {}
 	}
     },
-    loadinterface:function() {
+    loadInterface:function() {
 	var loads = {signs:1,dict:1};
 	var self = this;
 	var progress = function(x){return self.progress(x);};
@@ -103,15 +105,15 @@ SkyInterface.prototype = {
         var self = this;
         this.dict.searchTerms(q,function(x) {
             var dom = $('#results').empty().get(0);
-            var t,r = x.results.rows;
-            for (var i=0,l=r.length;i<l;i++) {
-                t = r.item(i);
+            var t,rows = x.item;
+            for (var i=0,l=rows.length;i<l;i++) {
+                t = rows[i]
                 $(dom).append('<li><a href="#" onclick="si.showTerm('+t.entry+');">'+t.term+'</a></li>');
             }
-            if (r.length===1 || autoshow && r.length) {
-                self.showTerm(r.item(0).entry);
+            if (rows.length===1 || autoshow && rows.length) {
+                self.showTerm(rows[0].entry);
             }
-            if (r.length===0) {
+            if (rows.length===0) {
               var extra = '';
               if (self.server_connection) {
                 extra = '<p class="" style="margin-top:1em;"><a href="#" onclick="si.requestTerm('
@@ -342,9 +344,15 @@ SkySigns.prototype = {
 
 function SkyDictionary(){}
 SkyDictionary.prototype = {
-    open:function(db,opts){ this.db=db; this.opts=opts; return this; },
+    open:function(db,opts){ 
+        this.db=db; 
+        this.opts=opts; 
+        return this; 
+    },
     searchTerms:function(q,cb) { this.db.searchTerms(q,cb); },
-    getEntry:function(entry,cb) { this.db.getEntry(entry,cb); },
+    getEntry:function(entry,cb) { 
+        this.db.getEntry(entry,cb); 
+    },
     loaded:function(cb) { this.db.count(cb); },
     load:function(cb) {
         var self = this;

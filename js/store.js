@@ -4,12 +4,21 @@
     replacements, deletions, new signs
 */
 function SkyDB(){}
+SkyDB.prototype = {
+    open:function(){return null}
+};
 if (window.openDatabase) {
     SkyDB.prototype = {
         searchTerms:function(q,cb) {
             this.db.transaction(function(tx) {
                 tx.executeSql("SELECT * FROM terms WHERE term LIKE (?||'%') ORDER BY term",[q],
-                              function(tx,res) { cb({'results':res,'type':"terms"}); }
+                              function(tx,res) { 
+                                  var terms = [];
+                                  for (var i=0;i<res.rows.length;i++) {
+                                      terms.push(res.rows.item(i));
+                                  }
+                                  cb({'type':"terms",'item':terms,'results':res}); 
+                              }
                              );
             });
         },
@@ -300,8 +309,8 @@ if (window.openDatabase) {
                               +'synced INTEGER'//boolean: synced with server
                               +')'
                              );
-              //TODO: alter column add tags.synced if not exists
-
+                //legacy for if it didn't have a synced column 
+                //tx.executeSql('ALTER TABLE tags ADD synced INTEGER');
             });
         }
     };
