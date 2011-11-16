@@ -5,7 +5,8 @@
 */
 function SkyDB(){}
 SkyDB.prototype = {
-    open:function(){return null}
+    open:function() { return null },
+    loaded:function(cb) { cb(0) }
 };
 if (window.openDatabase) {
     SkyDB.prototype = {

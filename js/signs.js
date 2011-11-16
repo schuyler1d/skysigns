@@ -15,8 +15,10 @@ SkyInterface.prototype = {
         debug.begin();
         this.opts = opts;
         this.db = new SkyDB().open(progress);
-        this.dict = dict.open(this.db,opts);
-        this.signs = signs.open(this.db,opts);
+        jQuery.getScript('js/server.js',function() {        
+            self.dict = dict.open(self.db,opts);
+            self.signs = signs.open(self.db,opts);
+        });
         this.viewer = new opts.viewer().init(debug.onviewer,'canvas');
 
 	this.loadInterface(); //interface to load data
@@ -209,7 +211,7 @@ SkySigns.prototype = {
     getShape:function(key, cb) {
         var self = this;
         var rv = {'key':key};
-        this.db.getShape(key,function(table,s) {
+        var process_shape = function(table, s) {
             var shape = s.data;
             if (shape) {
             	var sparts = shape.split('$');
@@ -220,7 +222,12 @@ SkySigns.prototype = {
             } else {
                 cb(rv);
             }
-        });
+        }
+        if (key in this.shapes) {
+            process_shape(null, {'data':this.shapes[key]})
+        } else {
+            this.db.getShape(key,process_shape);
+        }
     },
     marshallPaths:function(path_ids,cb) {
         var len = path_ids.length,
@@ -289,8 +296,12 @@ SkySigns.prototype = {
         }
         return rv;
     },
-    open:function(db,opts){ this.db=db; this.opts=opts; this.paths = new Array(30602);
-                            return this; },
+    open:function(db,opts){ 
+        this.db=db; this.opts=opts; 
+        this.paths = new Array(30602);
+        this.shapes = {};
+        return this; 
+    },
     load:function(cb){ this.db.create(); this.loadShapes(cb); this.loadPathsDB(cb); },
     loaded:function(cb){ this.db.haveShapes(cb); this.db.havePaths(cb); },
     loadPaths:function(cb) {
@@ -381,7 +392,10 @@ window.initSkyS = function() {
     jQuery('#error').append('<li>location: '+document.location+'</li>');
     window.si.init(window.ss,window.sd,{
         base_path:'',
-        is_mobile:(document.location.protocol==='file:'),
+        //0=none, 1=accessible, 2=primary
+        server:((document.location.protocol==='file:')
+                ? 1 : 2 
+               ),
         remote_path:((document.location.protocol==='file:')
                      ? 'http://skyb.us/static/signlanguage/v1/'
                      : ''),
