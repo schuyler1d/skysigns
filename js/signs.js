@@ -119,7 +119,7 @@ SkyInterface.prototype = {
               var extra = '';
               if (self.server_connection) {
                 extra = '<p class="" style="margin-top:1em;"><a href="#" onclick="si.requestTerm('
-                  +q+');">Request dictionary addition</a></p>';
+                  +escape(q)+');">Request dictionary addition</a></p>';
               }
               $(dom).append('<li>No results found.'+extra+'</li>');       
             }
@@ -142,6 +142,10 @@ SkyInterface.prototype = {
             }
         });
         $.mobile.changePage('#signdisplay');
+    },
+    requestTerm:function(escaped_q) {
+      //1. add to request database/call the server (or queue to sync)
+      //2. alert(ok)
     },
     checkloaded:function() {
         var self = this;

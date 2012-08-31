@@ -172,3 +172,9 @@ body.edit_allowed .only_edit_allowed
 { 
   display:block;
  }
+
+/*jquery-mobile 1.1.1 workarounds*/
+.ui-header .ui-fullsize .ui-btn-inner {
+    /*X button that appears during a search misplaces the X icon*/
+    padding:0;
+}
