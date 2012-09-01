@@ -47,6 +47,11 @@ SkyInterface.prototype = {
         jQuery('#q').live('input',function(evt) {
             if (this.value.length > 1)
                 self.search(this.value);
+        }).live('change', function(evt) {
+          //when the field is cleared
+          if (this.value.length === 0) {
+            $('#results').empty();
+          }
         });
 
         $('#composer-page').live('pagebeforeshow',function(event,ui){
