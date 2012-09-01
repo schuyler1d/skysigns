@@ -1,6 +1,10 @@
 /*
 TODO: 
-  1. connect initial paths file with shapes file and confirm that they're
+ * load paths, shapes, dict into django
+ * determine when 
+ * server interface
+
+  x. connect initial paths file with shapes file and confirm that they're
       the same version (or path should include a version)
  */
 
@@ -396,28 +400,29 @@ window.ss = new SkySigns();
 window.sd = new SkyDictionary();
 window.si = new SkyInterface();
 
-window.initSkyS = function() {
+if (document.location.protocol==='file:') {
+  //settings for mobile
+  window.initSkyS = function() {
     //jQuery('#error').append('<li>db_orig:'+window.openDatabase_orig+'</li>');
     jQuery('#error').append('<li>location: '+document.location+'</li>');
     window.si.init(window.ss,window.sd,{
         base_path:'',
-        //0=none, 1=accessible, 2=primary
-        server:((document.location.protocol==='file:')
-                ? 1 : 2 
-               ),
-        remote_path:((document.location.protocol==='file:')
-                     ? 'http://skyb.us/static/signlanguage/v1/'
-                     : ''),
+        server:1, //0=none, 1=accessible, 2=primary
+        remote_path:'http://skyb.us/static/signlanguage/v1/',
         storage:{ paths:'sql', shapes:'sql' },
         viewer:CanvgViewer, //for android 2.3-
         loadpaths:false
     });
-}
-if (window.PhoneGap) { //is not currently working.  why not?
-    PhoneGap.onDeviceReady.subscribeOnce(window.initSkyS);
+  }
+  if (window.PhoneGap) { //is not currently working.  why not?
+      PhoneGap.onDeviceReady.subscribeOnce(window.initSkyS);
+  } else {
+      jQuery(document).bind('mobileinit',initSkyS);
+  }
 } else {
-    jQuery(document).bind('mobileinit',initSkyS);
+    jQuery.getScript('config.js')
 }
+
 jQuery(window).bind('load',function() {
     $('#q').focus();
 });
