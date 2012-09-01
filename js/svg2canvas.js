@@ -77,7 +77,6 @@ CanvgViewer.prototype = {
         ctx = ctx || this.ctx;
         var w = ctx.canvas.width = ctx.canvas.width;
         if (this.ctx == ctx) this.w=w;
-        ctx.save();
     },
     clear:function(ctx) {
         ctx = ctx || this.ctx;
@@ -85,7 +84,6 @@ CanvgViewer.prototype = {
         if (this.ctx == ctx) this.w=w;
         ctx.translate(w/2,w/2);
         ctx.scale(1.5,1.5);
-        ctx.save();
     },
     _transform:SvgNormal.prototype._transform,
     createContext:function(domparent,w,h) {

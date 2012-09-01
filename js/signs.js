@@ -404,7 +404,7 @@ window.initSkyS = function() {
                      ? 'http://skyb.us/static/signlanguage/v1/'
                      : ''),
         storage:{ paths:'sql', shapes:'sql' },
-        viewer:CanvgViewer,
+        viewer:CanvgViewer, //for android 2.3-
         loadpaths:false
     });
 }
