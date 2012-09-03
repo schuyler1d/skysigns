@@ -12,6 +12,8 @@ function SkyInterface(){}
 SkyInterface.prototype = {
     composer_mode:'help',
     init:function(signs,dict,opts) {
+      $.mobile.selectmenu.prototype.options.hidePlaceholderMenuItems = false;
+
         var self = this;
         ///func.bind() NOT supported in 1.5 android!
 	var progress = function(x){return self.progress(x);};
@@ -400,7 +402,7 @@ window.ss = new SkySigns();
 window.sd = new SkyDictionary();
 window.si = new SkyInterface();
 
-if (document.location.protocol==='file:') {
+if (document.location.protocol==='file:' || document.location.host ==='localhost') {
   //settings for mobile
   window.initSkyS = function() {
     //jQuery('#error').append('<li>db_orig:'+window.openDatabase_orig+'</li>');

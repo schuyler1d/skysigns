@@ -178,3 +178,5 @@ body.edit_allowed .only_edit_allowed
     /*X button that appears during a search misplaces the X icon*/
     padding:0;
 }
+
+div.community .ui-field-contain div.ui-slider-switch { width: 9em }

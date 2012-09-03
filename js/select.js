@@ -30,11 +30,12 @@ Composer.prototype = {
     modes:['help','composer'],
     init:function(si) {
         var self = this;
+      $.mobile.selectmenu.prototype.options.hidePlaceholderMenuItems = false;
         this.si = si;
         this.mode = 'help';
         jQuery('#composer-add').change(function(evt,ui) {
             var section = $(this).val();
-            $(this).val('Add').selectmenu('refresh');
+            $(this).val('').selectmenu('refresh');
             setTimeout(function() {
                 self.selectSection(section);
             },100);
