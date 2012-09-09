@@ -1,15 +1,15 @@
-1st release:
-------------
-1. better help
-2. turn off composer for now
-4. a way to force (re)load of shapes data and database
-   or optional: 
-     'update your shapes data for new features!'
-
-2nd release
------------
-1. composer
-2. 
+0. edit interface loading/exiting
+   clicking on symbol switches to correct choices
+1. DB/Server Sync /get data
+   views for "current_aggregate": newest_signs, requested_signs, top_contributors, 
+             "my_info": updates on requested_signs, my_entries (answers or status)
+2. Editor actions
+   requested signs: mark as "fingerspelled" 
+   mark current signs as: "wrong" "regional" "best (of duplicates)" "old" "signed english"
+                and "add synonyms" 
+   for created signs: "publish", "retract"
+   server must handle "corrections" or maybe just allow 'edits' on "my signs", but allow "copy"
+3. notes field (for 
 
 How does curation work?
   some people are editors?
@@ -30,22 +30,14 @@ Help/Guide:
 
 * skylog()
 * phonegap-deviceready
-* show download progress
 
-* break up paths/shapes/dict into separate files
-* need to import phonegap.js on the various platforms for PhoneGap.File API
 * iPhone? include phonegap storage.js for openDatabase
-* implement flexible storage for paths,shapes so they can be in sql/localStorage/memory
 * display sign within boundary
    example: 'attractive' sign is too tall, 
-            'alseep soundly' too tall cutoff on bottom
+            'asleep soundly' too tall cutoff on bottom (though no longer)
 
-* composer
-  * hand list
 
 PhoneGap/Mobile Issues
 ----------------------
-* Android doesn't support SVG -- need to use canvas
-  http://appsynergy.net/2010/08/14/converting-svg-path-to-html5-canvas/
 * iOS observes the DB quota and seems to hover around 2.75M as the maximum
    -- though I wonder if I'm splitting up my space, and it depends on how much storage is already used up, etc. -- either way, the division between localStorage and webSQL makes sense here, even if it's slower
