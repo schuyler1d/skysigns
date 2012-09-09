@@ -187,8 +187,9 @@ Composer.prototype = {
                 var shs = self.si.signs.ksw2cluster(x.item.shapes);
                 for (var i=0;i<shs.length;i++) {
                     var s = shs[i];
-                    self.editNewShape({key:s.key, 
-                                       section:'hand',
+                    self.editNewShape({key:s.key,
+                                       orig_key:s.key,
+                                       section:self.getSection(s.key),
                                        onload:function(shobj) {
                                            self.repaintCanvas();
                                        }
@@ -202,6 +203,18 @@ Composer.prototype = {
                 $('#compose-term').val(x.item.join(', '));
             }
         });
+    },
+    getSection:function(key) {
+      var keyint = parseInt(key, 16);
+      for (var a in this.sections) {
+        var s = this.sections[a],
+            from = parseInt(s.ranges[0], 16),
+            to = parseInt(s.ranges[1], 16);
+        if (from <= keyint && keyint <= to) {
+          return a;
+        }
+      }
+      return 'hand'; //default
     },
     addShape:function(sym,list,opts) {
         var self = this;
